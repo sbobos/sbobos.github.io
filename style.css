@@ -37,6 +37,25 @@ section {
   border-radius: 10px;
 }
 
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  max-width: 800px;
+  margin: auto;
+}
+
+.skills-grid div {
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+#contact a {
+  color: #38bdf8;
+  text-decoration: none;
+}
+
 #game {
   background: #020617;
 }

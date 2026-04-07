@@ -1,83 +1,129 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <title>Ramadani Portfolio</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+  <head>
+    <title>Ramadani Portfolio</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav>
+      <h2>Portfolio</h2>
+      <div>
+        <a href="#about">About</a>
+        <a href="#experience">Experience</a>
+        <a href="#projects">Projects</a>
+        <a href="#game">Game</a>
+      </div>
+    </nav>
 
-  <nav>
-    <h2>Ramadani</h2>
-    <div>
-      <a href="#about">About</a>
-      <a href="#experience">Experience</a>
-      <a href="#projects">Projects</a>
-      <a href="#game">Game</a>
-    </div>
-  </nav>
+    <section class="hero">
+      <h1>Muhammad Ramadani Cikalananda</h1>
+      <p>Electrical Engineer | AI & Energy Systems</p>
+    </section>
 
-  <section class="hero">
-    <h1>Muhammad Ramadani Cikalananda</h1>
-    <p>Electrical Engineer | AI & Energy Systems</p>
-  </section>
-
-  <section id="about">
-    <h2>About Me</h2>
-    <p>
-      Electrical Engineering Master's student specializing in Artificial Intelligence, 
-      Model Predictive Control, and Energy Systems. Passionate about building intelligent 
-      systems that solve real-world problems, especially in renewable energy and automation.
-    </p>
-  </section>
-
-  <section id="experience">
-    <h2>Experience</h2>
-
-    <div class="card">
-      <h3>Practicum Assistant - Intelligent Biomedical System Lab</h3>
-      <p>Teaching Python, Machine Learning, and Neural Networks using TensorFlow.</p>
-    </div>
-
-    <div class="card">
-      <h3>Research Assistant - ELITIA Laboratory</h3>
-      <p>Worked on Industrial Automation and IoT research projects.</p>
-    </div>
-
-    <div class="card">
-      <h3>Engineer Intern - Teknologi Kendali Semesta</h3>
-      <p>Built lithium battery packs and implemented BMS systems.</p>
-    </div>
-
-  </section>
-
-  <section id="projects">
-    <h2>Highlighted Project</h2>
-
-    <div class="card">
-      <h3>MPC-Based Energy Management System</h3>
+    <section id="about">
+      <h2>About Me</h2>
       <p>
-        Designed an intelligent system for EV battery swap stations using Model Predictive Control.
+        Electrical Engineering Master's student specializing in Artificial
+        Intelligence, Model Predictive Control, and Energy Systems. Passionate
+        about building intelligent systems that solve real-world problems,
+        especially in renewable energy and automation.
       </p>
-      <ul>
-        <li>Reduced waiting time: 40 min → under 5 min</li>
-        <li>Improved efficiency over 10x</li>
-        <li>Handled real-time uncertainty and demand spikes</li>
-      </ul>
-    </div>
+    </section>
 
-    <div class="card">
-      <h3>Achievement</h3>
-      <p>🏆 Best Paper Award - ICSEEA 2026</p>
-    </div>
+    <section id="experience">
+      <h2>Experience</h2>
 
-  </section>
+      <div class="card">
+        <h3>Practicum Assistant - Intelligent Biomedical System Lab</h3>
+        <p>
+          Teaching Python, Machine Learning, and Neural Networks using
+          TensorFlow.
+        </p>
+      </div>
 
-  <section id="game">
-    <h2>Mini Game</h2>
-    <p id="score">Score: 0</p>
-    <button onclick="addScore()">Click me</button>
-  </section>
+      <div class="card">
+        <h3>Research Assistant - ELITIA Laboratory</h3>
+        <p>Worked on Industrial Automation and IoT research projects.</p>
+      </div>
 
-  <script src="game.js"></script>
-</body>
+      <div class="card">
+        <h3>Engineer Intern - Teknologi Kendali Semesta</h3>
+        <p>Built lithium battery packs and implemented BMS systems.</p>
+      </div>
+    </section>
+
+    <section id="projects">
+      <h2>Highlighted Project</h2>
+
+      <div class="card">
+        <h3>MPC-Based Energy Management System</h3>
+        <p>
+          Designed an intelligent system for EV battery swap stations using
+          Model Predictive Control.
+        </p>
+        <ul>
+          <li>Reduced waiting time: 40 min → under 5 min</li>
+          <li>Improved efficiency over 10x</li>
+          <li>Handled real-time uncertainty and demand spikes</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Achievement</h3>
+        <p>🏆 Best Paper Award - ICSEEA 2026</p>
+      </div>
+    </section>
+
+    <section id="publications">
+      <h2>Publications</h2>
+
+      <div class="card">
+        <h3>
+          MPC-Based Energy Management of PV-Integrated Battery Swap Station
+        </h3>
+        <p>
+          Presented at ICSEEA 2026. Proposed a predictive control system for
+          optimizing EV battery swap stations with renewable energy integration.
+        </p>
+        <p><strong>🏆 Best Paper Award</strong></p>
+      </div>
+    </section>
+
+    <section id="skills">
+      <h2>Skills</h2>
+
+      <div class="skills-grid">
+        <div>Python</div>
+        <div>Machine Learning</div>
+        <div>TensorFlow</div>
+        <div>Model Predictive Control</div>
+        <div>IoT Systems</div>
+        <div>Embedded Systems</div>
+        <div>PLC & Industrial Automation</div>
+        <div>Battery Management Systems</div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <p>Bandung, Indonesia</p>
+      <p>Email: your-email@example.com</p>
+      <p>
+        <a
+          href="https://www.linkedin.com/in/muhammad-ramadani-cikalananda"
+          target="_blank"
+        >
+          LinkedIn Profile
+        </a>
+      </p>
+    </section>
+
+    <section id="game">
+      <h2>Mini Game</h2>
+      <p id="score">Score: 0</p>
+      <button onclick="addScore()">Click me</button>
+    </section>
+
+    <script src="game.js"></script>
+  </body>
 </html>
