@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My First Game</title>
+</head>
+<body>
+  <h1>Click the button!</h1>
+  <p id="score">Score: 0</p>
+  <button onclick="addScore()">Click me</button>
+
+  <script>
+    let score = 0;
+    function addScore() {
+      score++;
+      document.getElementById("score").innerText = "Score: " + score;
+    }
+  </script>
+</body>
+</html>
