@@ -1,12 +1,28 @@
 body {
   font-family: Arial;
-  text-align: center;
+  margin: 0;
+  background: #111;
+  color: #fff;
 }
 
 section {
-  padding: 50px;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.hero {
+  background: linear-gradient(135deg, #1e90ff, #00c6ff);
+}
+
+h1 {
+  margin: 0;
+  font-size: 36px;
+}
+
+h2 {
+  margin-bottom: 20px;
 }
 
 #game {
-  background: #f0f0f0;
+  background: #222;
 }
