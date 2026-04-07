@@ -6,34 +6,74 @@
 </head>
 <body>
 
+  <nav>
+    <h2>Ramadani</h2>
+    <div>
+      <a href="#about">About</a>
+      <a href="#experience">Experience</a>
+      <a href="#projects">Projects</a>
+      <a href="#game">Game</a>
+    </div>
+  </nav>
+
   <section class="hero">
     <h1>Muhammad Ramadani Cikalananda</h1>
-    <p>Student | Aspiring Developer</p>
+    <p>Electrical Engineer | AI & Energy Systems</p>
   </section>
 
-  <section>
+  <section id="about">
     <h2>About Me</h2>
     <p>
-      I am a motivated learner with interest in technology, development, and interactive projects.
-      Currently exploring web development and game creation using HTML, CSS, and JavaScript.
+      Electrical Engineering Master's student specializing in Artificial Intelligence, 
+      Model Predictive Control, and Energy Systems. Passionate about building intelligent 
+      systems that solve real-world problems, especially in renewable energy and automation.
     </p>
   </section>
 
-  <section>
+  <section id="experience">
     <h2>Experience</h2>
-    <ul>
-      <li>Practicum / Laboratory Assistant</li>
-      <li>Worked on academic and technical projects</li>
-    </ul>
+
+    <div class="card">
+      <h3>Practicum Assistant - Intelligent Biomedical System Lab</h3>
+      <p>Teaching Python, Machine Learning, and Neural Networks using TensorFlow.</p>
+    </div>
+
+    <div class="card">
+      <h3>Research Assistant - ELITIA Laboratory</h3>
+      <p>Worked on Industrial Automation and IoT research projects.</p>
+    </div>
+
+    <div class="card">
+      <h3>Engineer Intern - Teknologi Kendali Semesta</h3>
+      <p>Built lithium battery packs and implemented BMS systems.</p>
+    </div>
+
   </section>
 
-  <section>
-    <h2>Skills</h2>
-    <p>HTML, CSS, JavaScript (Beginner)</p>
+  <section id="projects">
+    <h2>Highlighted Project</h2>
+
+    <div class="card">
+      <h3>MPC-Based Energy Management System</h3>
+      <p>
+        Designed an intelligent system for EV battery swap stations using Model Predictive Control.
+      </p>
+      <ul>
+        <li>Reduced waiting time: 40 min → under 5 min</li>
+        <li>Improved efficiency over 10x</li>
+        <li>Handled real-time uncertainty and demand spikes</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Achievement</h3>
+      <p>🏆 Best Paper Award - ICSEEA 2026</p>
+    </div>
+
   </section>
 
   <section id="game">
-    <h2>My Game</h2>
+    <h2>Mini Game</h2>
     <p id="score">Score: 0</p>
     <button onclick="addScore()">Click me</button>
   </section>

@@ -1,8 +1,23 @@
 body {
-  font-family: Arial;
   margin: 0;
-  background: #111;
-  color: #fff;
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  background: #020617;
+  position: sticky;
+  top: 0;
+}
+
+nav a {
+  margin-left: 15px;
+  text-decoration: none;
+  color: #38bdf8;
 }
 
 section {
@@ -11,18 +26,17 @@ section {
 }
 
 .hero {
-  background: linear-gradient(135deg, #1e90ff, #00c6ff);
+  background: linear-gradient(135deg, #1e3a8a, #0ea5e9);
 }
 
-h1 {
-  margin: 0;
-  font-size: 36px;
-}
-
-h2 {
-  margin-bottom: 20px;
+.card {
+  background: #1e293b;
+  margin: 20px auto;
+  padding: 20px;
+  max-width: 600px;
+  border-radius: 10px;
 }
 
 #game {
-  background: #222;
+  background: #020617;
 }
