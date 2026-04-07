@@ -1,0 +1,12 @@
+body {
+  font-family: Arial;
+  text-align: center;
+}
+
+section {
+  padding: 50px;
+}
+
+#game {
+  background: #f0f0f0;
+}
