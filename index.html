@@ -1,12 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My First Game</title>
+  <title>My Portfolio</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+    }
+    section {
+      padding: 50px;
+    }
+    #game {
+      background: #f0f0f0;
+    }
+  </style>
 </head>
 <body>
-  <h1>Click the button!</h1>
-  <p id="score">Score: 0</p>
-  <button onclick="addScore()">Click me</button>
+
+  <section>
+    <h1>My Name</h1>
+    <p>Aspiring Game Developer</p>
+  </section>
+
+  <section>
+    <h2>About Me</h2>
+    <p>I like making simple browser games.</p>
+  </section>
+
+  <section>
+    <h2>Skills</h2>
+    <p>HTML, JavaScript</p>
+  </section>
+
+  <section id="game">
+    <h2>My Game</h2>
+    <p id="score">Score: 0</p>
+    <button onclick="addScore()">Click me</button>
+  </section>
 
   <script>
     let score = 0;
@@ -15,5 +45,6 @@
       document.getElementById("score").innerText = "Score: " + score;
     }
   </script>
+
 </body>
 </html>
