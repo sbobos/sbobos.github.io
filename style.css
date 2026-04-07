@@ -1,61 +1,111 @@
 body {
   margin: 0;
-  font-family: Arial;
+  font-family: 'Segoe UI', Arial;
   background: #0f172a;
   color: white;
+  scroll-behavior: smooth;
 }
 
+/* NAVBAR */
 nav {
   display: flex;
   justify-content: space-between;
-  padding: 20px;
-  background: #020617;
+  align-items: center;
+  padding: 15px 30px;
+  background: rgba(2, 6, 23, 0.8);
+  backdrop-filter: blur(10px);
   position: sticky;
   top: 0;
 }
 
+nav h2 {
+  margin: 0;
+}
+
 nav a {
-  margin-left: 15px;
+  margin-left: 20px;
   text-decoration: none;
   color: #38bdf8;
+  transition: 0.3s;
 }
 
+nav a:hover {
+  color: white;
+}
+
+/* SECTIONS */
 section {
-  padding: 60px 20px;
-  text-align: center;
+  padding: 80px 20px;
+  max-width: 900px;
+  margin: auto;
 }
 
+/* HERO */
 .hero {
+  text-align: center;
+  padding: 120px 20px;
   background: linear-gradient(135deg, #1e3a8a, #0ea5e9);
 }
 
-.card {
-  background: #1e293b;
-  margin: 20px auto;
-  padding: 20px;
-  max-width: 600px;
-  border-radius: 10px;
+.hero h1 {
+  font-size: 42px;
+  margin-bottom: 10px;
 }
 
+.hero p {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+/* CARDS */
+.card {
+  background: rgba(30, 41, 59, 0.6);
+  margin-top: 20px;
+  padding: 25px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* SKILLS GRID */
 .skills-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 15px;
-  max-width: 800px;
-  margin: auto;
 }
 
 .skills-grid div {
   background: #1e293b;
   padding: 15px;
   border-radius: 8px;
+  transition: 0.3s;
 }
 
-#contact a {
-  color: #38bdf8;
-  text-decoration: none;
+.skills-grid div:hover {
+  background: #38bdf8;
+  color: black;
 }
 
+/* GAME */
 #game {
-  background: #020617;
+  text-align: center;
+}
+
+/* BUTTON */
+button {
+  padding: 10px 20px;
+  border: none;
+  background: #38bdf8;
+  color: black;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: scale(1.05);
 }
