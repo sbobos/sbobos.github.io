@@ -1,177 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IRONVEIL — A Hunter's Log</title>
-<style>
-  :root{
-    --bg:#12171a;
-    --panel:#1b2320;
-    --panel-alt:#212a26;
-    --border:#38433d;
-    --text:#e4d9c0;
-    --text-dim:#9aa39a;
-    --blood:#a23b2e;
-    --blood-dim:#6e2c22;
-    --gold:#c79a3c;
-    --gold-dim:#8a6b28;
-    --moss:#7a9a6e;
-    --moss-dim:#4f6a47;
-    --frost:#6f9bb0;
-    --font-display: Georgia, 'Times New Roman', serif;
-    --font-mono: 'Courier New', Courier, monospace;
-  }
-  @media (prefers-reduced-motion: reduce){
-    *{ animation-duration:0.001s !important; transition-duration:0.001s !important; }
-  }
-  *{ box-sizing:border-box; }
-  html,body{
-    margin:0; padding:0; background:var(--bg); color:var(--text);
-    font-family:var(--font-mono); min-height:100vh;
-  }
-  #app{ max-width:960px; margin:0 auto; padding:16px 16px 48px; }
-
-  .banner{ text-align:center; padding:18px 10px 14px; border-bottom:1px solid var(--border); margin-bottom:18px; }
-  .banner .eyebrow{ letter-spacing:3px; font-size:11px; color:var(--gold-dim); text-transform:uppercase; }
-  .banner h1{ font-family:var(--font-display); font-size:30px; margin:6px 0 4px; letter-spacing:1px; color:var(--text); }
-  .banner .sub{ font-size:12px; color:var(--text-dim); }
-
-  .topbar{
-    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
-    background:var(--panel); border:1px solid var(--border); border-radius:4px;
-    padding:10px 14px; margin-bottom:18px; font-size:13px;
-  }
-  .topbar .stat{ color:var(--text-dim); }
-  .topbar .stat b{ color:var(--gold); font-weight:normal; }
-
-  .panel{ background:var(--panel); border:1px solid var(--border); border-radius:4px; padding:16px; margin-bottom:18px; }
-  .panel h2{ font-family:var(--font-display); font-size:17px; margin:0 0 12px; border-bottom:1px dashed var(--border); padding-bottom:8px; color:var(--gold); letter-spacing:0.5px; }
-
-  .quest-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px; }
-  .quest-card{ background:var(--panel-alt); border:1px solid var(--border); border-radius:4px; padding:12px; }
-  .quest-card .qname{ font-family:var(--font-display); font-size:16px; color:var(--text); }
-  .quest-card .qicon{ font-size:26px; margin-right:8px; vertical-align:middle; }
-  .quest-card .qflavor{ font-size:12px; color:var(--text-dim); margin:6px 0 4px; line-height:1.5; }
-  .quest-card .qarena{ font-size:11px; color:var(--frost); margin-bottom:10px; }
-
-  button{
-    font-family:var(--font-mono); background:var(--panel-alt); color:var(--text);
-    border:1px solid var(--border); border-radius:3px; padding:8px 12px; cursor:pointer;
-    font-size:12px; letter-spacing:0.5px;
-  }
-  button:hover:not(:disabled){ border-color:var(--gold-dim); color:var(--gold); }
-  button:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
-  button:disabled{ opacity:0.4; cursor:not-allowed; }
-  button.primary{ border-color:var(--blood); color:var(--text); }
-  button.primary:hover:not(:disabled){ background:var(--blood-dim); color:var(--text); border-color:var(--blood); }
-  button.dodge:hover:not(:disabled){ border-color:var(--frost); color:var(--frost); }
-  button.wide{ width:100%; text-align:left; margin-top:8px; }
-
-  .forge-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; }
-  .craft-card{ background:var(--panel-alt); border:1px solid var(--border); border-radius:4px; padding:12px; }
-  .craft-card .cname{ font-family:var(--font-display); font-size:15px; }
-  .craft-card .ctag{ font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px; }
-  .craft-card .cstat{ font-size:12px; color:var(--moss); margin:4px 0 8px; }
-  .req-list{ list-style:none; margin:0 0 10px; padding:0; font-size:11px; }
-  .req-list li{ display:flex; justify-content:space-between; padding:2px 0; color:var(--text-dim); }
-  .req-list li.ok{ color:var(--moss); }
-  .req-list li.bad{ color:var(--blood); }
-
-  .inv-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px; font-size:12px; }
-  .inv-item{ background:var(--panel-alt); border:1px solid var(--border); border-radius:3px; padding:6px 10px; display:flex; justify-content:space-between; }
-  .inv-item span.n{ color:var(--text-dim); }
-  .inv-empty{ color:var(--text-dim); font-size:12px; font-style:italic; }
-
-  .equip-row{ display:flex; gap:16px; flex-wrap:wrap; font-size:12px; margin-top:4px; }
-  .equip-row div{ color:var(--text-dim); }
-  .equip-row b{ color:var(--gold); font-weight:normal; }
-
-  .arena-tag{ font-size:11px; color:var(--frost); margin-bottom:12px; }
-  .monster-head{ display:flex; align-items:center; gap:14px; margin-bottom:10px; }
-  .monster-head .micon{ font-size:44px; }
-  .monster-head .mname{ font-family:var(--font-display); font-size:22px; }
-  .monster-head .mtag{
-    display:inline-block; font-size:10px; letter-spacing:1px; text-transform:uppercase;
-    color:var(--blood); border:1px solid var(--blood-dim); border-radius:3px; padding:2px 6px;
-    margin-left:8px; vertical-align:middle;
-  }
-
-  .telegraph-banner{
-    background:#26201a; border:1px solid var(--gold-dim); border-radius:4px;
-    padding:10px 12px; margin:10px 0; font-size:12px; color:var(--gold); line-height:1.5;
-  }
-  .telegraph-banner .tt-label{ font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--gold-dim); display:block; margin-bottom:4px; }
-
-  .barwrap{ background:#0d1210; border:1px solid var(--border); border-radius:3px; height:14px; overflow:hidden; position:relative; }
-  .barfill{ height:100%; transition:width 0.25s ease; }
-  .barfill.hp{ background:var(--blood); }
-  .barfill.stam{ background:var(--moss); }
-  .barfill.part{ background:var(--gold-dim); }
-  .barfill.broken{ background:#3a3a3a; }
-  .barlabel{ font-size:11px; color:var(--text-dim); display:flex; justify-content:space-between; margin-bottom:3px; }
-
-  .parts-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; margin:14px 0; }
-  .part-card{ background:var(--panel-alt); border:1px solid var(--border); border-radius:4px; padding:10px; }
-  .part-card.broken{ border-style:dashed; border-color:#4a4a44; }
-  .part-card .pname{ font-size:12px; letter-spacing:0.5px; display:flex; justify-content:space-between; align-items:center; }
-  .part-tag{ font-size:9px; padding:1px 5px; border-radius:2px; letter-spacing:0.5px; }
-  .part-tag.exposed{ background:var(--gold-dim); color:#1a1408; }
-  .part-tag.spent{ background:#3a3a3a; color:var(--text-dim); }
-  .part-tag.armored{ background:#3a2a1a; color:var(--frost); border:1px solid var(--frost); }
-  .hint-row{ margin-top:5px; display:flex; gap:5px; flex-wrap:wrap; }
-  .hint-chip{ font-size:9px; color:var(--text-dim); border:1px solid var(--border); border-radius:2px; padding:1px 5px; }
-
-  .player-status{ display:flex; gap:20px; flex-wrap:wrap; margin:14px 0; }
-  .player-status .col{ flex:1; min-width:180px; }
-
-  .action-group-label{ font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px; margin:10px 0 4px; }
-  .actions{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px; margin-bottom:6px; }
-
-  .log{ background:#0d1210; border:1px solid var(--border); border-radius:4px; padding:10px 12px; height:190px; overflow-y:auto; font-size:12px; line-height:1.6; }
-  .log div{ margin-bottom:2px; }
-  .log .l-hit{ color:var(--text); }
-  .log .l-crit{ color:var(--gold); }
-  .log .l-dmg{ color:var(--blood); }
-  .log .l-sys{ color:var(--text-dim); font-style:italic; }
-  .log .l-break{ color:var(--gold); font-weight:bold; }
-  .log .l-telegraph{ color:var(--frost); }
-  .log .l-good{ color:var(--moss); }
-
-  .overlay{ position:relative; margin-top:14px; background:var(--panel-alt); border:1px solid var(--gold-dim); border-radius:4px; padding:16px; }
-  .overlay h3{ font-family:var(--font-display); color:var(--gold); margin:0 0 10px; }
-  .loot-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:8px; margin:10px 0; }
-  .loot-item{ background:var(--panel); border:1px solid var(--border); border-radius:3px; padding:6px 8px; font-size:12px; }
-
-  .footer-note{ text-align:center; font-size:11px; color:var(--text-dim); margin-top:24px; }
-  .hidden{ display:none !important; }
-  ::-webkit-scrollbar{ width:8px; }
-  ::-webkit-scrollbar-thumb{ background:var(--border); border-radius:4px; }
-</style>
-</head>
-<body>
-<div id="app">
-
-  <div class="banner">
-    <div class="eyebrow">Field Log · Lowland Hunting Grounds</div>
-    <h1>IRONVEIL</h1>
-    <div class="sub">a hunter's log — no levels, only the gear and reflexes you earn</div>
-  </div>
-
-  <div class="topbar">
-    <div class="stat">Hunter: <b id="tb-name">—</b></div>
-    <div class="stat">Zenny: <b id="tb-zenny">0</b></div>
-    <div class="stat">Weapon: <b id="tb-weapon">—</b></div>
-    <div class="stat">Armor: <b id="tb-armor">—</b></div>
-  </div>
-
-  <div id="village-screen"></div>
-  <div id="hunt-screen" class="hidden"></div>
-
-  <div class="footer-note">Base template — see the MOVE / PART / ARENA config blocks in the script to add your own monsters.</div>
-</div>
-
-<script>
 /* =========================================================================
    CONFIG — everything a monster designer needs to touch lives below.
 
@@ -201,6 +27,16 @@
 ========================================================================= */
 
 const MOVES = {
+  boar_ram:       { key:'boar_ram', type:'damage', dodgeType:'left', blockable:true, baseDamage:16, element:'none',
+    telegraph:"The boar lowers its tusked snout, scraping its hooves against the dirt as it locks its eyes onto you. It's preparing a full-speed charge!",
+    resolveText:"The Boar surges forward like a battering ram! Its tusks spear through your guard and knock you back." },
+  boar_headbut:   { key:'boar_headbut', type:'damage', dodgeType:'back', blockable:true, baseDamage:12, element:'none',
+    telegraph:"The Boar pulls its heavy, armored skull back, snorting aggressively at close range.",
+    resolveText:"The head whips its heavy head upward! The massive impact leaves your head ringing!" },
+  boar_kick:      { key:'boar_kick', type:'damage', dodgeType:'right', blockable:false, baseDamage:10, element:'none',
+    telegraph:"The Boar suddenly pivots away, bucking its hindquarters toward you while glancing back over its shoulder.",
+    resolveText:"The Boar kicks out savagely with its sharp hind hooves, tearing through you!" },
+  
   wyrm_bite:      { key:'wyrm_bite', type:'damage', dodgeType:'back', blockable:true, baseDamage:16, element:'none',
     telegraph:"The wyrm lowers its head and lunges its jaw forward — better to fall back than meet it head-on.",
     resolveText:"It snaps forward with a vicious bite!" },
@@ -235,6 +71,25 @@ const MOVES = {
 };
 
 const MONSTERS = {
+
+    boar: {
+    id:'boar', name:'Ram Hog', icon:'🐖', arenaKey:'dunes',
+    flavor:"Agile, agresive, and large sized dune hog. Hostile toward everything it faces.",
+    maxHp:160, defaultMoveKeys:['boar_ram','boar_headbut','boar_kick'],
+    parts:[
+      { key:'head', name:'Head', maxHp:60, hitzone:{cut:20,blunt:60,fire:15,ice:5},
+        exposedMultiplier:1.35, requiresBroken:null, postBreakImmune:false,
+        breakBonus:22, breakMsg:"The hardened skull shell shattered!",
+        rewards:['Boar Tusk','Large Skull','Large Skull'], disablesMoves:['hog_ram'] },
+      { key:'body', name:'Body', maxHp:100, hitzone:{cut:45,blunt:40,fire:10,ice:5},
+        exposedMultiplier:1.3, requiresBroken:null, postBreakImmune:false,
+        breakBonus:26, breakMsg:'Scars and wound visible!',
+        rewards:['Boar Pelt','Boar Pelt','Large Bone'], disablesMoves:['wyrm_spikeslam'] },
+    ],
+    carveTable:['Large Skull','Boar Pelt','Boar Pelt','Large Bone','Beast Stone'],
+    zennyRange:[50,100]
+  },
+    
   wyrm: {
     id:'wyrm', name:'Duneback Wyrm', icon:'🦎', arenaKey:'dunes',
     flavor:"A sand-armored wyrm that stalks the dunes at dusk. Fast, low, and vicious in a scrap.",
@@ -1069,6 +924,9 @@ function renderHunt(){
 /* ---------- INIT ---------- */
 
 renderVillage();
-</script>
-</body>
-</html>
+window.startHunt = startHunt;
+window.playerAction = playerAction;
+window.craftItem = craftItem;
+window.renderVillage = renderVillage;
+window.setVillageTab = setVillageTab;
+window.openInventory = openInventory;

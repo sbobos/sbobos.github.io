@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRONVEIL — A Hunter's Log</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <div id="app">
+
+        <div class="banner">
+            <div class="eyebrow">Field Log · Lowland Hunting Grounds</div>
+            <h1>IRONVEIL</h1>
+            <div class="sub">
+                a hunter's log — no levels, only the gear and reflexes you earn
+            </div>
+        </div>
+
+        <div class="topbar">
+            <div class="stat">
+                Hunter: <b id="tb-name">—</b>
+            </div>
+
+            <div class="stat">
+                Zenny: <b id="tb-zenny">0</b>
+            </div>
+
+            <div class="stat">
+                Weapon: <b id="tb-weapon">—</b>
+            </div>
+
+            <div class="stat">
+                Armor: <b id="tb-armor">—</b>
+            </div>
+        </div>
+
+        <div id="village-screen"></div>
+
+        <div id="hunt-screen" class="hidden"></div>
+
+        <div class="footer-note">
+            Base template — see the MOVE / PART / ARENA config blocks in the script to add your own monsters.
+        </div>
+
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+
+</body>
+</html>
