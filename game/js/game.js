@@ -170,14 +170,16 @@ const ARENAS = {
 };
 
 const WEAPONS = {
-  basic:    { key:'basic',    name:"Hunter's Blade",    atk:10, damageType:'cut',   element:'none', elementPower:0,  tag:'Starter' },
-  wyrmfang: { key:'wyrmfang', name:"Wyrmfang Cleaver",   atk:19, damageType:'cut',   element:'fire', elementPower:8,  tag:'Wyrm Forge', recipe:{'Wyrm Fang':3,'Wyrm Scale':2}, zenny:120 },
-  bearclaw: { key:'bearclaw', name:"Maul Claw Gauntlet", atk:17, damageType:'blunt', element:'none', elementPower:0,  tag:'Bear Forge', recipe:{'Bear Claw':3,'Bear Pelt':1}, zenny:100 },
-  dunelord: { key:'dunelord', name:"Dunelord Greatfang", atk:26, damageType:'cut',   element:'fire', elementPower:14, tag:'Master Forge', recipe:{'Wyrm Fang':4,'Sand Pearl':1,'Bear Claw':2}, zenny:260 }
+  basic:      { key:'basic',    name:"Hunter's Blade",    atk:10, damageType:'cut',   element:'none', elementPower:0,  tag:'Starter' },
+  boarhammer: { key:'boarhammer', name:"Ram Head Slugger",   atk:15, damageType:'blunt',   element:'none', elementPower:0,  tag:'Boar Forge', recipe:{'Large Skull':3,'Boar Tusk':2}, zenny:80 },
+  wyrmfang:   { key:'wyrmfang', name:"Wyrmfang Cleaver",   atk:19, damageType:'cut',   element:'fire', elementPower:8,  tag:'Wyrm Forge', recipe:{'Wyrm Fang':3,'Wyrm Scale':2}, zenny:120 },
+  bearclaw:   { key:'bearclaw', name:"Maul Claw Gauntlet", atk:17, damageType:'blunt', element:'none', elementPower:0,  tag:'Bear Forge', recipe:{'Bear Claw':3,'Bear Pelt':1}, zenny:100 },
+  dunelord:   { key:'dunelord', name:"Dunelord Greatfang", atk:26, damageType:'cut',   element:'fire', elementPower:14, tag:'Master Forge', recipe:{'Wyrm Fang':4,'Sand Pearl':1,'Bear Claw':2}, zenny:260 }
 };
 
 const ARMORS = {
   basic:     { key:'basic',     name:"Cloth Vest",          def:3,  resist:{fire:0,ice:0},   tag:'Starter' },
+  boarhide:  { key:'boarhide',  name:"Boarhide Cloth",      def:6,  resist:{fire:-5,ice:5},  tag:'Boar Forge', recipe:{'Boar Pelt':3,'Large Bone':2}, zenny:80 },
   wyrmscale: { key:'wyrmscale', name:"Wyrmscale Mail",      def:9,  resist:{fire:20,ice:0},  tag:'Wyrm Forge', recipe:{'Wyrm Scale':4,'Wyrm Hide':1}, zenny:110 },
   frosthide: { key:'frosthide', name:"Frosthide Coat",      def:8,  resist:{fire:0,ice:20},  tag:'Bear Forge', recipe:{'Bear Pelt':3,'Bear Fang':2}, zenny:100 },
   bulwark:   { key:'bulwark',   name:"Bulwark of Ironveil", def:15, resist:{fire:10,ice:10}, tag:'Master Forge', recipe:{'Wyrm Hide':2,'Bear Pelt':2,'Sand Pearl':1}, zenny:240 }
