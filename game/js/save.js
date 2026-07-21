@@ -1,4 +1,3 @@
-import { player, setPlayer } from './state.js';
 import { player, setPlayer, story, setStory } from './state.js';
 
 /* ---------- SAVE / LOAD (portable code, no browser storage) ---------- */
