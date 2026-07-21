@@ -101,6 +101,29 @@ body {
   letter-spacing: 0.5px;
 }
 
+.section-copy {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin: -4px 0 12px;
+  line-height: 1.6;
+}
+
+.stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.stat-chip {
+  font-size: 11px;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: rgba(255,255,255,0.03);
+}
+
 .quest-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -131,7 +154,47 @@ body {
 .quest-card .qarena {
   font-size: 11px;
   color: var(--frost);
+  margin-bottom: 8px;
+}
+
+.story-banner {
+  background: linear-gradient(135deg, rgba(199,154,60,0.15), rgba(106,148,176,0.12));
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 14px;
+}
+
+.story-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+
+.story-copy {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.story-pill {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid var(--gold-dim);
+  border-radius: 999px;
+  padding: 3px 7px;
+  margin-bottom: 6px;
+}
+
+.story-subtitle {
+  font-size: 11px;
+  color: var(--text-dim);
   margin-bottom: 10px;
+  line-height: 1.5;
 }
 
 button {
@@ -181,6 +244,100 @@ button.wide {
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 12px;
 }
+
+.tree-panel {
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: rgba(255,255,255,0.03);
+}
+
+.tree-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+
+.tree-copy {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.tree-list {
+  display: grid;
+  gap: 6px;
+}
+
+.tree-node {
+  font-size: 11px;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 6px 8px;
+}
+
+.tree-node.unlocked {
+  color: var(--moss);
+  border-color: var(--moss-dim);
+}
+
+.tree-node.active {
+  color: var(--gold);
+  border-color: var(--gold-dim);
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.shop-card,
+.inventory-card {
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.shop-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.shop-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.shop-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--gold);
+}
+
+.wide-card {
+  min-width: 100%;
+}
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin-top: 6px;
+}
+
 .craft-card {
   background: var(--panel-alt);
   border: 1px solid var(--border);
@@ -200,8 +357,36 @@ button.wide {
 .craft-card .cstat {
   font-size: 12px;
   color: var(--moss);
-  margin: 4px 0 8px;
+  margin: 4px 0 4px;
 }
+
+.compare-text {
+  font-size: 10px;
+  color: var(--gold);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.weapon-style {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+.loadout-note {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 4px;
+}
+.tactic-pill {
+  font-size: 10px;
+  color: var(--frost);
+  border: 1px solid var(--frost);
+  border-radius: 999px;
+  padding: 3px 8px;
+}
+
 .req-list {
   list-style: none;
   margin: 0 0 10px;

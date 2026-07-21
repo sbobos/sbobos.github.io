@@ -170,20 +170,35 @@ const ARENAS = {
 };
 
 const WEAPONS = {
-  basic:      { key:'basic',    name:"Hunter's Blade",    atk:10, damageType:'cut',   element:'none', elementPower:0,  tag:'Starter' },
-  boarhammer: { key:'boarhammer', name:"Ram Head Slugger",   atk:15, damageType:'blunt',   element:'none', elementPower:0,  tag:'Boar Forge', recipe:{'Large Skull':3,'Boar Tusk':2}, zenny:80 },
-  wyrmfang:   { key:'wyrmfang', name:"Wyrmfang Cleaver",   atk:19, damageType:'cut',   element:'fire', elementPower:8,  tag:'Wyrm Forge', recipe:{'Wyrm Fang':3,'Wyrm Scale':2}, zenny:120 },
-  bearclaw:   { key:'bearclaw', name:"Maul Claw Gauntlet", atk:17, damageType:'blunt', element:'none', elementPower:0,  tag:'Bear Forge', recipe:{'Bear Claw':3,'Bear Pelt':1}, zenny:100 },
-  dunelord:   { key:'dunelord', name:"Dunelord Greatfang", atk:26, damageType:'cut',   element:'fire', elementPower:14, tag:'Master Forge', recipe:{'Wyrm Fang':4,'Sand Pearl':1,'Bear Claw':2}, zenny:260 }
+  basic:      { key:'basic',    name:"Hunter's Blade",    atk:10, damageType:'cut',   element:'none', elementPower:0,  tag:'Starter', tree:'starter', special:'balanced', specialDesc:'Balanced: no extra effects.' },
+  boarhammer: { key:'boarhammer', name:"Ram Head Slugger",   atk:15, damageType:'blunt',   element:'none', elementPower:0,  tag:'Boar Forge', recipe:{'Large Skull':3,'Boar Tusk':2}, zenny:80, tree:'boar', unlocksFrom:'basic', special:'impact', specialDesc:'Impact: +4 damage against already broken parts.' },
+  wyrmfang:   { key:'wyrmfang', name:"Wyrmfang Cleaver",   atk:19, damageType:'cut',   element:'fire', elementPower:8,  tag:'Wyrm Forge', recipe:{'Wyrm Fang':3,'Wyrm Scale':2}, zenny:120, tree:'wyrm', unlocksFrom:'basic', special:'sear', specialDesc:'Sear: crits and fire-weak targets gain +6 damage.' },
+  bearclaw:   { key:'bearclaw', name:"Maul Claw Gauntlet", atk:17, damageType:'blunt', element:'none', elementPower:0,  tag:'Bear Forge', recipe:{'Bear Claw':3,'Bear Pelt':1}, zenny:100, tree:'bear', unlocksFrom:'basic', special:'grip', specialDesc:'Grip: guarding restores extra stamina.' },
+  dunelord:   { key:'dunelord', name:"Dunelord Greatfang", atk:26, damageType:'cut',   element:'fire', elementPower:14, tag:'Master Forge', recipe:{'Wyrm Fang':4,'Sand Pearl':1,'Bear Claw':2}, zenny:260, tree:'master', unlocksFrom:'wyrmfang', special:'overwhelm', specialDesc:'Overwhelm: 20% chance to add +8 damage.' }
 };
 
 const ARMORS = {
-  basic:     { key:'basic',     name:"Cloth Vest",          def:3,  resist:{fire:0,ice:0},   tag:'Starter' },
-  boarhide:  { key:'boarhide',  name:"Boarhide Cloth",      def:6,  resist:{fire:-5,ice:5},  tag:'Boar Forge', recipe:{'Boar Pelt':3,'Large Bone':2}, zenny:80 },
-  wyrmscale: { key:'wyrmscale', name:"Wyrmscale Mail",      def:9,  resist:{fire:20,ice:0},  tag:'Wyrm Forge', recipe:{'Wyrm Scale':4,'Wyrm Hide':1}, zenny:110 },
-  frosthide: { key:'frosthide', name:"Frosthide Coat",      def:8,  resist:{fire:0,ice:20},  tag:'Bear Forge', recipe:{'Bear Pelt':3,'Bear Fang':2}, zenny:100 },
-  bulwark:   { key:'bulwark',   name:"Bulwark of Ironveil", def:15, resist:{fire:10,ice:10}, tag:'Master Forge', recipe:{'Wyrm Hide':2,'Bear Pelt':2,'Sand Pearl':1}, zenny:240 }
+  basic:     { key:'basic',     name:"Cloth Vest",          slot:'body', def:3,  resist:{fire:0,ice:0},   tag:'Starter' },
+  boarhide:  { key:'boarhide',  name:"Boarhide Cloth",      slot:'body', def:6,  resist:{fire:-5,ice:5},  tag:'Boar Forge', recipe:{'Boar Pelt':3,'Large Bone':2}, zenny:80 },
+  wyrmscale: { key:'wyrmscale', name:"Wyrmscale Mail",      slot:'body', def:9,  resist:{fire:20,ice:0},  tag:'Wyrm Forge', recipe:{'Wyrm Scale':4,'Wyrm Hide':1}, zenny:110 },
+  frosthide: { key:'frosthide', name:"Frosthide Coat",      slot:'body', def:8,  resist:{fire:0,ice:20},  tag:'Bear Forge', recipe:{'Bear Pelt':3,'Bear Fang':2}, zenny:100 },
+  bulwark:   { key:'bulwark',   name:"Bulwark of Ironveil", slot:'body', def:15, resist:{fire:10,ice:10}, tag:'Master Forge', recipe:{'Wyrm Hide':2,'Bear Pelt':2,'Sand Pearl':1}, zenny:240 },
+  headband:  { key:'headband',  name:"Hunter's Headband",   slot:'head', def:2,  resist:{ice:5}, tag:'Starter', recipe:{'Large Bone':1}, zenny:30 },
+  frostcap:  { key:'frostcap',  name:"Frostcap Hood",       slot:'head', def:4,  resist:{ice:15}, tag:'Bear Forge', recipe:{'Bear Fang':1,'Bear Pelt':1}, zenny:60 },
+  sandmask:  { key:'sandmask',  name:"Sandmask Visor",      slot:'head', def:3,  resist:{fire:10}, tag:'Wyrm Forge', recipe:{'Wyrm Scale':2,'Wyrm Eye':1}, zenny:70 }
 };
+
+const SHOP_ITEMS = {
+  potion: { key:'potion', name:'Potion', price:30, desc:'Adds one potion to your satchel for the next hunt.', effect:(p) => { p.potions += 1; } },
+  salve: { key:'salve', name:'Vitality Salve', price:45, desc:'Raises your maximum HP by 10 and restores you to full.', effect:(p) => { p.maxHp += 10; p.hp = p.maxHp; } },
+  tonic: { key:'tonic', name:'Stamina Tonic', price:45, desc:'Raises your maximum stamina by 10 and refills it.', effect:(p) => { p.maxStamina += 10; p.stamina = p.maxStamina; } }
+};
+
+const STORY_MISSIONS = [
+  { key:'intro_boar', title:'The Dune Track', monsterId:'boar', chapter:1, description:'Investigate the boar that has been harassing the outer camps.', flavor:'Main objective' },
+  { key:'wyrm_salt', title:'The Sand-Scored Trail', monsterId:'wyrm', chapter:2, description:'Follow the wyrm trail into the deeper dunes before it turns the region feral.', flavor:'Main objective' },
+  { key:'bear_ice', title:'The Hollow Below', monsterId:'bear', chapter:3, description:'The cold has worsened, and the old bear has begun prowling the ravine.', flavor:'Main objective' }
+];
 
 /* ---------- STATE ---------- */
 
@@ -191,14 +206,22 @@ let player = {
   name:'Hunter',
   maxHp:120, hp:120,
   maxStamina:100, stamina:100,
-  weapon:'basic', armor:'basic',
+  weapon:'basic',
+  armorSlots:{ head:'headband', body:'basic' },
   ownedWeapons:['basic'],
-  ownedArmors:['basic'],
+  ownedArmors:['basic','headband'],
   zenny:60,
   potions:3,
   materials:{},
   stats:{ hunts:0, victories:0, fled:0, defeats:0 },
   trophies:{}
+};
+
+let story = {
+  chapter:1,
+  activeMissionKey:'intro_boar',
+  completedMissionKeys:[],
+  unlockedMissionKeys:['intro_boar']
 };
 
 let hunt = null;
@@ -213,7 +236,17 @@ function clamp(v,min,max){ return Math.max(min,Math.min(max,v)); }
 function pct(v,max){ return clamp((v/max)*100,0,100); }
 function addMat(name,n){ player.materials[name] = (player.materials[name]||0) + n; }
 function currentWeapon(){ return WEAPONS[player.weapon]; }
-function currentArmor(){ return ARMORS[player.armor]; }
+function currentArmor(){
+  return {
+    head: ARMORS[player.armorSlots?.head] || ARMORS.basic,
+    body: ARMORS[player.armorSlots?.body] || ARMORS.basic
+  };
+}
+function getArmorStats(){
+  const armor = currentArmor();
+  const resist = { fire: (armor.head.resist?.fire || 0) + (armor.body.resist?.fire || 0), ice: (armor.head.resist?.ice || 0) + (armor.body.resist?.ice || 0) };
+  return { def: (armor.head.def || 0) + (armor.body.def || 0), resist };
+}
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 /* ---------- SAVE / LOAD (portable code, no browser storage) ---------- */
@@ -240,8 +273,12 @@ function loadSaveCode(code){
     loaded.trophies = loaded.trophies || {};
     loaded.ownedWeapons = loaded.ownedWeapons || ['basic'];
     loaded.ownedArmors = loaded.ownedArmors || ['basic'];
+    loaded.armorSlots = loaded.armorSlots || { head:'headband', body:'basic' };
+    if (!loaded.armorSlots.head) loaded.armorSlots.head = 'headband';
+    if (!loaded.armorSlots.body) loaded.armorSlots.body = 'basic';
     if (!loaded.ownedWeapons.includes(loaded.weapon)) loaded.ownedWeapons.push(loaded.weapon);
-    if (!loaded.ownedArmors.includes(loaded.armor)) loaded.ownedArmors.push(loaded.armor);
+    if (!loaded.ownedArmors.includes(loaded.armorSlots.body)) loaded.ownedArmors.push(loaded.armorSlots.body);
+    if (!loaded.ownedArmors.includes(loaded.armorSlots.head)) loaded.ownedArmors.push(loaded.armorSlots.head);
     player = loaded;
     return true;
   } catch(e){
@@ -255,7 +292,8 @@ function renderTopbar(){
   document.getElementById('tb-name').textContent = player.name;
   document.getElementById('tb-zenny').textContent = player.zenny;
   document.getElementById('tb-weapon').textContent = currentWeapon().name;
-  document.getElementById('tb-armor').textContent = currentArmor().name;
+  const armor = currentArmor();
+  document.getElementById('tb-armor').textContent = `${armor.head.name} / ${armor.body.name}`;
 }
 
 /* ---------- VILLAGE SCREEN ---------- */
@@ -273,11 +311,12 @@ function renderVillage(){
   const tabs = [
     ['quests','Quest Board'],
     ['forge','Forge'],
-    ['status','Status'],
+    ['shop','Shop'],
+    ['inventory','Inventory'],
     ['save','Save / Load']
   ];
   const tabBar = `
-    <div class="actions" style="grid-template-columns:repeat(4,1fr); margin-bottom:18px;">
+    <div class="actions" style="grid-template-columns:repeat(5,1fr); margin-bottom:18px;">
       ${tabs.map(([key,label]) => `<button class="${villageTab===key?'primary':''}" onclick="setVillageTab('${key}')">${label}</button>`).join('')}
     </div>
   `;
@@ -285,43 +324,249 @@ function renderVillage(){
   let body = '';
   if (villageTab === 'quests') body = renderQuestsTab();
   else if (villageTab === 'forge') body = renderForgeTab();
-  else if (villageTab === 'status') body = renderStatusTab();
+  else if (villageTab === 'shop') body = renderShopTab();
+  else if (villageTab === 'inventory') body = renderInventoryTab();
   else if (villageTab === 'save') body = renderSaveTab();
 
   v.innerHTML = tabBar + body;
   renderTopbar();
 }
 
+function getActiveStoryMission(){
+  return STORY_MISSIONS.find(m => m.key === story.activeMissionKey) || STORY_MISSIONS[0];
+}
+
+function getQuestBoardEntries(){
+  const activeMission = getActiveStoryMission();
+  const entries = [];
+
+  entries.push({
+    type:'main',
+    mission: activeMission,
+    monster: MONSTERS[activeMission.monsterId],
+    label:'Main Objective'
+  });
+
+  const sidePool = Object.entries(MONSTERS)
+    .filter(([id]) => id !== activeMission.monsterId)
+    .filter(([id]) => {
+      const mission = STORY_MISSIONS.find(item => item.monsterId === id);
+      return !mission || mission.chapter <= story.chapter;
+    })
+    .map(([id, monster]) => ({ id, monster }));
+
+  const shuffled = [...sidePool].sort(() => Math.random() - 0.5);
+  const limit = Math.min(2, shuffled.length);
+  for (let i = 0; i < limit; i += 1) {
+    const { id, monster } = shuffled[i];
+    entries.push({
+      type:'side',
+      mission: STORY_MISSIONS.find(item => item.monsterId === id) || null,
+      monster,
+      label:'Side Hunt'
+    });
+  }
+
+  return entries;
+}
+
 function renderQuestsTab(){
-  const questCards = Object.values(MONSTERS).map(m => `
-    <div class="quest-card">
-      <div><span class="qicon">${m.icon}</span><span class="qname">${m.name}</span></div>
-      <div class="qflavor">${m.flavor}</div>
-      <div class="qarena">Territory: ${ARENAS[m.arenaKey].name}</div>
-      <button class="primary wide" onclick="startHunt('${m.id}')">Depart on hunt</button>
+  const activeMission = getActiveStoryMission();
+  const questCards = getQuestBoardEntries().map(entry => {
+    const monster = entry.monster;
+    const mission = entry.mission;
+    const actionLabel = entry.type === 'main' ? 'Take assignment' : 'Accept hunt';
+    const subtitle = entry.type === 'main'
+      ? `${activeMission.description}`
+      : (mission ? mission.description : 'A fresh lead has surfaced nearby.');
+    return `
+      <div class="quest-card">
+        <div><span class="qicon">${monster.icon}</span><span class="qname">${monster.name}</span></div>
+        <div class="qflavor">${monster.flavor}</div>
+        <div class="qarena">Territory: ${ARENAS[monster.arenaKey].name}</div>
+        <div class="story-pill">${entry.label}</div>
+        <div class="story-subtitle">${subtitle}</div>
+        <button class="primary wide" onclick="startHunt('${monster.id}', '${mission ? mission.key : ''}')">${actionLabel}</button>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="panel">
+      <h2>Quest Board</h2>
+      <p class="section-copy">Your current assignment is the core of the story. The rest of the board shifts as the region opens up.</p>
+      <div class="story-banner">
+        <div class="story-title">Story progress</div>
+        <div class="story-copy">Chapter ${story.chapter} · ${activeMission.title}</div>
+        <div class="story-copy">${activeMission.description}</div>
+      </div>
+      <div class="quest-grid">${questCards}</div>
     </div>
-  `).join('');
-  return `<div class="panel"><h2>Quest Board</h2><div class="quest-grid">${questCards}</div></div>`;
+  `;
 }
 
 function renderForgeTab(){
   const weaponCards = Object.values(WEAPONS).map(item => renderCraftCard(item, true)).join('');
   const armorCards = Object.values(ARMORS).map(item => renderCraftCard(item, false)).join('');
+  const current = currentWeapon();
+  const treeSummary = `
+    <div class="stat-row">
+      <div class="stat-chip">Weapon: ${current.name}</div>
+      <div class="stat-chip">Head: ${currentArmor().head.name}</div>
+      <div class="stat-chip">Body: ${currentArmor().body.name}</div>
+      <div class="stat-chip">Style: ${current.specialDesc}</div>
+    </div>
+    <div class="tree-panel">
+      <div class="tree-title">Weapon tree</div>
+      <div class="tree-copy">The first branch is always available. Later paths open after you prove yourself with their predecessor.</div>
+      <div class="tree-list">
+        ${Object.values(WEAPONS).filter(item => item.tree === 'starter' || item.tree === 'boar' || item.tree === 'wyrm' || item.tree === 'bear' || item.tree === 'master').map(item => {
+          const unlocked = item.key === 'basic' || player.ownedWeapons.includes(item.unlocksFrom || item.key) || player.ownedWeapons.includes(item.key);
+          const active = player.weapon === item.key;
+          return `<div class="tree-node ${active ? 'active' : ''} ${unlocked ? 'unlocked' : ''}">${item.name}${active ? ' · Equipped' : ''}</div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
   return `
     <div class="panel">
-      <h2>Forge — Weapons</h2>
+      <h2>Forge</h2>
+      <p class="section-copy">Craft reliable tools and armor from the materials you carve from each hunt. Your loadout is the real progression here.</p>
+      ${treeSummary}
+    </div>
+    <div class="panel">
+      <h2>Weapons</h2>
       <div class="forge-grid">${weaponCards}</div>
     </div>
     <div class="panel">
-      <h2>Forge — Armor</h2>
+      <h2>Armor</h2>
       <div class="forge-grid">${armorCards}</div>
     </div>
   `;
 }
 
+function renderShopTab(){
+  const cards = Object.values(SHOP_ITEMS).map(item => `
+    <div class="shop-card">
+      <div class="shop-title">${item.name}</div>
+      <div class="shop-desc">${item.desc}</div>
+      <div class="shop-actions">
+        <span>${item.price} zenny</span>
+        <button ${player.zenny < item.price ? 'disabled' : ''} onclick="buyShopItem('${item.key}')">Buy</button>
+      </div>
+    </div>
+  `).join('');
+
+  return `
+    <div class="panel">
+      <h2>Hunter's Shop</h2>
+      <p class="section-copy">Camp supplies and small upgrades keep your hunts alive when the terrain turns hostile.</p>
+      <div class="shop-grid">${cards}</div>
+    </div>
+  `;
+}
+
+function buyShopItem(key){
+  const item = SHOP_ITEMS[key];
+  if (!item || player.zenny < item.price) return;
+  player.zenny -= item.price;
+  item.effect(player);
+  renderVillage();
+}
+
+function renderInventoryTab(){
+  const weaponCards = player.ownedWeapons.map(key => {
+    const item = WEAPONS[key];
+    const equipped = player.weapon === key;
+    return `
+      <div class="inventory-card">
+        <div class="shop-title">${item.name}</div>
+        <div class="shop-desc">ATK ${item.atk} · ${item.damageType}${item.element !== 'none' ? ' · +' + item.elementPower + ' ' + item.element : ''}</div>
+        <div class="shop-actions">
+          <span>${equipped ? 'Equipped' : 'Owned'}</span>
+          <button ${equipped ? 'disabled' : ''} onclick="equipOwnedItem('${item.key}', true)">${equipped ? 'Ready' : 'Equip'}</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const armorCards = player.ownedArmors.map(key => {
+    const item = ARMORS[key];
+    const equipped = player.armorSlots[item.slot] === key;
+    return `
+      <div class="inventory-card">
+        <div class="shop-title">${item.name}</div>
+        <div class="shop-desc">DEF ${item.def}${(item.resist.fire || item.resist.ice) ? ' · resist ' + Object.entries(item.resist).filter(([,v]) => v > 0).map(([k,v]) => k + ' ' + v + '%').join(', ') : ''}</div>
+        <div class="shop-actions">
+          <span>${equipped ? 'Equipped' : 'Owned'}</span>
+          <button ${equipped ? 'disabled' : ''} onclick="equipOwnedItem('${item.key}', false)">${equipped ? 'Ready' : 'Equip'}</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const materialEntries = Object.entries(player.materials).filter(([,n]) => n > 0);
+  const materialHtml = materialEntries.length
+    ? `<div class="inv-grid">${materialEntries.map(([name,count]) => `<div class="inv-item"><span>${name}</span><span class="n">x${count}</span></div>`).join('')}</div>`
+    : `<div class="inv-empty">No materials yet — every hunt adds more.</div>`;
+
+  const trophyEntries = Object.entries(player.trophies);
+  const trophyHtml = trophyEntries.length
+    ? `<div class="inv-grid">${trophyEntries.map(([name,count]) => `<div class="inv-item"><span>${name}</span><span class="n">x${count}</span></div>`).join('')}</div>`
+    : `<div class="inv-empty">No trophies collected yet.</div>`;
+
+  return `
+    <div class="panel">
+      <h2>Inventory</h2>
+      <p class="section-copy">Track your gear, resources, and the trophies that mark your path across the wilds.</p>
+      <div class="inventory-grid">
+        <div class="inventory-card wide-card">
+          <div class="shop-title">Supplies</div>
+          <div class="shop-desc">Potions: ${player.potions} · HP: ${player.hp}/${player.maxHp} · Stamina: ${player.stamina}/${player.maxStamina}</div>
+        </div>
+        <div class="inventory-card wide-card">
+          <div class="shop-title">Equipment</div>
+          <div class="shop-desc">Weapon: ${currentWeapon().name} · Head: ${currentArmor().head.name} · Body: ${currentArmor().body.name}</div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Owned Weapons</h2>
+      <div class="shop-grid">${weaponCards || '<div class="inv-empty">No weapons unlocked yet.</div>'}</div>
+    </div>
+    <div class="panel">
+      <h2>Owned Armor</h2>
+      <div class="shop-grid">${armorCards || '<div class="inv-empty">No armor unlocked yet.</div>'}</div>
+    </div>
+    <div class="panel">
+      <h2>Materials</h2>
+      ${materialHtml}
+    </div>
+    <div class="panel">
+      <h2>Trophies</h2>
+      ${trophyHtml}
+    </div>
+  `;
+}
+
+function equipOwnedItem(key, isWeapon){
+  if (isWeapon){
+    if (player.ownedWeapons.includes(key)) player.weapon = key;
+  } else if (player.ownedArmors.includes(key)) {
+    const item = ARMORS[key];
+    if (item) player.armorSlots[item.slot] = key;
+  }
+  renderVillage();
+}
+
 function renderCraftCard(item, isWeapon){
   const owned = isWeapon ? player.ownedWeapons.includes(item.key) : player.ownedArmors.includes(item.key);
-  const equipped = isWeapon ? player.weapon === item.key : player.armor === item.key;
+  const equipped = isWeapon ? player.weapon === item.key : player.armorSlots[item.slot] === item.key;
+  const canUnlock = isWeapon ? (!item.unlocksFrom || player.ownedWeapons.includes(item.unlocksFrom) || player.weapon === item.unlocksFrom) : true;
+  const currentItem = isWeapon ? currentWeapon() : (item.slot === 'head' ? currentArmor().head : currentArmor().body);
+  const compareText = isWeapon
+    ? `vs current: ${item.atk - currentItem.atk >= 0 ? '+' : ''}${item.atk - currentItem.atk} ATK`
+    : `vs current: ${item.def - currentItem.def >= 0 ? '+' : ''}${item.def - currentItem.def} DEF`;
 
   let reqRows = '';
   let allOk = true;
@@ -343,6 +588,7 @@ function renderCraftCard(item, isWeapon){
   let btnLabel = 'Craft & equip';
   if (equipped) btnLabel = 'Equipped';
   else if (owned) btnLabel = 'Equip';
+  const unlockHint = isWeapon && item.unlocksFrom && !canUnlock ? `<div class="tree-copy">Requires ${WEAPONS[item.unlocksFrom].name}</div>` : '';
 
   return `
     <div class="craft-card">
@@ -352,8 +598,11 @@ function renderCraftCard(item, isWeapon){
         ${isWeapon ? 'ATK '+item.atk+(item.element!=='none' ? ' · +'+item.elementPower+' '+item.element : '') : 'DEF '+item.def+(item.resist && (item.resist.fire||item.resist.ice) ? ' · Resist '+Object.entries(item.resist).filter(([,v])=>v>0).map(([k,v])=>k+' '+v+'%').join(', ') : '')}
         ${!owned && item.recipe ? ' · '+item.zenny+'z' : ''}
       </div>
+      <div class="compare-text">${equipped ? 'Current setup' : compareText}</div>
+      ${isWeapon ? `<div class="weapon-style">${item.specialDesc}</div>` : ''}
       ${reqRows}
-      <button ${(!owned && !allOk)?'disabled':''} ${equipped?'disabled':''} onclick="craftItem('${item.key}', ${isWeapon})">
+      ${unlockHint}
+      <button ${(!owned && !allOk)?'disabled':''} ${equipped?'disabled':''} ${isWeapon && item.unlocksFrom && !canUnlock ? 'disabled' : ''} onclick="craftItem('${item.key}', ${isWeapon})">
         ${btnLabel}
       </button>
     </div>
@@ -363,6 +612,7 @@ function renderCraftCard(item, isWeapon){
 function craftItem(key, isWeapon){
   const item = isWeapon ? WEAPONS[key] : ARMORS[key];
   if (!item) return;
+  if (isWeapon && item.unlocksFrom && !player.ownedWeapons.includes(item.unlocksFrom)) return;
   const ownedList = isWeapon ? player.ownedWeapons : player.ownedArmors;
 
   if (!ownedList.includes(key)){
@@ -374,13 +624,16 @@ function craftItem(key, isWeapon){
     Object.entries(item.recipe).forEach(([mat,need]) => addMat(mat, -need));
     ownedList.push(key);
   }
-  if (isWeapon) player.weapon = key; else player.armor = key;
+  if (isWeapon) player.weapon = key; else {
+    const slot = item.slot || 'body';
+    player.armorSlots[slot] = key;
+  }
   renderVillage();
 }
 
 function renderStatusTab(){
   const w = currentWeapon();
-  const a = currentArmor();
+  const armor = currentArmor();
   const matEntries = Object.entries(player.materials).filter(([,n]) => n > 0);
   const invHtml = matEntries.length
     ? `<div class="inv-grid">${matEntries.map(([n,c]) => `<div class="inv-item"><span>${n}</span><span class="n">x${c}</span></div>`).join('')}</div>`
@@ -402,7 +655,8 @@ function renderStatusTab(){
       <h2>Equipped Gear</h2>
       <div class="equip-row" style="flex-direction:column; gap:6px;">
         <div>Weapon: <b>${w.name}</b> — ATK ${w.atk}, ${w.damageType}${w.element!=='none' ? `, +${w.elementPower} ${w.element}` : ''}</div>
-        <div>Armor: <b>${a.name}</b> — DEF ${a.def}${(a.resist.fire||a.resist.ice) ? ', resist ' + Object.entries(a.resist).filter(([,v])=>v>0).map(([k,v])=>k+' '+v+'%').join(', ') : ''}</div>
+        <div>Head: <b>${armor.head.name}</b> — DEF ${armor.head.def}${(armor.head.resist.fire||armor.head.resist.ice) ? ', resist ' + Object.entries(armor.head.resist).filter(([,v])=>v>0).map(([k,v])=>k+' '+v+'%').join(', ') : ''}</div>
+        <div>Body: <b>${armor.body.name}</b> — DEF ${armor.body.def}${(armor.body.resist.fire||armor.body.resist.ice) ? ', resist ' + Object.entries(armor.body.resist).filter(([,v])=>v>0).map(([k,v])=>k+' '+v+'%').join(', ') : ''}</div>
       </div>
     </div>
     <div class="panel">
@@ -491,23 +745,29 @@ function doLoadSave(){
 function doNewGame(){
   player = {
     name:'Hunter', maxHp:120, hp:120, maxStamina:100, stamina:100,
-    weapon:'basic', armor:'basic', ownedWeapons:['basic'], ownedArmors:['basic'],
+    weapon:'basic', armorSlots:{ head:'headband', body:'basic' }, ownedWeapons:['basic'], ownedArmors:['basic','headband'],
     zenny:60, potions:3, materials:{},
     stats:{ hunts:0, victories:0, fled:0, defeats:0 }, trophies:{}
+  };
+  story = {
+    chapter:1,
+    activeMissionKey:'intro_boar',
+    completedMissionKeys:[],
+    unlockedMissionKeys:['intro_boar']
   };
   renderVillage();
 }
 
 /* ---------- HUNT SETUP ---------- */
 
-function startHunt(monsterId){
+function startHunt(monsterId, missionKey){
   const template = MONSTERS[monsterId];
   const monster = JSON.parse(JSON.stringify(template));
   monster.hp = monster.maxHp;
   monster.enraged = false;
   monster.parts.forEach(p => { p.hp = p.maxHp; p.broken = false; });
 
-  hunt = { monster, pendingMove:null, turnCount:0, sandstormActive:false, playerGuardedThisRound:false, log:[], over:false };
+  hunt = { monster, pendingMove:null, turnCount:0, sandstormActive:false, playerGuardedThisRound:false, recoveryWindow:false, log:[], over:false, missionKey: missionKey || null };
   player.hp = player.maxHp;
   player.stamina = player.maxStamina;
 
@@ -521,6 +781,18 @@ function endHunt(result){
   let rewardsHtml = '';
 
   player.stats.hunts += 1;
+  if (hunt.missionKey){
+    const mission = STORY_MISSIONS.find(item => item.key === hunt.missionKey);
+    if (mission && result === 'victory' && !story.completedMissionKeys.includes(hunt.missionKey)){
+      story.completedMissionKeys.push(hunt.missionKey);
+      const nextMission = STORY_MISSIONS.find(item => item.chapter === mission.chapter + 1);
+      if (nextMission){
+        story.unlockedMissionKeys.push(nextMission.key);
+        story.activeMissionKey = nextMission.key;
+        story.chapter = Math.max(story.chapter, nextMission.chapter);
+      }
+    }
+  }
   if (result === 'victory') player.stats.victories += 1;
   else if (result === 'flee') player.stats.fled += 1;
   else if (result === 'defeat') player.stats.defeats += 1;
@@ -647,12 +919,44 @@ function playerAction(actionType, payload){
   }
 
   if (hunt.pendingMove){
+    if (actionType === 'attack'){
+      logMsg('You seize the opening and strike before the monster can complete its move!', 'l-good');
+      doPlayerAttack(payload.partKey);
+      hunt.pendingMove = null;
+      hunt.sandstormActive = false;
+      hunt.pendingMoveWasJustResolved = false;
+      if (hunt.over) return;
+      if (player.hp <= 0){ endHunt('defeat'); return; }
+      hunt.recoveryWindow = true;
+      renderHunt();
+      return;
+    }
+    if (!['dodge','guard'].includes(actionType)){
+      logMsg('The monster is already committing to its attack — react now!', 'l-sys');
+      renderHunt();
+      return;
+    }
     resolvePendingMove(actionType, payload);
     if (player.hp <= 0){ endHunt('defeat'); return; }
   }
 
-  if (actionType === 'attack') doPlayerAttack(payload.partKey);
-  else if (actionType === 'guard') doPlayerGuardSelf();
+  if (actionType === 'attack'){
+    doPlayerAttack(payload.partKey);
+    if (hunt.over) return;
+    if (player.hp <= 0){ endHunt('defeat'); return; }
+
+    if (!hunt.recoveryWindow){
+      hunt.recoveryWindow = true;
+      logMsg('The monster recoils from the hit, giving you a brief opening.', 'l-good');
+      renderHunt();
+      return;
+    }
+
+    hunt.recoveryWindow = true;
+    logMsg('You keep the pressure on while the monster is still off-balance.', 'l-good');
+    renderHunt();
+    return;
+  } else if (actionType === 'guard') doPlayerGuardSelf();
   else if (actionType === 'item') doPlayerItem();
   else if (actionType === 'dodge' && !hunt.pendingMoveWasJustResolved) doPlayerDodgeSelf();
 
@@ -660,8 +964,26 @@ function playerAction(actionType, payload){
   if (hunt.over) return;
   if (player.hp <= 0){ endHunt('defeat'); return; }
 
+  hunt.recoveryWindow = false;
   monsterTelegraphPhase();
   renderHunt();
+}
+
+function getWeaponSpecialEffect(weapon, part, dmg, crit){
+  let extraDmg = 0;
+  let note = '';
+  switch (weapon.key){
+    case 'boarhammer':
+      if (part.broken){ extraDmg = 4; note = 'Impact drives extra force into the exposed wound.'; }
+      break;
+    case 'wyrmfang':
+      if (crit || part.hitzone.fire >= 20){ extraDmg = 6; note = 'The blade sears the weak spot with blazing force.'; }
+      break;
+    case 'dunelord':
+      if (Math.random() < 0.2){ extraDmg = 8; note = 'The greatfang overwhelms the target with a crushing blow.'; }
+      break;
+  }
+  return { extraDmg, note };
 }
 
 function doPlayerAttack(partKey){
@@ -685,6 +1007,8 @@ function doPlayerAttack(partKey){
   let dmg = Math.round((physical + elemental) * rand(0.85,1.2));
   const crit = Math.random() < 0.15;
   if (crit) dmg = Math.round(dmg * 1.5);
+  const special = getWeaponSpecialEffect(weapon, part, dmg, crit);
+  dmg = Math.max(1, dmg + special.extraDmg);
   dmg = Math.max(1, dmg);
 
   const wasBrokenAlready = part.broken;
@@ -694,7 +1018,7 @@ function doPlayerAttack(partKey){
     m.hp = Math.max(0, m.hp - dmg);
   }
 
-  logMsg(`You strike the ${part.name.toLowerCase()} for ${dmg} damage.${crit ? ' A solid hit!' : ''}`, crit ? 'l-crit' : 'l-hit');
+  logMsg(`You strike the ${part.name.toLowerCase()} for ${dmg} damage.${crit ? ' A solid hit!' : ''}${special.note ? ' ' + special.note : ''}`, crit ? 'l-crit' : 'l-hit');
 
   if (part.hp <= 0 && !wasBrokenAlready){
     part.broken = true;
@@ -714,9 +1038,16 @@ function doPlayerAttack(partKey){
 }
 
 function doPlayerGuardSelf(){
-  player.stamina = Math.min(player.maxStamina, player.stamina + 20);
+  const weapon = currentWeapon();
+  let gain = 20;
+  let note = '';
+  if (weapon.key === 'bearclaw'){
+    gain = 28;
+    note = ' Your clawed gauntlet keeps your footing firm.';
+  }
+  player.stamina = Math.min(player.maxStamina, player.stamina + gain);
   if (!hunt.pendingMove){
-    logMsg('You settle into a ready stance, catching your breath.', 'l-sys');
+    logMsg(`You settle into a ready stance, catching your breath.${note}`, 'l-sys');
   }
 }
 
@@ -787,11 +1118,13 @@ function resolvePendingMove(actionType, payload){
   } else {
     let dmg = Math.round(move.baseDamage * (m.enraged ? 1.25 : 1) * (tailBroken(m) ? 0.9 : 1) * dmgMult);
     if (move.element !== 'none'){
-      const resist = currentArmor().resist[move.element] || 0;
+      const armorStats = getArmorStats();
+      const resist = armorStats.resist[move.element] || 0;
       dmg = Math.round(dmg * (1 - resist/100));
     }
     if (dmg > 0){
-      dmg = Math.max(1, dmg - Math.round(currentArmor().def * 0.5));
+      const armorStats = getArmorStats();
+      dmg = Math.max(1, dmg - Math.round(armorStats.def * 0.5));
       player.hp = Math.max(0, player.hp - dmg);
     }
     if (outcome === 'perfect') logMsg(`${move.resolveText} You read it perfectly and dodge clean.`, 'l-good');
@@ -812,6 +1145,7 @@ function monsterTelegraphPhase(){
   const pool = availableMoves(m);
   const chosen = pickMove(pool, m.enraged);
   hunt.pendingMove = chosen;
+  hunt.recoveryWindow = false;
   logMsg(chosen.telegraph, 'l-telegraph');
 
   hunt.turnCount++;
@@ -849,6 +1183,7 @@ function renderHunt(){
     else if (p.broken) tag = '<span class="part-tag exposed">EXPOSED</span>';
     else if (locked) tag = '<span class="part-tag armored">ARMORED</span>';
     const hints = hitzoneHints(p).map(hn => `<span class="hint-chip">${hn}</span>`).join('');
+    const attackDisabled = '';
     return `
       <div class="part-card ${p.broken?'broken':''}">
         <div class="pname"><span>${p.name}</span>${tag}</div>
@@ -856,7 +1191,7 @@ function renderHunt(){
           <div class="barfill ${p.broken?'broken':'part'}" style="width:${pct(p.hp,p.maxHp)}%"></div>
         </div>
         <div class="hint-row">${hints}</div>
-        <button class="wide" style="margin-top:8px;" onclick="playerAction('attack',{partKey:'${p.key}'})">Attack ${p.name.toLowerCase()}</button>
+        <button class="wide" style="margin-top:8px;" onclick="playerAction('attack',{partKey:'${p.key}'})" ${attackDisabled}>Attack ${p.name.toLowerCase()}</button>
       </div>
     `;
   }).join('');
@@ -865,11 +1200,24 @@ function renderHunt(){
     <div class="telegraph-banner">
       <span class="tt-label">Incoming — ${hunt.pendingMove.blockable ? 'blockable' : 'must be dodged'}</span>
       ${hunt.pendingMove.telegraph}
+      <div style="margin-top:6px; color:var(--frost);">React now: ${hunt.pendingMove.blockable ? 'guard or dodge' : 'dodge only'}.</div>
+    </div>
+  ` : hunt.recoveryWindow ? `
+    <div class="telegraph-banner" style="border-color:var(--moss-dim); color:var(--moss);">
+      <span class="tt-label">Tempo opening</span>
+      The monster is still recovering. Press another attack while the opening lasts.
     </div>
   ` : `
     <div class="telegraph-banner" style="border-color:var(--border); color:var(--text-dim);">
       <span class="tt-label">Reading the field</span>
       No move telegraphed yet — act to see what it does next.
+    </div>
+  `;
+
+  const loadoutHint = `
+    <div class="loadout-note">
+      <div class="tactic-pill">Weapon style: ${weapon.specialDesc}</div>
+      <div class="tactic-pill">Armor: ${getArmorStats().def} DEF · fire ${getArmorStats().resist.fire}% · ice ${getArmorStats().resist.ice}%</div>
     </div>
   `;
 
@@ -887,6 +1235,7 @@ function renderHunt(){
       <div class="barwrap"><div class="barfill hp" style="width:${pct(m.hp,m.maxHp)}%"></div></div>
 
       ${telegraphHtml}
+      ${loadoutHint}
 
       <div class="parts-grid">${partsHtml}</div>
 
@@ -901,7 +1250,7 @@ function renderHunt(){
         </div>
       </div>
 
-      <div class="action-group-label">Dodge (react to the telegraph)</div>
+      <div class="action-group-label">Attack or react to the telegraph</div>
       <div class="actions">
         <button class="dodge" onclick="playerAction('dodge',{dir:'left'})">Dodge left</button>
         <button class="dodge" onclick="playerAction('dodge',{dir:'right'})">Dodge right</button>
@@ -911,7 +1260,7 @@ function renderHunt(){
       <div class="action-group-label">Other actions</div>
       <div class="actions">
         <button onclick="playerAction('guard')">Guard</button>
-        <button onclick="playerAction('item')" ${player.potions<=0?'disabled':''}>Use potion (${player.potions})</button>
+        <button onclick="playerAction('item')" ${player.potions<=0 || hunt.pendingMove ? 'disabled' : ''}>Use potion (${player.potions})</button>
         <button onclick="playerAction('flee')">Flee hunt</button>
       </div>
       <div style="font-size:11px;color:var(--text-dim);margin-bottom:8px;">Weapon: ${weapon.name} (ATK ${weapon.atk}) · attacks cost 20 stamina · dodging ignores your weapon's swing this round</div>
@@ -929,6 +1278,10 @@ renderVillage();
 window.startHunt = startHunt;
 window.playerAction = playerAction;
 window.craftItem = craftItem;
+window.buyShopItem = buyShopItem;
+window.equipOwnedItem = equipOwnedItem;
 window.renderVillage = renderVillage;
 window.setVillageTab = setVillageTab;
-window.openInventory = openInventory;
+window.doGenerateSave = doGenerateSave;
+window.doLoadSave = doLoadSave;
+window.doNewGame = doNewGame;

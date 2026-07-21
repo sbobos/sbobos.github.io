@@ -1,1 +1,1 @@
-import "./game.js";
+import "./game.js?v=202607211";
