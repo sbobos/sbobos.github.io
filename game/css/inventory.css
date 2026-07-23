@@ -1,0 +1,110 @@
+/* shop */
+
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.shop-card,
+.inventory-card {
+    position: relative;
+}
+
+.shop-title {
+    font-family: var(--font-display);
+    font-size: 15px;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+
+.shop-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.shop-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--gold);
+}
+
+.wide-card {
+    min-width: 100%;
+}
+
+/* inventory */
+
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.inv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+    font-size: 12px;
+}
+
+.inv-item {
+    background: var(--panel-alt);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 6px 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.inv-item span.n {
+    color: var(--text-dim);
+}
+
+.inv-empty {
+    color: var(--text-dim);
+    font-size: 12px;
+    font-style: italic;
+}
+
+/* equipment */
+
+.equip-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.equip-row div {
+    color: var(--text-dim);
+}
+
+.equip-row b {
+    color: var(--gold);
+    font-weight: normal;
+}
+
+/* loadout */
+
+.loadout-note {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0 4px;
+}
+
+.tactic-pill {
+    font-size: 10px;
+    color: var(--frost);
+    border: 1px solid var(--frost);
+    border-radius: 999px;
+    padding: 3px 8px;
+}

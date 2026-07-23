@@ -1,0 +1,25 @@
+:root {
+    --bg: #12171a;
+    --panel: #1b2320;
+    --panel-alt: #212a26;
+    --border: #38433d;
+    --text: #e4d9c0;
+    --text-dim: #9aa39a;
+    --blood: #a23b2e;
+    --blood-dim: #6e2c22;
+    --gold: #c79a3c;
+    --gold-dim: #8a6b28;
+    --moss: #7a9a6e;
+    --moss-dim: #4f6a47;
+    --frost: #6f9bb0;
+
+    --font-display: Georgia, "Times New Roman", serif;
+    --font-mono: "Courier New", Courier, monospace;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.001s !important;
+        transition-duration: 0.001s !important;
+    }
+}

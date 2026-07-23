@@ -1,0 +1,48 @@
+button {
+    font-family: var(--font-mono);
+    background: var(--panel-alt);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+button:hover:not(:disabled) {
+    border-color: var(--gold-dim);
+    color: var(--gold);
+}
+
+button:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+}
+
+button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+button.primary {
+    border-color: var(--blood);
+    color: var(--text);
+}
+
+button.primary:hover:not(:disabled) {
+    background: var(--blood-dim);
+    color: var(--text);
+    border-color: var(--blood);
+}
+
+button.dodge:hover:not(:disabled) {
+    border-color: var(--frost);
+    color: var(--frost);
+}
+
+button.wide {
+    width: 100%;
+    text-align: left;
+    margin-top: 8px;
+}

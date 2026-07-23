@@ -9,7 +9,7 @@ import { renderVillage } from './village.js';
 
 function renderShopSection(){
   const cards = Object.values(SHOP_ITEMS).map(item => `
-    <div class="shop-card">
+    <div class="card shop-card">
       <div class="shop-title">${item.name}</div>
       <div class="shop-desc">${item.desc}</div>
       <div class="shop-actions">
@@ -58,7 +58,7 @@ function renderBountyCard(bounty){
   if (bounty.rewardZenny) rewardParts.push(`${bounty.rewardZenny} zenny`);
 
   return `
-    <div class="craft-card">
+    <div class="card craft-card">
       <div class="ctag">Bounty · Repeatable</div>
       <div class="cname">${bounty.title}</div>
       <div class="cstat">${bounty.desc}</div>
@@ -107,7 +107,7 @@ function renderTradeCard(trade){
   const canTrade = giveEntries.every(([mat,need]) => (player.materials[mat]||0) >= need);
 
   return `
-    <div class="craft-card">
+    <div class="card craft-card">
       <div class="ctag">Barter</div>
       <div class="cname">${tradeGetLabel(trade)}</div>
       <div class="cstat">In exchange for:</div>

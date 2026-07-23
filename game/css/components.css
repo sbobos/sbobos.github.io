@@ -1,0 +1,109 @@
+.banner {
+    text-align: center;
+    padding: 18px 10px 14px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 18px;
+}
+
+.banner .eyebrow {
+    letter-spacing: 3px;
+    font-size: 11px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+}
+
+.banner h1 {
+    font-family: var(--font-display);
+    font-size: 30px;
+    margin: 6px 0 4px;
+    letter-spacing: 1px;
+    color: var(--text);
+}
+
+.banner .sub {
+    font-size: 12px;
+    color: var(--text-dim);
+}
+
+/* Story */
+
+.story-banner {
+    background: linear-gradient(
+        135deg,
+        rgba(199,154,60,0.15),
+        rgba(106,148,176,0.12)
+    );
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 14px;
+}
+
+.story-pill {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid var(--gold-dim);
+    border-radius: 999px;
+    padding: 3px 7px;
+    margin-bottom: 6px;
+}
+
+.story-title {
+    font-family: var(--font-display);
+    font-size: 14px;
+    color: var(--gold);
+    margin-bottom: 4px;
+}
+
+.story-subtitle {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.story-copy {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.5;
+}
+
+/* Quests */
+
+.quest-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+}
+
+.quest-card {
+    position: relative;
+}
+
+.quest-card .qicon {
+    font-size: 26px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.quest-card .qname {
+    font-family: var(--font-display);
+    font-size: 16px;
+    color: var(--text);
+}
+
+.quest-card .qflavor {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin: 6px 0 4px;
+    line-height: 1.5;
+}
+
+.quest-card .qarena {
+    font-size: 11px;
+    color: var(--frost);
+    margin-bottom: 8px;
+}

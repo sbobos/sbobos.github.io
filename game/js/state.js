@@ -10,6 +10,7 @@ export let player = {
   name:'Hunter',
   maxHp:120, hp:120,
   maxStamina:100, stamina:100,
+  staggered: false,
   weapon:'basic',
   armorSlots:{ head:'headband', body:'basic' },
   ownedWeapons:['basic'],

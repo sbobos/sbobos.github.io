@@ -1,55 +1,352 @@
-/* MOVE fields:
-   key            unique id
-   type           'damage' (hurts the player) or 'debuff' (non-hp effect)
-   telegraph      shown BEFORE the move lands (this round) — write it so the
-                  wording hints which dodge direction reads correctly
-   resolveText    shown WHEN the move actually lands
-   dodgeType      'left' | 'right' | 'back' — the correct reaction
-   blockable      can Guard reduce it? (false = must be dodged, not blocked)
-   baseDamage     damage at neutral (non-enraged) power
-   element        'none' | 'fire' | 'ice' — used against armor resistance
-*/
+/* ==========================================================================
+   MOVE DATABASE
+
+   Every move is pure data.
+
+   The combat system should only read these fields. Avoid checking move.key
+   inside combat logic—add a new field here instead whenever possible.
+
+   --------------------------------------------------------------------------
+   Fields
+
+   key             Internal identifier.
+
+   name            Display name for UI, logs, hunter notes, etc.
+
+   type            "damage" | "debuff"
+
+   telegraph       Message shown when the monster prepares the move.
+
+   resolveText     Message shown when the move resolves.
+
+   dodgeType       Correct dodge direction.
+                   "left" | "right" | "back"
+
+   guardResult     What happens if the player chooses Guard.
+
+                   "block"   = normal guarded hit
+                   "stagger" = guard is broken, player becomes staggered
+                   "pierce"  = ignores guarding entirely
+                   "ignore"  = guard has no effect
+
+   staminaBreak    Set player stamina to 0 after guarding.
+
+   knockback       "none" | "small" | "medium" | "large"
+
+   baseDamage      Raw damage before armor and modifiers.
+
+   element         "none" | "fire" | "ice"
+
+   status          Optional status effect.
+                   null | "burn" | "bleed" | "poison" | ...
+
+   ========================================================================== */
 
 export const MOVES = {
-  boar_ram:       { key:'boar_ram', type:'damage', dodgeType:'left', blockable:true, baseDamage:16, element:'none',
-    telegraph:"The boar lowers its tusked snout, scraping its hooves against the dirt as it locks its eyes onto you. It's preparing a full-speed charge!",
-    resolveText:"The Boar surges forward like a battering ram! Its tusks spear through your guard and knock you back." },
-  boar_headbut:   { key:'boar_headbut', type:'damage', dodgeType:'back', blockable:true, baseDamage:12, element:'none',
-    telegraph:"The Boar pulls its heavy, armored skull back, snorting aggressively at close range.",
-    resolveText:"The head whips its heavy head upward! The massive impact leaves your head ringing!" },
-  boar_kick:      { key:'boar_kick', type:'damage', dodgeType:'right', blockable:false, baseDamage:10, element:'none',
-    telegraph:"The Boar suddenly pivots away, bucking its hindquarters toward you while glancing back over its shoulder.",
-    resolveText:"The Boar kicks out savagely with its sharp hind hooves, tearing through you!" },
-  
-  wyrm_bite:      { key:'wyrm_bite', type:'damage', dodgeType:'back', blockable:true, baseDamage:16, element:'none',
-    telegraph:"The wyrm lowers its head and lunges its jaw forward — better to fall back than meet it head-on.",
-    resolveText:"It snaps forward with a vicious bite!" },
-  wyrm_tailwhip:  { key:'wyrm_tailwhip', type:'damage', dodgeType:'left', blockable:true, baseDamage:18, element:'none',
-    telegraph:"Its tail curls out wide to the side, building for a sweep.",
-    resolveText:"The tail whips through where you were standing!" },
-  wyrm_spikeslam: { key:'wyrm_spikeslam', type:'damage', dodgeType:'right', blockable:false, baseDamage:20, element:'none',
-    telegraph:"It rears up, spiked back arched — no guard will hold under this, better to step clear.",
-    resolveText:"It slams its spiked back down like a hammer!" },
-  wyrm_sandcharge:{ key:'wyrm_sandcharge', type:'damage', dodgeType:'right', blockable:true, baseDamage:14, element:'none',
-    telegraph:"It digs its claws into the sand, coiling to rush you straight on.",
-    resolveText:"It charges through the sand at full speed!" },
-  wyrm_sandburst: { key:'wyrm_sandburst', type:'damage', dodgeType:'back', blockable:false, baseDamage:24, element:'fire',
-    telegraph:"Its cracked belly glows from within — pressure is building fast, give it room.",
-    resolveText:"The wyrm's belly erupts in a spray of superheated sand!" },
 
-  bear_paw:       { key:'bear_paw', type:'damage', dodgeType:'left', blockable:true, baseDamage:15, element:'none',
-    telegraph:"It raises a massive paw, claws catching the light.",
-    resolveText:"A heavy paw swipe crashes toward you!" },
-  bear_charge:    { key:'bear_charge', type:'damage', dodgeType:'right', blockable:true, baseDamage:18, element:'none',
-    telegraph:"It plants its forelegs and lowers its head, ready to drive forward.",
-    resolveText:"It charges in, head down!" },
-  bear_slam:      { key:'bear_slam', type:'damage', dodgeType:'back', blockable:false, baseDamage:20, element:'none',
-    telegraph:"Both forelegs rise together, poised to slam the ground — get clear, don't stand your ground.",
-    resolveText:"It slams both forelegs down with tremendous force!" },
-  bear_roar:      { key:'bear_roar', type:'debuff', dodgeType:'back', blockable:true, baseDamage:0, element:'none',
-    telegraph:"It rears back on its hind legs, drawing breath for a roar.",
-    resolveText:"A thunderous roar shakes the arena, rattling your nerves!" },
-  bear_furybite:  { key:'bear_furybite', type:'damage', dodgeType:'left', blockable:false, baseDamage:26, element:'none',
-    telegraph:"Wounded and furious, it lunges wildly with bared teeth — there is no pattern to read here, just move.",
-    resolveText:"It lunges with reckless, wounded fury!" }
+    /* ==================== BOAR ==================== */
+
+    boar_ram: {
+        key: "boar_ram",
+        name: "Boar Ram",
+
+        type: "damage",
+
+        dodgeType: "left",
+        guardResult: "block",
+
+        staminaBreak: false,
+        knockback: "medium",
+
+        baseDamage: 16,
+        element: "none",
+        status: null,
+
+        telegraph:
+            "The boar lowers its tusked snout, scraping its hooves against the dirt as it locks its eyes onto you. It's preparing a full-speed charge!",
+
+        resolveText:
+            "The Boar surges forward like a battering ram! Its tusks spear through your guard and knock you back."
+    },
+
+    boar_headbut: {
+        key: "boar_headbut",
+        name: "Headbutt",
+
+        type: "damage",
+
+        dodgeType: "back",
+        guardResult: "block",
+
+        staminaBreak: false,
+        knockback: "small",
+
+        baseDamage: 12,
+        element: "none",
+        status: null,
+
+        telegraph:
+            "The Boar pulls its heavy, armored skull back, snorting aggressively at close range.",
+
+        resolveText:
+            "The head whips its heavy head upward! The massive impact leaves your head ringing!"
+    },
+
+    boar_kick: {
+        key: "boar_kick",
+        name: "Hind Kick",
+
+        type: "damage",
+
+        dodgeType: "right",
+        guardResult: "stagger",
+
+        staminaBreak: true,
+        knockback: "large",
+
+        baseDamage: 10,
+        element: "none",
+        status: null,
+
+        telegraph:
+            "The Boar suddenly pivots away, bucking its hindquarters toward you while glancing back over its shoulder.",
+
+        resolveText:
+            "The Boar kicks out savagely with its sharp hind hooves, tearing through you!"
+    },
+
+    /* ==================== WYRM ==================== */
+
+    wyrm_bite: {
+        key: "wyrm_bite",
+        name: "Savage Bite",
+
+        type: "damage",
+
+        dodgeType: "back",
+        guardResult: "block",
+
+        staminaBreak: false,
+        knockback: "small",
+
+        baseDamage: 16,
+        element: "none",
+        status: null,
+
+        telegraph:
+            "The wyrm lowers its head and lunges its jaw forward — better to fall back than meet it head-on.",
+
+        resolveText:
+            "It snaps forward with a vicious bite!"
+    },
+
+    wyrm_tailwhip: {
+        key: "wyrm_tailwhip",
+        name: "Tail Whip",
+
+        type: "damage",
+
+        dodgeType: "left",
+        guardResult: "block",
+
+        staminaBreak: false,
+        knockback: "medium",
+
+        baseDamage: 18,
+        element: "none",
+        status: null,
+
+        telegraph:
+            "Its tail curls out wide to the side, building for a sweeping strike.",
+
+        resolveText:
+            "The tail whips through where you were standing!"
+    },
+
+    wyrm_spikeslam: {
+        key: "wyrm_spikeslam",
+        name: "Spike Slam",
+
+        type: "damage",
+
+        dodgeType: "right",
+        guardResult: "stagger",
+
+        staminaBreak: true,
+        knockback: "large",
+
+        baseDamage: 20,
+        element: "none",
+        status: null,
+
+        telegraph:
+            "It rears up, its spiked back arched high. No shield will withstand the impact—move!",
+
+        resolveText:
+            "It slams its spiked back into the ground like a falling boulder!"
+    },
+
+    wyrm_sandcharge: {
+        key: "wyrm_sandcharge",
+        name: "Sand Charge",
+
+        type: "damage",
+
+        dodgeType: "right",
+        guardResult: "block",
+
+        staminaBreak: false,
+        knockback: "medium",
+
+        baseDamage: 14,
+        element: "none",
+        status: null,
+
+        telegraph:
+            "It digs its claws into the sand, coiling its body before bursting forward.",
+
+        resolveText:
+            "It charges through the sand at full speed!"
+    },
+
+    wyrm_sandburst: {
+        key: "wyrm_sandburst",
+        name: "Sand Burst",
+
+        type: "damage",
+
+        dodgeType: "back",
+        guardResult: "stagger",
+
+        staminaBreak: true,
+        knockback: "large",
+
+        baseDamage: 24,
+        element: "fire",
+        status: "burn",
+
+        telegraph:
+            "Its cracked belly glows from within as pressure rapidly builds beneath the scales.",
+
+        resolveText:
+            "The wyrm erupts in a violent explosion of superheated sand!"
+    },
+
+    /* ==================== BEAR ==================== */
+
+    bear_paw: {
+        key: "bear_paw",
+        name: "Heavy Paw",
+
+        type: "damage",
+
+        dodgeType: "left",
+        guardResult: "block",
+
+        staminaBreak: false,
+        knockback: "small",
+
+        baseDamage: 15,
+        element: "none",
+        status: null,
+
+        telegraph:
+            "It raises a massive paw, claws catching the light.",
+
+        resolveText:
+            "A heavy paw swipe crashes toward you!"
+    },
+
+    bear_charge: {
+        key: "bear_charge",
+        name: "Bear Charge",
+
+        type: "damage",
+
+        dodgeType: "right",
+        guardResult: "block",
+
+        staminaBreak: false,
+        knockback: "medium",
+
+        baseDamage: 18,
+        element: "none",
+        status: null,
+
+        telegraph:
+            "It plants its forelegs firmly and lowers its head before charging.",
+
+        resolveText:
+            "It barrels straight toward you!"
+    },
+
+    bear_slam: {
+        key: "bear_slam",
+        name: "Earth Slam",
+
+        type: "damage",
+
+        dodgeType: "back",
+        guardResult: "stagger",
+
+        staminaBreak: true,
+        knockback: "large",
+
+        baseDamage: 20,
+        element: "none",
+        status: null,
+
+        telegraph:
+            "Both forelegs rise high into the air. Standing your ground would be a mistake.",
+
+        resolveText:
+            "Both forelegs slam into the earth with tremendous force!"
+    },
+
+    bear_roar: {
+        key: "bear_roar",
+        name: "War Roar",
+
+        type: "debuff",
+
+        dodgeType: "back",
+        guardResult: "block",
+
+        staminaBreak: false,
+        knockback: "none",
+
+        baseDamage: 0,
+        element: "none",
+        status: "fear",
+
+        telegraph:
+            "It rises onto its hind legs, drawing in a massive breath.",
+
+        resolveText:
+            "A thunderous roar echoes across the arena, rattling your nerves!"
+    },
+
+    bear_furybite: {
+        key: "bear_furybite",
+        name: "Fury Bite",
+
+        type: "damage",
+
+        dodgeType: "left",
+        guardResult: "stagger",
+
+        staminaBreak: true,
+        knockback: "large",
+
+        baseDamage: 26,
+        element: "none",
+        status: "bleed",
+
+        telegraph:
+            "Driven into a frenzy, it lunges wildly with bloodshot eyes and exposed fangs.",
+
+        resolveText:
+            "It lunges forward in a desperate, savage bite!"
+    }
+
 };

@@ -25,7 +25,7 @@ export function renderHunt(){
     const hints = hitzoneHints(p).map(hn => `<span class="hint-chip">${hn}</span>`).join('');
     const attackDisabled = '';
     return `
-      <div class="part-card ${p.broken?'broken':''}">
+      <div class="card part-card ${p.broken?'broken':''}">
         <div class="pname"><span>${p.name}</span>${tag}</div>
         <div class="barwrap" style="margin-top:6px;">
           <div class="barfill ${p.broken?'broken':'part'}" style="width:${pct(p.hp,p.maxHp)}%"></div>
@@ -54,11 +54,22 @@ export function renderHunt(){
     </div>
   `;
 
+  let hazardHint = '';
+  if (arena.hazard) {
+    const { every, warnText } = arena.hazard;
+    if (hunt.sandstormActive) {
+      hazardHint = `<div class="hazard-note">Sandstorm active — perfect dodge is reduced to partial this turn.</div>`;
+    } else if (hunt.turnCount > 0 && hunt.turnCount % every === every - 1) {
+      hazardHint = `<div class="hazard-note">${warnText}</div>`;
+    }
+  }
+
   const loadoutHint = `
     <div class="loadout-note">
       <div class="tactic-pill">Weapon style: ${weapon.specialDesc}</div>
       <div class="tactic-pill">Armor: ${getArmorStats().def} DEF · fire ${getArmorStats().resist.fire}% · ice ${getArmorStats().resist.ice}%</div>
     </div>
+    ${hazardHint}
   `;
 
   h.innerHTML = `

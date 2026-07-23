@@ -10,7 +10,10 @@ export const ARENAS = {
     hazard:{ every:4,
       warnText:"The wind is rising — grit stings the air.",
       triggerText:"A sandstorm gust rips across the arena, blinding your footing!",
-      effect(){ hunt.sandstormActive = true; } }
+      effect(){
+        hunt.sandstormActive = true;
+        logMsg('Sand whips across the arena — your perfect timing is harder to hit.', 'l-dmg');
+      } }
   },
   tundra: {
     key:'tundra', name:'Frostmaul Hollow',

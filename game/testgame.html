@@ -1,54 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>IRONVEIL — A Hunter's Log</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/buttons.css">
+    <link rel="stylesheet" href="css/forge.css">
+    <link rel="stylesheet" href="css/inventory.css">
+    <link rel="stylesheet" href="css/combat.css">
+    <link rel="stylesheet" href="css/utilities.css">
 </head>
 
 <body>
 
-    <div id="app">
+    <main id="app">
 
-        <div class="banner">
+        <header class="banner">
             <div class="eyebrow">Field Log · Lowland Hunting Grounds</div>
+
             <h1>IRONVEIL</h1>
-            <div class="sub">
-                a hunter's log — no levels, only the gear and reflexes you earn
-            </div>
-        </div>
 
-        <div class="topbar">
-            <div class="stat">
-                Hunter: <b id="tb-name">—</b>
-            </div>
+            <p class="sub">
+                A hunter's log — no levels, only the gear and reflexes you earn.
+            </p>
+        </header>
+
+        <nav class="topbar" aria-label="Hunter Status">
 
             <div class="stat">
-                Zenny: <b id="tb-zenny">0</b>
-            </div>
-
-            <div class="stat">
-                Weapon: <b id="tb-weapon">—</b>
+                Hunter:
+                <b id="tb-name">—</b>
             </div>
 
             <div class="stat">
-                Armor: <b id="tb-armor">—</b>
+                Zenny:
+                <b id="tb-zenny">0</b>
             </div>
-        </div>
 
-        <div id="village-screen"></div>
+            <div class="stat">
+                Weapon:
+                <b id="tb-weapon">—</b>
+            </div>
 
-        <div id="hunt-screen" class="hidden"></div>
+            <div class="stat">
+                Armor:
+                <b id="tb-armor">—</b>
+            </div>
 
-        <div class="footer-note">
-            Monster hunter knockoff.
-        </div>
+        </nav>
 
-    </div>
+        <section id="village-screen"></section>
+
+        <section id="hunt-screen" class="hidden"></section>
+
+        <footer class="footer-note">
+            IRONVEIL • Prototype Build
+        </footer>
+
+    </main>
 
     <script type="module" src="js/main.js"></script>
 
 </body>
+
 </html>

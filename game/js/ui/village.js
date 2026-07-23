@@ -93,7 +93,7 @@ export function renderQuestsTab(){
       ? `${activeMission.description}`
       : (mission ? mission.description : 'A fresh lead has surfaced nearby.');
     return `
-      <div class="quest-card">
+      <div class="card quest-card">
         <div><span class="qicon">${monster.icon}</span><span class="qname">${monster.name}</span></div>
         <div class="qflavor">${monster.flavor}</div>
         <div class="qarena">Territory: ${ARENAS[monster.arenaKey].name}</div>
@@ -163,7 +163,7 @@ export function renderInventoryTab(){
     const item = WEAPONS[key];
     const equipped = player.weapon === key;
     return `
-      <div class="inventory-card">
+      <div class="card inventory-card">
         <div class="shop-title">${item.name}</div>
         <div class="shop-desc">ATK ${item.atk} · ${item.damageType}${item.element !== 'none' ? ' · +' + item.elementPower + ' ' + item.element : ''}</div>
         <div class="shop-actions">
@@ -178,7 +178,7 @@ export function renderInventoryTab(){
     const item = ARMORS[key];
     const equipped = player.armorSlots[item.slot] === key;
     return `
-      <div class="inventory-card">
+      <div class="card inventory-card">
         <div class="shop-title">${item.name}</div>
         <div class="shop-desc">DEF ${item.def}${(item.resist.fire || item.resist.ice) ? ' · resist ' + Object.entries(item.resist).filter(([,v]) => v > 0).map(([k,v]) => k + ' ' + v + '%').join(', ') : ''}</div>
         <div class="shop-actions">
@@ -204,11 +204,11 @@ export function renderInventoryTab(){
       <h2>Inventory</h2>
       <p class="section-copy">Track your gear, resources, and the trophies that mark your path across the wilds.</p>
       <div class="inventory-grid">
-        <div class="inventory-card wide-card">
+        <div class="card inventory-card wide-card">
           <div class="shop-title">Supplies</div>
           <div class="shop-desc">Potions: ${player.potions} · HP: ${player.hp}/${player.maxHp} · Stamina: ${player.stamina}/${player.maxStamina}</div>
         </div>
-        <div class="inventory-card wide-card">
+        <div class="card inventory-card wide-card">
           <div class="shop-title">Equipment</div>
           <div class="shop-desc">Weapon: ${currentWeapon().name} · Head: ${currentArmor().head.name} · Body: ${currentArmor().body.name}</div>
         </div>
@@ -275,7 +275,7 @@ export function renderCraftCard(item, isWeapon){
   const unlockHint = isWeapon && item.unlocksFrom && !canUnlock ? `<div class="tree-copy">Requires ${WEAPONS[item.unlocksFrom].name}</div>` : '';
 
   return `
-    <div class="craft-card">
+    <div class="card craft-card">
       <div class="ctag">${item.tag}${owned && !equipped ? ' · Owned' : ''}</div>
       <div class="cname">${item.name}</div>
       <div class="cstat">
