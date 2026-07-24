@@ -1,6 +1,6 @@
 import { BOSSES } from "../data/monsters/bosses.js";
 import { SMALL_MONSTERS } from "../data/monsters/smallmonsters.js";
-import { pickRandomFillerNodes } from "./expeditionBuilder.js";
+import { pickRandomFillerNodes } from "./expeditionbuilder.js";
 
 let counter = 0;
 
