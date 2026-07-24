@@ -9,7 +9,7 @@ import { generateSaveCode, loadSaveCode } from "../save.js";
 import { renderTopbar } from "./topbar.js";
 import { renderCampTab } from "./camp.js";
 import { generateSideExpedition } from "../hunt/sidequestgenerator.js";
-import { registerMission } from "../questRegistry.js";
+import { registerMission } from "../questregistry.js";
 
 /* ---------- VILLAGE SCREEN STATE ---------- */
 let villageTab = "quests";
