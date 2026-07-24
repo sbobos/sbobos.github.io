@@ -1,14 +1,26 @@
-import { renderVillage, setVillageTab, equipOwnedItem, craftItem,
-         doGenerateSave, doLoadSave, doNewGame } from './ui/village.js';
-import { buyShopItem, turnInBounty, doTrade } from './ui/camp.js';
-import { startHunt } from './hunt/setup.js';
-import { playerAction } from './hunt/actions.js';
+import {
+  renderVillage,
+  setVillageTab,
+  equipOwnedItem,
+  craftItem,
+  doGenerateSave,
+  doLoadSave,
+  doNewGame,
+} from "./ui/village.js";
 
-/* ---------- INIT ----------
-   All onclick="" handlers in the rendered HTML strings call these by name,
-   so they need to live on window — ES modules don't do that automatically.
-*/
+import {
+  buyShopItem,
+  turnInBounty,
+  doTrade,
+} from "./ui/camp.js";
+
+import { startHunt } from "./hunt/setup.js";
+import { startExpedition, continueExpedition } from "./hunt/expedition.js";
+import { playerAction } from "./hunt/actions.js";
+
 window.startHunt = startHunt;
+window.startExpedition = startExpedition;
+window.continueExpedition = continueExpedition;
 window.playerAction = playerAction;
 window.craftItem = craftItem;
 window.buyShopItem = buyShopItem;
