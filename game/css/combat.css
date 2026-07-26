@@ -1,296 +1,350 @@
 /* Arena & Monsters */
 
 .arena-tag {
-    font-size: 11px;
-    color: var(--frost);
-    margin-bottom: 12px;
+  font-size: 11px;
+  color: var(--frost);
+  margin-bottom: 12px;
 }
 
 .monster-head {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
 }
 
 .monster-head .micon {
-    font-size: 44px;
+  font-size: 44px;
 }
 
 .monster-head .mname {
-    font-family: var(--font-display);
-    font-size: 22px;
+  font-family: var(--font-display);
+  font-size: 22px;
 }
 
 .monster-head .mtag {
-    display: inline-block;
-    font-size: 10px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--blood);
-    border: 1px solid var(--blood-dim);
-    border-radius: 3px;
-    padding: 2px 6px;
-    margin-left: 8px;
-    vertical-align: middle;
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--blood);
+  border: 1px solid var(--blood-dim);
+  border-radius: 3px;
+  padding: 2px 6px;
+  margin-left: 8px;
+  vertical-align: middle;
 }
 
 /* Encounter Overlay */
 
 .encounter-icon {
-    font-size:48px;
-    text-align:center;
-    margin:12px 0;
+  font-size: 48px;
+  text-align: center;
+  margin: 12px 0;
 }
 
 .encounter-text {
-    text-align:center;
-    line-height:1.6;
-    margin:18px 0;
+  text-align: center;
+  line-height: 1.6;
+  margin: 18px 0;
 }
 
 .encounter-info {
-    margin:16px 0;
-    padding:12px;
-    background:var(--panel-alt);
-    border:1px solid var(--border);
-    border-radius:4px;
-    font-size:12px;
-    color:var(--text-dim);
+  margin: 16px 0;
+  padding: 12px;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--text-dim);
 }
 
 /* Telegraph */
 
 .telegraph-banner {
-    background: #26201a;
-    border: 1px solid var(--gold-dim);
-    border-radius: 4px;
-    padding: 10px 12px;
-    margin: 10px 0;
-    font-size: 12px;
-    color: var(--gold);
-    line-height: 1.5;
+  background: #26201a;
+  border: 1px solid var(--gold-dim);
+  border-radius: 4px;
+  padding: 10px 12px;
+  margin: 10px 0;
+  font-size: 12px;
+  color: var(--gold);
+  line-height: 1.5;
 }
 
 .telegraph-banner .tt-label {
-    display: block;
-    margin-bottom: 4px;
-    font-size: 10px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--gold-dim);
+  display: block;
+  margin-bottom: 4px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gold-dim);
 }
 
 /* Status Bars */
 
 .barwrap {
-    position: relative;
-    overflow: hidden;
-    height: 14px;
-    background: #0d1210;
-    border: 1px solid var(--border);
-    border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+  height: 14px;
+  background: #0d1210;
+  border: 1px solid var(--border);
+  border-radius: 3px;
 }
 
 .barfill {
-    height: 100%;
-    transition: width 0.25s ease;
+  height: 100%;
+  transition: width 0.25s ease;
 }
 
 .barfill.hp {
-    background: var(--blood);
+  background: var(--blood);
 }
 
 .barfill.stam {
-    background: var(--moss);
+  background: var(--moss);
 }
 
 .barfill.part {
-    background: var(--gold-dim);
+  background: var(--gold-dim);
 }
 
 .barfill.broken {
-    background: #3a3a3a;
+  background: #3a3a3a;
 }
 
 .barlabel {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 3px;
-    font-size: 11px;
-    color: var(--text-dim);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 3px;
+  font-size: 11px;
+  color: var(--text-dim);
 }
 
 /* Monster Parts Grid */
 
 .parts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-    gap: 10px;
-    margin: 14px 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 10px;
+  margin: 14px 0;
 }
 
 .part-card {
-    position: relative;
+  position: relative;
 }
 
 .part-card.broken {
-    border-style: dashed;
-    border-color: #4a4a44;
+  border-style: dashed;
+  border-color: #4a4a44;
 }
 
 .part-card .pname {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 12px;
-    letter-spacing: .5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  letter-spacing: 0.5px;
 }
 
 .part-tag {
-    padding: 1px 5px;
-    border-radius: 2px;
-    font-size: 9px;
-    letter-spacing: .5px;
+  padding: 1px 5px;
+  border-radius: 2px;
+  font-size: 9px;
+  letter-spacing: 0.5px;
 }
 
 .part-tag.exposed {
-    background: var(--gold-dim);
-    color: #1a1408;
+  background: var(--gold-dim);
+  color: #1a1408;
 }
 
 .part-tag.spent {
-    background: #3a3a3a;
-    color: var(--text-dim);
+  background: #3a3a3a;
+  color: var(--text-dim);
 }
 
 .part-tag.armored {
-    background: #3a2a1a;
-    color: var(--frost);
-    border: 1px solid var(--frost);
+  background: #3a2a1a;
+  color: var(--frost);
+  border: 1px solid var(--frost);
 }
 
 .hint-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-top: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 5px;
 }
 
 .hint-chip {
-    padding: 1px 5px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    font-size: 9px;
-    color: var(--text-dim);
+  padding: 1px 5px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  font-size: 9px;
+  color: var(--text-dim);
 }
 
 /* Player Status */
 
 .player-status {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin: 14px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin: 14px 0;
 }
 
 .player-status .col {
-    flex: 1;
-    min-width: 180px;
+  flex: 1;
+  min-width: 180px;
 }
 
 /* Actions */
 
 .action-group-label {
-    margin: 10px 0 4px;
-    font-size: 10px;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  margin: 10px 0 4px;
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .actions {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 8px;
-    margin-bottom: 6px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin-bottom: 6px;
 }
 
 .log {
-    height: 190px;
-    overflow-y: auto;
-    padding: 10px 12px;
-    background: #0d1210;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    font-size: 12px;
-    line-height: 1.6;
+  height: 190px;
+  overflow-y: auto;
+  padding: 10px 12px;
+  background: #0d1210;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1.6;
 }
 
 /* Combat Log Entries */
 
 .log div {
-    margin-bottom: 2px;
+  margin-bottom: 2px;
 }
 
 .log .l-hit {
-    color: var(--text);
+  color: var(--text);
 }
 
 .log .l-crit {
-    color: var(--gold);
+  color: var(--gold);
 }
 
 .log .l-dmg {
-    color: var(--blood);
+  color: var(--blood);
 }
 
 .log .l-sys {
-    color: var(--text-dim);
-    font-style: italic;
+  color: var(--text-dim);
+  font-style: italic;
 }
 
 .log .l-break {
-    color: var(--gold);
-    font-weight: bold;
+  color: var(--gold);
+  font-weight: bold;
 }
 
 .log .l-telegraph {
-    color: var(--frost);
+  color: var(--frost);
 }
 
 .log .l-good {
-    color: var(--moss);
+  color: var(--moss);
 }
 
 /* Loot Overlay */
 
 .overlay {
-    position: relative;
-    margin-top: 14px;
-    padding: 16px;
-    background: var(--panel-alt);
-    border: 1px solid var(--gold-dim);
-    border-radius: 4px;
+  position: relative;
+  margin-top: 14px;
+  padding: 16px;
+  background: var(--panel-alt);
+  border: 1px solid var(--gold-dim);
+  border-radius: 4px;
 }
 
 .overlay h3 {
-    margin: 0 0 10px;
-    font-family: var(--font-display);
-    color: var(--gold);
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  color: var(--gold);
 }
 
 .loot-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 8px;
-    margin: 10px 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+  margin: 10px 0;
 }
 
 .loot-item {
-    padding: 6px 8px;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    font-size: 12px;
+  padding: 6px 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+/* Move Select */
+
+.move-select {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+
+.move-pick {
+  text-align: left;
+  padding: 8px 10px;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.move-pick:hover {
+  border-color: var(--gold-dim);
+}
+
+.move-pick.selected {
+  background: #26201a;
+  border-color: var(--gold);
+}
+
+.move-name {
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  color: var(--text);
+}
+
+.move-pick.selected .move-name {
+  color: var(--gold);
+}
+
+.move-desc {
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--text-dim);
+}
+
+.move-cost {
+  margin-top: 5px;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  color: var(--moss);
 }

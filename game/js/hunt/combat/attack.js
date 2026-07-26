@@ -1,12 +1,26 @@
 import { hunt, player } from "../../state.js";
-import { COMBAT } from "./constants.js";
 import { calculateAttack } from "./damage.js";
 import { spendStamina, findMonsterPart } from "./helpers.js";
 import { logMsg } from "../log.js";
 import { endHunt } from "../setup.js";
+import { currentWeapon } from "../../utils.js";
+import { movesetFor } from "../../data/playerMoves.js";
 
-export function doPlayerAttack(partKey) {
-  if (!spendStamina(player, COMBAT.ATTACK_STAMINA_COST)) {
+/**
+ * moveKey is optional so the game stays playable before the move-select UI
+ * exists — when omitted, the weapon's first listed move is used. Once the
+ * UI passes a real moveKey through playerAction('attack', {partKey, moveKey}),
+ * this fallback stops mattering.
+ */
+export function doPlayerAttack(partKey, moveKey) {
+  const weapon = currentWeapon();
+  const moveset = movesetFor(weapon);
+  const move =
+    moveset.moves.find((mv) => mv.key === moveKey) ?? moveset.moves[0];
+
+  const staminaCost = Math.round(move.staminaCost * (weapon.staminaMult ?? 1));
+
+  if (!spendStamina(player, staminaCost)) {
     logMsg(
       "You're too winded to swing hard. Wait for stamina to recover.",
       "l-sys",
@@ -17,12 +31,12 @@ export function doPlayerAttack(partKey) {
   const monster = hunt.monster;
   const part = findMonsterPart(monster, partKey);
 
-  const attack = calculateAttack(part);
+  const attack = calculateAttack(part, move);
 
-  applyAttack(monster, part, attack);
+  applyAttack(monster, part, attack, move);
 }
 
-function applyAttack(monster, part, attack) {
+function applyAttack(monster, part, attack, move) {
   const wasBroken = part.broken;
 
   applyDamage(part, attack.damage);
@@ -31,7 +45,7 @@ function applyAttack(monster, part, attack) {
     applyDamage(monster, attack.damage);
   }
 
-  logAttack(part, attack);
+  logAttack(part, attack, move);
 
   if (part.hp <= 0 && !wasBroken) {
     breakPart(monster, part);
@@ -69,13 +83,13 @@ function updateMonsterState(monster) {
   }
 }
 
-function logAttack(part, attack) {
+function logAttack(part, attack, move) {
   const critText = attack.crit ? " A solid hit!" : "";
 
   const specialText = attack.special.note ? ` ${attack.special.note}` : "";
 
   logMsg(
-    `You strike the ${part.name.toLowerCase()} for ${attack.damage} damage.${critText}${specialText}`,
+    `You use ${move.name} on the ${part.name.toLowerCase()} for ${attack.damage} damage.${critText}${specialText}`,
     attack.crit ? "l-crit" : "l-hit",
   );
 }

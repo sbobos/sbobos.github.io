@@ -1,5 +1,4 @@
-import { STORY_MISSIONS } from "../data/story.js";
-import { SIDE_MISSIONS } from "../data/sidequests.js";
+import { MISSIONS } from "../data/missions.js";
 import { ENCOUNTERS } from "../data/encounters.js";
 import { startHunt } from "./setup.js";
 import { renderEncounter, setEncounterHandler } from "../ui/expedition.js";
@@ -18,8 +17,7 @@ let currentEncounter = null;
 export function startExpedition(missionKey) {
   const rawMission =
     getRegisteredMission(missionKey) ??
-    STORY_MISSIONS.find((m) => m.key === missionKey) ??
-    SIDE_MISSIONS.find((m) => m.key === missionKey);
+    MISSIONS.find((m) => m.key === missionKey);
 
   if (!rawMission) {
     console.error(`Unknown mission: ${missionKey}`);

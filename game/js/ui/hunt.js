@@ -5,6 +5,7 @@ import { hitzoneHints } from "../hunt/parts.js";
 import { renderLog } from "../hunt/log.js";
 import { renderTopbar } from "./topbar.js";
 import { HAZARDS } from "../hunt/combat/hazards.js";
+import { movesetFor } from "../data/playerMoves.js";
 
 /* ---------- HUNT SCREEN RENDER ---------- */
 
@@ -19,6 +20,37 @@ export function renderHunt() {
   const arena = ARENAS[m.arenaKey];
   const hazard = HAZARDS[arena.hazard];
 
+  // Move selection lives on hunt (not local state) so it survives re-renders
+  // and resets naturally each new hunt via setup.js's fresh hunt object.
+  const moveset = movesetFor(weapon);
+  if (
+    !hunt.selectedMoveKey ||
+    !moveset.moves.some((mv) => mv.key === hunt.selectedMoveKey)
+  ) {
+    hunt.selectedMoveKey = moveset.moves[0].key;
+  }
+  const selectedMove = moveset.moves.find(
+    (mv) => mv.key === hunt.selectedMoveKey,
+  );
+  const selectedCost = Math.round(
+    selectedMove.staminaCost * (weapon.staminaMult ?? 1),
+  );
+  const canAffordSelected = player.stamina >= selectedCost;
+
+  const moveSelectHtml = moveset.moves
+    .map((mv) => {
+      const cost = Math.round(mv.staminaCost * (weapon.staminaMult ?? 1));
+      const active = mv.key === hunt.selectedMoveKey;
+      return `
+      <button class="move-pick ${active ? "selected" : ""}" onclick="selectMove('${mv.key}')">
+        <div class="move-name">${mv.name}</div>
+        <div class="move-desc">${mv.desc}</div>
+        <div class="move-cost">${cost} stamina</div>
+      </button>
+    `;
+    })
+    .join("");
+
   const partsHtml = m.parts
     .map((p) => {
       const locked =
@@ -32,7 +64,7 @@ export function renderHunt() {
       const hints = hitzoneHints(p)
         .map((hn) => `<span class="hint-chip">${hn}</span>`)
         .join("");
-      const attackDisabled = "";
+      const attackDisabled = canAffordSelected ? "" : "disabled";
       return `
       <div class="card part-card ${p.broken ? "broken" : ""}">
         <div class="pname"><span>${p.name}</span>${tag}</div>
@@ -40,7 +72,7 @@ export function renderHunt() {
           <div class="barfill ${p.broken ? "broken" : "part"}" style="width:${pct(p.hp, p.maxHp)}%"></div>
         </div>
         <div class="hint-row">${hints}</div>
-        <button class="wide" style="margin-top:8px;" onclick="playerAction('attack',{partKey:'${p.key}'})" ${attackDisabled}>Attack ${p.name.toLowerCase()}</button>
+        <button class="wide" style="margin-top:8px;" onclick="playerAction('attack',{partKey:'${p.key}',moveKey:'${hunt.selectedMoveKey}'})" ${attackDisabled}>${selectedMove.name} → ${p.name.toLowerCase()}</button>
       </div>
     `;
     })
@@ -102,6 +134,10 @@ export function renderHunt() {
       ${telegraphHtml}
       ${loadoutHint}
 
+      <div class="action-group-label">Choose your move</div>
+      <div class="move-select">${moveSelectHtml}</div>
+
+      <div class="action-group-label">Then target a part</div>
       <div class="parts-grid">${partsHtml}</div>
 
       <div class="player-status">
@@ -128,11 +164,21 @@ export function renderHunt() {
         <button onclick="playerAction('item')" ${player.potions <= 0 || hunt.pendingMove ? "disabled" : ""}>Use potion (${player.potions})</button>
         <button onclick="playerAction('flee')">Flee hunt</button>
       </div>
-      <div style="font-size:11px;color:var(--text-dim);margin-bottom:8px;">Weapon: ${weapon.name} (ATK ${weapon.atk}) · attacks cost 20 stamina · dodging ignores your weapon's swing this round</div>
+      <div style="font-size:11px;color:var(--text-dim);margin-bottom:8px;">Weapon: ${weapon.name} (ATK ${weapon.atk}) · ${selectedMove.name} costs ${selectedCost} stamina · dodging ignores your weapon's swing this round</div>
 
       <div id="hunt-log" class="log"></div>
     </div>
   `;
   renderLog();
   renderTopbar();
+}
+
+/**
+ * Sets which move the part-attack buttons below will use. Purely a UI
+ * selection — doesn't spend a turn, doesn't call playerAction — so it's
+ * safe to change mid-telegraph while reacting to a monster's pending move.
+ */
+export function selectMove(moveKey) {
+  hunt.selectedMoveKey = moveKey;
+  renderHunt();
 }

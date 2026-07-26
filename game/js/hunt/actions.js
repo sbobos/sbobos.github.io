@@ -1,6 +1,7 @@
 import { hunt, player } from "../state.js";
 
 import { doPlayerAttack } from "./combat/attack.js";
+import { currentWeapon } from "../utils.js";
 
 import { logMsg } from "./log.js";
 import { resolvePendingMove } from "./resolve.js";
@@ -57,7 +58,7 @@ function handleReaction(actionType, payload) {
       "l-sys",
     );
 
-    doPlayerAttack(payload.partKey);
+    doPlayerAttack(payload.partKey, payload.moveKey);
 
     if (combatFinished()) {
       return true;
@@ -92,7 +93,7 @@ function handleReaction(actionType, payload) {
 function performAction(actionType, payload) {
   switch (actionType) {
     case "attack":
-      attack(payload.partKey);
+      attack(payload.partKey, payload.moveKey);
       break;
 
     case "guard":
@@ -109,8 +110,8 @@ function performAction(actionType, payload) {
   }
 }
 
-function attack(partKey) {
-  doPlayerAttack(partKey);
+function attack(partKey, moveKey) {
+  doPlayerAttack(partKey, moveKey);
 
   if (hunt.over) {
     return;
@@ -134,7 +135,9 @@ function attack(partKey) {
 }
 
 function guard() {
-  recoverStamina(20);
+  const weapon = currentWeapon();
+
+  recoverStamina(Math.round(20 * (weapon.guardStaminaMult ?? 1)));
 
   if (!hunt.pendingMove) {
     logMsg("You settle into a ready stance, catching your breath.", "l-sys");

@@ -18,7 +18,7 @@ export const SMALL_MONSTERS = {
 
     lootTable: "boarling",
 
-    zennyRange: [5, 10],
+    goldcoinRange: [5, 10],
   },
 
   sandjackal: {
@@ -40,7 +40,7 @@ export const SMALL_MONSTERS = {
 
     lootTable: "sandjackal",
 
-    zennyRange: [8, 15],
+    goldcoinRange: [8, 15],
   },
 
   icewolf: {
@@ -62,6 +62,6 @@ export const SMALL_MONSTERS = {
 
     lootTable: "icewolf",
 
-    zennyRange: [10, 20],
+    goldcoinRange: [10, 20],
   },
 };

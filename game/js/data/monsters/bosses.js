@@ -58,7 +58,7 @@ export const BOSSES = {
       elite: "boar_elite",
       master: "boar_master",
     },
-    zennyRange: [50, 100],
+    goldcoinRange: [50, 100],
   },
 
   wyrm: {
@@ -137,7 +137,7 @@ export const BOSSES = {
       elite: "wyrm_elite",
       master: "wyrm_master",
     },
-    zennyRange: [90, 150],
+    goldcoinRange: [90, 150],
   },
   bear: {
     id: "bear",
@@ -210,6 +210,6 @@ export const BOSSES = {
       elite: "bear_elite",
       master: "bear_master",
     },
-    zennyRange: [80, 140],
+    goldcoinRange: [80, 140],
   },
 };

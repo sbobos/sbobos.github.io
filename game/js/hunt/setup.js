@@ -2,11 +2,14 @@ import { hunt, player, story, setHunt } from "../state.js";
 import { BOSSES } from "../data/monsters/bosses.js";
 import { ARENAS } from "../data/arenas.js";
 import { RANKS } from "../data/ranks.js";
-import { STORY_MISSIONS } from "../data/story.js";
+import { MISSIONS } from "../data/missions.js";
 import { logMsg } from "./log.js";
 import { randInt, addMat, rollLoot } from "../utils.js";
 import { renderHunt } from "../ui/hunt.js";
 import { LOOT_TABLES } from "../data/loot.js";
+import { getRegisteredMission, unregisterMission } from "../questregistry.js";
+import { refreshQuestBoard } from "../ui/village.js";
+import { advanceDay } from "./day.js";
 
 /* ---------- HUNT SETUP ---------- */
 
@@ -62,21 +65,28 @@ export function endHunt(result) {
   let rewardsHtml = "";
 
   player.stats.hunts += 1;
-  if (hunt.missionKey) {
-    const mission = STORY_MISSIONS.find((item) => item.key === hunt.missionKey);
-    if (
-      mission &&
-      result === "victory" &&
-      !story.completedMissionKeys.includes(hunt.missionKey)
-    ) {
+  advanceDay();
+  if (hunt.missionKey && result === "victory") {
+    const mission = getRegisteredMission(hunt.missionKey);
+
+    if (mission && !story.completedMissionKeys.includes(hunt.missionKey)) {
       story.completedMissionKeys.push(hunt.missionKey);
-      const nextMission = STORY_MISSIONS.find(
-        (item) => item.chapter === mission.chapter + 1,
-      );
-      if (nextMission) {
-        story.unlockedMissionKeys.push(nextMission.key);
-        story.activeMissionKey = nextMission.key;
-        story.chapter = Math.max(story.chapter, nextMission.chapter);
+
+      if (mission.category === "main") {
+        const nextMission = MISSIONS.find(
+          (m) => m.category === "main" && m.chapter === mission.chapter + 1,
+        );
+
+        if (nextMission) {
+          story.unlockedMissionKeys.push(nextMission.key);
+          story.activeMissionKey = nextMission.key;
+          story.chapter = Math.max(story.chapter, nextMission.chapter);
+        }
+      }
+
+      if (mission.category === "side") {
+        unregisterMission(mission.key);
+        refreshQuestBoard();
       }
     }
   }
@@ -103,12 +113,12 @@ export function endHunt(result) {
 
       loot[pick] = (loot[pick] || 0) + 1;
     }
-    const zennyGain = randInt(
-      hunt.monster.zennyRange[0],
-      hunt.monster.zennyRange[1],
+    const goldcoinGain = randInt(
+      hunt.monster.goldcoinRange[0],
+      hunt.monster.goldcoinRange[1],
     );
     Object.entries(loot).forEach(([n, c]) => addMat(n, c));
-    player.zenny += zennyGain;
+    player.goldcoin += goldcoinGain;
 
     rewardsHtml = `
       <h3>Hunt successful</h3>
@@ -120,7 +130,7 @@ export function endHunt(result) {
               `<div class="loot-item">${n} <span style="color:var(--gold);float:right;">x${c}</span></div>`,
           )
           .join("")}
-        <div class="loot-item">Zenny <span style="color:var(--gold);float:right;">+${zennyGain}</span></div>
+        <div class="loot-item">goldcoin <span style="color:var(--gold);float:right;">+${goldcoinGain}</span></div>
       </div>
     `;
   } else if (result === "defeat") {

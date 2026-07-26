@@ -12,10 +12,10 @@ export let player = {
   maxStamina:100, stamina:100,
   staggered: false,
   weapon:'basic',
-  armorSlots:{ head:'headband', body:'basic' },
+  armorSlots:{ head:'headband', chest:'basic', arms:null, waist:null, legs:null },
   ownedWeapons:['basic'],
   ownedArmors:['basic','headband'],
-  zenny:60,
+  goldcoin:60,
   potions:3,
   materials:{},
   stats:{ hunts:0, victories:0, fled:0, defeats:0 },
@@ -31,6 +31,12 @@ export let story = {
 
 export let hunt = null;
 
+export let world = {
+  day: 1
+  // future home for: weather, dailyShopSeed, activeEvents, etc.
+};
+
 export function setPlayer(p){ player = p; }
 export function setStory(s){ story = s; }
 export function setHunt(h){ hunt = h; }
+export function setWorld(w){ world = w; }

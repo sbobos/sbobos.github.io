@@ -13,8 +13,8 @@ function renderShopSection(){
       <div class="shop-title">${item.name}</div>
       <div class="shop-desc">${item.desc}</div>
       <div class="shop-actions">
-        <span>${item.price} zenny</span>
-        <button ${player.zenny < item.price ? 'disabled' : ''} onclick="buyShopItem('${item.key}')">Buy</button>
+        <span>${item.price} goldcoin</span>
+        <button ${player.goldcoin < item.price ? 'disabled' : ''} onclick="buyShopItem('${item.key}')">Buy</button>
       </div>
     </div>
   `).join('');
@@ -30,8 +30,8 @@ function renderShopSection(){
 
 export function buyShopItem(key){
   const item = SHOP_ITEMS[key];
-  if (!item || player.zenny < item.price) return;
-  player.zenny -= item.price;
+  if (!item || player.goldcoin < item.price) return;
+  player.goldcoin -= item.price;
   item.effect(player);
   renderVillage();
 }
@@ -55,7 +55,7 @@ function renderBountyCard(bounty){
   const canTurnIn = costEntries.every(([mat,need]) => (player.materials[mat]||0) >= need);
 
   const rewardParts = Object.entries(bounty.rewardMaterials||{}).map(([mat,n]) => `${n}x ${mat}`);
-  if (bounty.rewardZenny) rewardParts.push(`${bounty.rewardZenny} zenny`);
+  if (bounty.rewardgoldcoin) rewardParts.push(`${bounty.rewardgoldcoin} goldcoin`);
 
   return `
     <div class="card craft-card">
@@ -63,7 +63,7 @@ function renderBountyCard(bounty){
       <div class="cname">${bounty.title}</div>
       <div class="cstat">${bounty.desc}</div>
       ${reqListHtml(costEntries)}
-      <div class="compare-text">Reward: ${rewardParts.join(', ') || 'Zenny only'}</div>
+      <div class="compare-text">Reward: ${rewardParts.join(', ') || 'goldcoin only'}</div>
       <button ${canTurnIn ? '' : 'disabled'} onclick="turnInBounty('${bounty.key}')">Turn in</button>
     </div>
   `;
@@ -88,7 +88,7 @@ export function turnInBounty(key){
 
   Object.entries(bounty.cost).forEach(([mat,need]) => addMat(mat, -need));
   Object.entries(bounty.rewardMaterials||{}).forEach(([mat,n]) => addMat(mat, n));
-  if (bounty.rewardZenny) player.zenny += bounty.rewardZenny;
+  if (bounty.rewardgoldcoin) player.goldcoin += bounty.rewardgoldcoin;
 
   renderVillage();
 }
@@ -97,7 +97,7 @@ export function turnInBounty(key){
 
 function tradeGetLabel(trade){
   const parts = [];
-  if (trade.get.zenny) parts.push(`${trade.get.zenny} zenny`);
+  if (trade.get.goldcoin) parts.push(`${trade.get.goldcoin} goldcoin`);
   Object.entries(trade.get.materials||{}).forEach(([mat,n]) => parts.push(`${n}x ${mat}`));
   return parts.join(', ');
 }
@@ -122,7 +122,7 @@ function renderTradeSection(){
   return `
     <div class="panel">
       <h2>Trader's Stall</h2>
-      <p class="section-copy">Dump excess common materials for zenny, or barter up toward rarer ones. Rates are fixed and the stall is always open.</p>
+      <p class="section-copy">Dump excess common materials for goldcoin, or barter up toward rarer ones. Rates are fixed and the stall is always open.</p>
       <div class="forge-grid">${cards}</div>
     </div>
   `;
@@ -135,7 +135,7 @@ export function doTrade(key){
   if (!canTrade) return;
 
   Object.entries(trade.give).forEach(([mat,need]) => addMat(mat, -need));
-  if (trade.get.zenny) player.zenny += trade.get.zenny;
+  if (trade.get.goldcoin) player.goldcoin += trade.get.goldcoin;
   Object.entries(trade.get.materials||{}).forEach(([mat,n]) => addMat(mat, n));
 
   renderVillage();

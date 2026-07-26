@@ -26,6 +26,6 @@ export function smallMonsterToHuntShape(key) {
       },
     ],
     carveTable: { normal: `smallMonster.${m.lootTable}` },
-    zennyRange: m.zennyRange,
+    goldcoinRange: m.goldcoinRange,
   };
 }

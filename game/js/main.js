@@ -17,8 +17,10 @@ import {
 import { startHunt } from "./hunt/setup.js";
 import { startExpedition, continueExpedition } from "./hunt/expedition.js";
 import { playerAction } from "./hunt/actions.js";
+import { selectMove } from "./ui/hunt.js";
 
 window.startHunt = startHunt;
+window.selectMove = selectMove;
 window.startExpedition = startExpedition;
 window.continueExpedition = continueExpedition;
 window.playerAction = playerAction;
