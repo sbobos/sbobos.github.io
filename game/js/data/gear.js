@@ -15,7 +15,7 @@ export const WEAPONS = {
     key: "basic",
     name: "Hunter's Blade",
     headKey: "hunterEdge",
-    handleKey: "steadyGrip",
+    handleKey: "basicGrip",
     coreKey: "inertCore",
     mechanismKey: "balancedSwing",
     tag: "Starter",
@@ -26,7 +26,7 @@ export const WEAPONS = {
     key: "boarhammer",
     name: "Ram Head Slugger",
     headKey: "boarHead",
-    handleKey: "steadyGrip",
+    handleKey: "basicGrip",
     coreKey: "inertCore",
     mechanismKey: "slugImpact",
     tag: "Boar Forge",
@@ -36,77 +36,35 @@ export const WEAPONS = {
     unlocksFrom: "basic",
     forgeLevel: 1,
   },
-  wyrmfang: {
-    key: "wyrmfang",
-    name: "Wyrmfang Cleaver",
-    headKey: "wyrmHead",
-    handleKey: "steadyGrip",
-    coreKey: "emberCore",
-    mechanismKey: "searingEdge",
-    tag: "Wyrm Forge",
-    recipe: { "Wyrm Fang": 3, "Wyrm Scale": 2 },
-    goldcoin: 120,
-    tree: "wyrm",
-    unlocksFrom: "basic",
-    forgeLevel: 1,
-  },
-  bearclaw: {
-    key: "bearclaw",
-    name: "Maul Claw Gauntlet",
-    headKey: "bearHead",
-    handleKey: "steadyGrip",
-    coreKey: "inertCore",
-    mechanismKey: "bracedGuard",
-    tag: "Bear Forge",
-    recipe: { "Bear Claw": 3, "Bear Pelt": 1 },
-    goldcoin: 100,
-    tree: "bear",
-    unlocksFrom: "basic",
-    forgeLevel: 1,
-  },
-  dunelord: {
-    key: "dunelord",
-    name: "Dunelord Greatfang",
-    headKey: "duneHead",
-    handleKey: "steadyGrip",
-    coreKey: "infernoCore",
-    mechanismKey: "overwhelmingForce",
-    tag: "Master Forge",
-    recipe: { "Wyrm Fang": 4, "Sand Pearl": 1, "Bear Claw": 2 },
-    goldcoin: 260,
-    tree: "master",
-    unlocksFrom: "wyrmfang",
-    forgeLevel: 2,
-  },
 };
 
 /**
- * Resolves a WEAPONS entry's part keys into the flat stat shape the rest
- * of the codebase reads: atk, damageType, element, elementPower, plus the
- * trade-off fields (critMod, physicalMult, staminaMult) and the moveset
- * key that drives the move-select menu.
- *
- * `special`/`specialDesc` no longer describe a numeric proc — that system
- * (specials.js) is retired. `specialDesc` is kept as a display-only string
- * (the Mechanism's `flavor`) so existing UI code showing "Weapon style: ..."
- * keeps working; the actual signature effects now live on individual moves
- * in js/data/playerMoves.js.
+ * Turns 4 explicit part keys into the flat combat stat shape. Used by both
+ * assembleWeapon() (presets) and the custom-crafting path — this is the
+ * only place part stats get combined, so presets and custom weapons always
+ * compute identically.
  */
-export function assembleWeapon(weaponKey) {
-  const w = WEAPONS[weaponKey];
-  if (!w) {
-    console.error(`Unknown weapon: ${weaponKey}`);
+export function assembleFromPartKeys({
+  headKey,
+  handleKey,
+  coreKey,
+  mechanismKey,
+}) {
+  const head = HEADS[headKey];
+  const handle = HANDLES[handleKey];
+  const core = CORES[coreKey];
+  const mech = MECHANISMS[mechanismKey];
+  if (!head || !handle || !core || !mech) {
+    console.error("Unknown part key(s)", {
+      headKey,
+      handleKey,
+      coreKey,
+      mechanismKey,
+    });
     return null;
   }
 
-  const head = HEADS[w.headKey];
-  const handle = HANDLES[w.handleKey];
-  const core = CORES[w.coreKey];
-  const mech = MECHANISMS[w.mechanismKey];
-
   return {
-    key: w.key,
-    name: w.name,
     atk: Math.round(head.atk * (1 + handle.atkMod)),
     damageType: head.damageType,
     critMod: head.critMod,
@@ -117,6 +75,31 @@ export function assembleWeapon(weaponKey) {
     moveset: mech.moveset,
     guardStaminaMult: mech.guardStaminaMult,
     specialDesc: mech.flavor,
+  };
+}
+
+/** Head + Mechanism, with a Core-element prefix when the Core isn't inert. */
+export function generateWeaponName(headKey, coreKey, mechanismKey) {
+  const head = HEADS[headKey];
+  const core = CORES[coreKey];
+  const mech = MECHANISMS[mechanismKey];
+  const corePrefix = core.element !== "none" ? `${core.name} ` : "";
+  return `${corePrefix}${head.name} ${mech.name}`.trim();
+}
+
+export function assembleWeapon(weaponKey) {
+  const w = WEAPONS[weaponKey];
+  if (!w) {
+    console.error(`Unknown weapon: ${weaponKey}`);
+    return null;
+  }
+  const parts = assembleFromPartKeys(w);
+  if (!parts) return null;
+
+  return {
+    key: w.key,
+    name: w.name,
+    ...parts,
     tag: w.tag,
     tree: w.tree,
     recipe: w.recipe,

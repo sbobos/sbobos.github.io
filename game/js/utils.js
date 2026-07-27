@@ -1,5 +1,5 @@
 import { player } from "./state.js";
-import { assembleWeapon, ARMORS } from "./data/gear.js";
+import { assembleWeapon, assembleFromPartKeys, WEAPONS, ARMORS } from "./data/gear.js";
 import { SKILLS } from "./data/skills.js";
 
 /* ---------- HELPERS ---------- */
@@ -23,7 +23,27 @@ export function addMat(name, n) {
 export const ARMOR_SLOTS = ["head", "chest", "arms", "waist", "legs"];
 
 export function currentWeapon() {
-  return assembleWeapon(player.weapon) || assembleWeapon("basic");
+  if (WEAPONS[player.weapon]) {
+    return assembleWeapon(player.weapon) || assembleWeapon("basic");
+  }
+  const custom = player.customWeapons?.[player.weapon];
+  if (custom) {
+    const parts = assembleFromPartKeys(custom);
+    if (parts) {
+      return {
+        key: custom.id,
+        name: custom.name,
+        ...parts,
+        tag: "Custom",
+        tree: null,
+        recipe: null,
+        goldcoin: null,
+        unlocksFrom: null,
+        forgeLevel: custom.forgeLevel ?? 0,
+      };
+    }
+  }
+  return assembleWeapon("basic");
 }
 
 export function currentArmor() {

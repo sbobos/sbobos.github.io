@@ -1,41 +1,3 @@
-/* ==========================================================================
-   PLAYER MOVE DATABASE
-
-   A weapon's Mechanism part carries a `moveset` key (see js/data/weaponParts.js).
-   That key looks up an entry here, which lists the moves available while
-   that weapon is equipped. Mirrors the monster MOVES pattern in
-   js/data/moves.js on purpose: pure data, combat code should only read
-   these fields, never branch on move.key directly.
-
-   Currently only the "standard" moveset exists — every Mechanism today
-   points at it (see weaponParts.js), same "catalog exists, only starter
-   populated" pattern as HANDLES having just steadyGrip. Future Mechanisms
-   can point at their own moveset key here to grant weapon-specific move
-   pools, the same way MECHANISMS.special/specialDesc already differ per
-   weapon without touching this file.
-
-   --------------------------------------------------------------------------
-   Fields
-
-   key             Internal identifier. Passed as moveKey alongside partKey:
-                   playerAction('attack', {moveKey, partKey}).
-
-   name            Display name for the move-select menu.
-
-   desc            Short flavor/mechanical blurb shown under the move button.
-
-   staminaCost     Stamina spent attempting this move. Move is unusable
-                   (same failure path as today's flat-cost check) if the
-                   player doesn't have enough.
-
-   damageMult      Multiplier applied to the weapon's normally-calculated
-                   damage (physical + elemental), before crit/special.
-
-   critRateMod     Added to COMBAT.CRIT_RATE for this move only. Can be
-                   negative.
-
-   ========================================================================== */
-
 export const MOVESETS = {
   standard: {
     key: "standard",
@@ -58,13 +20,132 @@ export const MOVESETS = {
       },
     ],
   },
+
+  // balancedSwing / "Blade" — no gimmick, no weakness. Same shape as
+  // standard almost exactly, just its own key so it can drift later
+  // without touching the shared fallback moveset.
+  blade: {
+    key: "blade",
+    moves: [
+      {
+        key: "blade_quickcut",
+        name: "Quick Cut",
+        desc: "A clean, fast cut. Reliable and cheap.",
+        staminaCost: 12,
+        damageMult: 0.75,
+        critRateMod: 0,
+      },
+      {
+        key: "blade_fullswing",
+        name: "Full Swing",
+        desc: "A committed two-handed swing. No frills, just damage.",
+        staminaCost: 30,
+        damageMult: 1.55,
+        critRateMod: 0.05,
+      },
+    ],
+  },
+
+  // slugImpact / "Slugger" — rewards softening a part before the big hit.
+  slugger: {
+    key: "slugger",
+    moves: [
+      {
+        key: "slugger_jab",
+        name: "Blunt Jab",
+        desc: "A quick knock — cheap, and chips away at part HP.",
+        staminaCost: 14,
+        damageMult: 0.65,
+        critRateMod: -0.05,
+      },
+      {
+        key: "slugger_haymaker",
+        name: "Haymaker",
+        desc: "A heavy blow that hits much harder against an already-broken part.",
+        staminaCost: 34,
+        damageMult: 1.4,
+        critRateMod: 0,
+        bonusVsBrokenPart: 12, // flat bonus damage if targeted part is already broken
+      },
+    ],
+  },
+
+  // searingEdge / "Cleaver" — built around crits and fire-weak exploitation.
+  cleaver: {
+    key: "cleaver",
+    moves: [
+      {
+        key: "cleaver_flick",
+        name: "Flicker Cut",
+        desc: "A precise, high-crit-chance flick of the blade.",
+        staminaCost: 14,
+        damageMult: 0.6,
+        critRateMod: 0.15,
+      },
+      {
+        key: "cleaver_searingarc",
+        name: "Searing Arc",
+        desc: "A wide burning arc. Deals bonus damage to fire-weak parts, and rewards a clean crit.",
+        staminaCost: 28,
+        damageMult: 1.3,
+        critRateMod: 0.1,
+        bonusOnCrit: 8, // flat bonus damage if this hit crits
+        bonusVsElementWeak: { element: "fire", threshold: 20, amount: 10 }, // flat bonus if part's fire hitzone >= 20
+      },
+    ],
+  },
+
+  // bracedGuard / "Gauntlet" — close-range, guard-and-punish playstyle.
+  // guardStaminaMult (1.5) already lives on the Mechanism itself; these
+  // moves lean cheap/fast to match a "trade blows up close" identity.
+  gauntlet: {
+    key: "gauntlet",
+    moves: [
+      {
+        key: "gauntlet_jab",
+        name: "Guard Jab",
+        desc: "A tight, low-stamina strike thrown from a guarded stance.",
+        staminaCost: 10,
+        damageMult: 0.6,
+        critRateMod: 0,
+      },
+      {
+        key: "gauntlet_counterpunch",
+        name: "Counter Punch",
+        desc: "A heavier punch meant to follow up right after guarding.",
+        staminaCost: 24,
+        damageMult: 1.2,
+        critRateMod: 0.1,
+      },
+    ],
+  },
+
+  // overwhelmingForce / "Greatfang" — high variance, chance at a big proc.
+  greatfang: {
+    key: "greatfang",
+    moves: [
+      {
+        key: "greatfang_swipe",
+        name: "Reckless Swipe",
+        desc: "An unrefined, wide swing. Middling damage, cheap-ish stamina.",
+        staminaCost: 16,
+        damageMult: 0.75,
+        critRateMod: 0,
+      },
+      {
+        key: "greatfang_overwhelm",
+        name: "Overwhelming Force",
+        desc: "A huge, risky swing. Usually just hits hard — but sometimes it hits MUCH harder.",
+        staminaCost: 36,
+        damageMult: 1.5,
+        critRateMod: 0,
+        procChance: 0.25,
+        procBonus: 18, // flat bonus damage on proc
+      },
+    ],
+  },
 };
 
-/**
- * Resolves a weapon's moveset (as returned by assembleWeapon()) to its
- * move list. Falls back to "standard" so an unrecognized/missing moveset
- * key never leaves the player with an empty move menu.
- */
 export function movesetFor(weapon) {
   return MOVESETS[weapon.moveset] ?? MOVESETS.standard;
 }

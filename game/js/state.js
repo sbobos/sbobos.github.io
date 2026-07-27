@@ -6,30 +6,35 @@
    from a different module — because ES module bindings are live.
 */
 
-export let player = {
-  name: "Hunter",
-  maxHp: 120,
-  hp: 120,
-  maxStamina: 100,
-  stamina: 100,
-  staggered: false,
-  weapon: "basic",
-  armorSlots: {
-    head: "headband",
-    chest: "basic",
-    arms: null,
-    waist: null,
-    legs: null,
-  },
-  ownedWeapons: ["basic"],
-  ownedArmors: ["basic", "headband"],
-  goldcoin: 60,
-  potions: 3,
-  materials: {},
-  forgeLevel: 0,
-  stats: { hunts: 0, victories: 0, fled: 0, defeats: 0 },
-  trophies: {},
-};
+export function createDefaultPlayer() {
+  return {
+    name: "sbobs",
+    maxHp: 120,
+    hp: 120,
+    maxStamina: 100,
+    stamina: 100,
+    staggered: false,
+    weapon: "basic",
+    armorSlots: {
+      head: "headband",
+      chest: "basic",
+      arms: null,
+      waist: null,
+      legs: null,
+    },
+    ownedWeapons: ["basic"],
+    ownedArmors: ["basic", "headband"],
+    customWeapons: {},
+    goldcoin: 60,
+    potions: 3,
+    materials: {},
+    forgeLevel: 0,
+    stats: { hunts: 0, victories: 0, fled: 0, defeats: 0 },
+    trophies: {},
+  };
+}
+
+export let player = createDefaultPlayer();
 
 export let story = {
   chapter: 1,

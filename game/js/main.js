@@ -14,13 +14,22 @@ import { startHunt } from "./hunt/setup.js";
 import { startExpedition, continueExpedition } from "./hunt/expedition.js";
 import { playerAction } from "./hunt/actions.js";
 import { selectMove } from "./ui/hunt.js";
-import { upgradeForge } from "./ui/village/forge.js";
+import {
+  selectWeaponPart,
+  craftCustomWeapon,
+  equipCustomWeapon,
+} from "./ui/village/weaponforge.js";
+import { setWeaponSubTab, upgradeForge } from "./ui/village/forge.js";
 
 window.startHunt = startHunt;
 window.selectMove = selectMove;
 window.startExpedition = startExpedition;
 window.continueExpedition = continueExpedition;
 window.upgradeForge = upgradeForge;
+window.selectWeaponPart = selectWeaponPart;
+window.craftCustomWeapon = craftCustomWeapon;
+window.equipCustomWeapon = equipCustomWeapon;
+window.setWeaponSubTab = setWeaponSubTab;
 window.playerAction = playerAction;
 window.craftItem = craftItem;
 window.buyShopItem = buyShopItem;

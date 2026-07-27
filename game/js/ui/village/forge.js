@@ -9,6 +9,14 @@ import {
   getArmorStats,
 } from "../../utils.js";
 import { renderVillage } from "../village.js";
+import { renderCustomForgeTab } from "./weaponforge.js";
+
+let weaponSubTab = "presets"; // module-level, mirrors your existing tab pattern
+
+export function setWeaponSubTab(tab) {
+  weaponSubTab = tab;
+  renderVillage();
+}
 
 export function renderForgeTab() {
   const weaponCards = Object.keys(WEAPONS)
@@ -92,7 +100,13 @@ export function renderForgeTab() {
     </div>
     <div class="panel">
       <h2>Weapons</h2>
-      <div class="forge-grid">${weaponCards}</div>
+      <div class="subtab-row">
+        <button class="subtab-btn ${weaponSubTab === "presets" ? "active" : ""}" onclick="setWeaponSubTab('presets')">Presets</button>
+        <button class="subtab-btn ${weaponSubTab === "custom" ? "active" : ""}" onclick="setWeaponSubTab('custom')">Custom Forge</button>
+      </div>
+      ${weaponSubTab === "presets"
+        ? `<div class="forge-grid">${weaponCards}</div>`
+        : renderCustomForgeTab()}
     </div>
     <div class="panel">
       <h2>Armor</h2>
