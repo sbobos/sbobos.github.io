@@ -13,6 +13,8 @@ export function monsterTelegraphPhase() {
 
   const chosen = chooseMonsterMove(m, hunt.rank);
 
+  console.log("chosen:", chosen);
+
   hunt.pendingMove = {
     ...chosen,
     blockable: chosen.guardResult === "block",

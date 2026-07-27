@@ -62,15 +62,29 @@ export function availableMoves(m, rank) {
 
 export function pickMove(pool, enraged) {
   let candidates = pool;
+
   if (enraged) {
     const dmgMoves = pool.filter((mv) => mv.type !== "debuff");
-    if (dmgMoves.length && Math.random() < 0.75) candidates = dmgMoves;
+    if (dmgMoves.length && Math.random() < 0.75) {
+      candidates = dmgMoves;
+    }
   }
+
+  if (candidates.length === 0) {
+    throw new Error("Monster has no available moves.");
+  }
+
   return candidates[randInt(0, candidates.length - 1)];
 }
 
 export function chooseMonsterMove(monster, rank) {
   const pool = availableMoves(monster, rank);
+
+  console.log({
+    monster: monster?.id ?? monster?.name,
+    rank,
+    pool,
+  });
 
   return pickMove(pool, monster.enraged);
 }
