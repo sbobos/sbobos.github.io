@@ -5,7 +5,7 @@ import { hitzoneHints } from "../hunt/parts.js";
 import { renderLog } from "../hunt/log.js";
 import { renderTopbar } from "./topbar.js";
 import { HAZARDS } from "../hunt/combat/hazards.js";
-import { movesetFor } from "../data/playerMoves.js";
+import { movesetFor } from "../data/playermoves.js";
 
 /* ---------- HUNT SCREEN RENDER ---------- */
 
