@@ -17,3 +17,56 @@
     background: var(--border);
     border-radius: 4px;
 }
+
+/* Simple punchy screen shake */
+@keyframes screen-shake {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  20%  { transform: translate(-6px, 4px) rotate(-1deg); }
+  40%  { transform: translate(6px, -4px) rotate(1deg); }
+  60%  { transform: translate(-4px, -2px) rotate(-0.5deg); }
+  80%  { transform: translate(4px, 2px) rotate(0.5deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.shake {
+  animation: screen-shake 0.25s ease-in-out;
+}
+
+/* Red Damage Flash Overlay */
+#damage-flash-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(220, 38, 38, 0.4);
+  box-shadow: inset 0 0 100px rgba(180, 0, 0, 0.8);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 9999;
+  transition: opacity 0.05s ease-in;
+}
+
+#damage-flash-overlay.flash-active {
+  animation: damage-flash-anim 0.45s ease-out forwards;
+}
+
+@keyframes damage-flash-anim {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Punchier Screen Shake */
+@keyframes screen-shake {
+  0% { transform: translate(0, 0) scale(1); }
+  15% { transform: translate(-8px, 6px) scale(1.01); }
+  30% { transform: translate(8px, -6px) scale(1.01); }
+  45% { transform: translate(-6px, -4px); }
+  60% { transform: translate(6px, 4px); }
+  75% { transform: translate(-3px, 2px); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+.shake {
+  animation: screen-shake 0.35s ease-in-out;
+}

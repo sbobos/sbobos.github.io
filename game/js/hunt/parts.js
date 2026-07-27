@@ -1,6 +1,7 @@
 import { hunt } from "../state.js";
 import { MOVES } from "../data/moves.js";
 import { randInt } from "../utils.js";
+import { rankMoveKeys } from "../data/ranks.js";
 
 /* ---------- PART / HITZONE HELPERS ---------- */
 
@@ -43,8 +44,13 @@ export function hitzoneHints(part) {
   return labels;
 }
 
-export function availableMoves(m) {
-  const active = new Set(m.defaultMoveKeys);
+/**
+ * Starts from this rank's cumulative move pool (base kit + any moves
+ * unlocked at this rank or below — see rankMoveKeys in data/ranks.js),
+ * then applies the existing break-gated disable/unlock layer on top.
+ */
+export function availableMoves(m, rank) {
+  const active = new Set(rankMoveKeys(m, rank));
   m.parts.forEach((p) => {
     if (p.broken) {
       (p.disablesMoves || []).forEach((k) => active.delete(k));
@@ -63,8 +69,8 @@ export function pickMove(pool, enraged) {
   return candidates[randInt(0, candidates.length - 1)];
 }
 
-export function chooseMonsterMove(monster) {
-  const pool = availableMoves(monster);
+export function chooseMonsterMove(monster, rank) {
+  const pool = availableMoves(monster, rank);
 
   return pickMove(pool, monster.enraged);
 }

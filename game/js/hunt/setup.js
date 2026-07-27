@@ -1,7 +1,7 @@
 import { hunt, player, story, setHunt } from "../state.js";
 import { BOSSES } from "../data/monsters/bosses.js";
 import { ARENAS } from "../data/arenas.js";
-import { RANKS } from "../data/ranks.js";
+import { getRankScaling } from "../data/ranks.js";
 import { MISSIONS } from "../data/missions.js";
 import { logMsg } from "./log.js";
 import { randInt, addMat, rollLoot } from "../utils.js";
@@ -9,7 +9,6 @@ import { renderHunt } from "../ui/hunt.js";
 import { LOOT_TABLES } from "../data/loot.js";
 import { getRegisteredMission, unregisterMission } from "../questregistry.js";
 import { refreshQuestBoard } from "../ui/village.js";
-import { advanceDay } from "./day.js";
 
 /* ---------- HUNT SETUP ---------- */
 
@@ -28,9 +27,10 @@ export function startHunt(
   }
 
   const monster = JSON.parse(JSON.stringify(template));
-  const scale = RANKS[rank] ?? RANKS.normal;
-  monster.maxHp = Math.round(monster.maxHp * scale.hp);
+  const scale = getRankScaling(template, rank);
+  monster.maxHp = Math.round(monster.maxHp * scale.hpMult);
   monster.hp = monster.maxHp;
+  monster.damageMult = scale.damageMult;
   monster.enraged = false;
   monster.parts.forEach((p) => {
     p.hp = p.maxHp;
@@ -65,28 +65,34 @@ export function endHunt(result) {
   let rewardsHtml = "";
 
   player.stats.hunts += 1;
-  advanceDay();
   if (hunt.missionKey && result === "victory") {
     const mission = getRegisteredMission(hunt.missionKey);
 
-    if (mission && !story.completedMissionKeys.includes(hunt.missionKey)) {
-      story.completedMissionKeys.push(hunt.missionKey);
+    if (hunt.missionKey && result === "victory") {
+      const mission = getRegisteredMission(hunt.missionKey);
 
-      if (mission.category === "main") {
-        const nextMission = MISSIONS.find(
-          (m) => m.category === "main" && m.chapter === mission.chapter + 1,
-        );
+      if (mission) {
+        if (
+          mission.category === "main" &&
+          !story.completedMissionKeys.includes(mission.key)
+        ) {
+          story.completedMissionKeys.push(mission.key);
 
-        if (nextMission) {
-          story.unlockedMissionKeys.push(nextMission.key);
-          story.activeMissionKey = nextMission.key;
-          story.chapter = Math.max(story.chapter, nextMission.chapter);
+          const nextMission = MISSIONS.find(
+            (m) => m.category === "main" && m.chapter === mission.chapter + 1,
+          );
+
+          if (nextMission) {
+            story.unlockedMissionKeys.push(nextMission.key);
+            story.activeMissionKey = nextMission.key;
+            story.chapter = Math.max(story.chapter, nextMission.chapter);
+          }
         }
-      }
 
-      if (mission.category === "side") {
-        unregisterMission(mission.key);
-        refreshQuestBoard();
+        if (mission.category === "side") {
+          unregisterMission(mission.key);
+          refreshQuestBoard();
+        }
       }
     }
   }
@@ -146,5 +152,6 @@ export function endHunt(result) {
   }
 
   const h = document.getElementById("hunt-screen");
+  console.log("overlay");
   h.innerHTML += `<div class="overlay">${rewardsHtml}<button class="primary" style="margin-top:10px;" onclick="continueExpedition()">Continue</button></div>`;
 }

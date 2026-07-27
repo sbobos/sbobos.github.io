@@ -23,7 +23,7 @@
 */
 
 export const HEADS = {
-  hunterEdge: { key:"hunterEdge", name:"Hunter",    damageType:"cut",   atk:100, critMod:0 },
+  hunterEdge: { key:"hunterEdge", name:"Hunter",    damageType:"cut",   atk:10, critMod:0 },
   boarHead:   { key:"boarHead",   name:"Boar",       damageType:"blunt", atk:15,  critMod:0 },
   wyrmHead:   { key:"wyrmHead",   name:"Wyrm",       damageType:"cut",   atk:19,  critMod:0 },
   bearHead:   { key:"bearHead",   name:"Bear",       damageType:"blunt", atk:17,  critMod:0 },

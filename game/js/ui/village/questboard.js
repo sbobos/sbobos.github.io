@@ -23,7 +23,6 @@ export function getActiveStoryMission() {
 
 export function refreshQuestBoard() {
   cachedEntries = null;
-  renderVillage();
 }
 
 export function getQuestBoardEntries() {
@@ -46,25 +45,17 @@ export function getQuestBoardEntries() {
   });
 
   const sidePool = MISSIONS.filter(
-    (m) =>
-      m.category === "side" &&
-      m.unlockChapter <= story.chapter &&
-      !story.completedMissionKeys.includes(m.key),
+    (m) => m.category === "side" && m.unlockChapter <= story.chapter,
   );
-
   const shuffled = [...sidePool].sort(() => Math.random() - 0.5);
-  const limit = Math.min(2, shuffled.length);
 
-  for (let i = 0; i < limit; i++) {
-    const mission = shuffled[i];
-    const monster = BOSSES[mission.monsterId];
-
+  for (const mission of shuffled.slice(0, 2)) {
     registerMission(mission);
 
     entries.push({
       type: "side",
       mission,
-      monster,
+      monster: BOSSES[mission.monsterId],
       label: "Side Hunt",
     });
   }

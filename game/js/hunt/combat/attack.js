@@ -3,15 +3,9 @@ import { calculateAttack } from "./damage.js";
 import { spendStamina, findMonsterPart } from "./helpers.js";
 import { logMsg } from "../log.js";
 import { endHunt } from "../setup.js";
-import { currentWeapon } from "../../utils.js";
+import { currentWeapon, playSound, triggerShake } from "../../utils.js"; // <-- Updated Imports
 import { movesetFor } from "../../data/playerMoves.js";
 
-/**
- * moveKey is optional so the game stays playable before the move-select UI
- * exists — when omitted, the weapon's first listed move is used. Once the
- * UI passes a real moveKey through playerAction('attack', {partKey, moveKey}),
- * this fallback stops mattering.
- */
 export function doPlayerAttack(partKey, moveKey) {
   const weapon = currentWeapon();
   const moveset = movesetFor(weapon);
@@ -32,6 +26,10 @@ export function doPlayerAttack(partKey, moveKey) {
   const part = findMonsterPart(monster, partKey);
 
   const attack = calculateAttack(part, move);
+
+  // Trigger base attack audio and light shake
+  playSound(attack.crit ? "crit" : "slash");
+  triggerShake("hunt-screen");
 
   applyAttack(monster, part, attack, move);
 }
@@ -63,12 +61,19 @@ function breakPart(monster, part) {
 
   applyDamage(monster, part.breakBonus);
 
+  // Break FX
+  playSound("break");
+  triggerShake("hunt-screen");
+
   logMsg(`${part.breakMsg} (+${part.breakBonus} bonus damage)`, "l-break");
 }
 
 function updateMonsterState(monster) {
   if (!monster.enraged && monster.hp <= monster.maxHp * 0.3) {
     monster.enraged = true;
+
+    // Enrage FX
+    playSound("enrage");
 
     logMsg(
       `The ${monster.name} is enraged! Its attacks grow fiercer.`,
@@ -85,7 +90,6 @@ function updateMonsterState(monster) {
 
 function logAttack(part, attack, move) {
   const critText = attack.crit ? " A solid hit!" : "";
-
   const specialText = attack.special.note ? ` ${attack.special.note}` : "";
 
   logMsg(

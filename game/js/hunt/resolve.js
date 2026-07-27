@@ -81,6 +81,7 @@ export function resolvePendingMove(actionType, payload) {
       move.baseDamage *
         (m.enraged ? 1.25 : 1) *
         (isPartBroken(m, "tail") ? 0.9 : 1) *
+        (m.damageMult ?? 1) *
         dmgMult,
     );
     if (move.element !== "none") {

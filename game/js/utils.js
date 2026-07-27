@@ -53,11 +53,13 @@ export function getArmorStats() {
     });
   });
 
-  const skillProgress = Object.entries(skillPoints).map(([skillKey, points]) => {
-    const meta = SKILLS[skillKey];
-    if (!meta) return null;
-    return { ...meta, points, active: points >= meta.threshold };
-  }).filter(Boolean);
+  const skillProgress = Object.entries(skillPoints)
+    .map(([skillKey, points]) => {
+      const meta = SKILLS[skillKey];
+      if (!meta) return null;
+      return { ...meta, points, active: points >= meta.threshold };
+    })
+    .filter(Boolean);
 
   return { def, resist, skillPoints, skillProgress };
 }
@@ -79,4 +81,152 @@ export function rollLoot(table) {
     roll -= entry.weight;
     if (roll <= 0) return entry.item;
   }
+}
+
+/* ---------- AUDIO SYNTHESIZER (WEB AUDIO API) ---------- */
+
+let audioCtx = null;
+
+function getAudioContext() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === "suspended") {
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+export function playSound(type) {
+  try {
+    const ctx = getAudioContext();
+    const now = ctx.currentTime;
+
+    if (type === "slash") {
+      const bufferSize = ctx.sampleRate * 0.15;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.setValueAtTime(800, now);
+      filter.frequency.exponentialRampToValueAtTime(100, now + 0.15);
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      noise.start(now);
+    } else if (type === "crit") {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.exponentialRampToValueAtTime(40, now + 0.2);
+
+      gain.gain.setValueAtTime(0.6, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.2);
+    } else if (type === "player_hurt") {
+      // Deep punchy bass impact for when player gets hit
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(150, now);
+      osc.frequency.exponentialRampToValueAtTime(30, now + 0.35);
+
+      gain.gain.setValueAtTime(0.8, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.35);
+    } else if (type === "break") {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(120, now);
+      osc.frequency.linearRampToValueAtTime(30, now + 0.3);
+
+      gain.gain.setValueAtTime(0.7, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.3);
+    } else if (type === "enrage") {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(60, now);
+      osc.frequency.linearRampToValueAtTime(140, now + 0.4);
+
+      gain.gain.setValueAtTime(0.4, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.4);
+    }
+  } catch (err) {
+    console.warn("Audio Context error:", err);
+  }
+}
+
+/**
+ * Triggers heavy screen shake animation.
+ */
+export function triggerShake(elementId = "hunt-screen") {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+
+  el.classList.remove("shake");
+  void el.offsetWidth;
+  el.classList.add("shake");
+
+  setTimeout(() => el.classList.remove("shake"), 350);
+}
+
+/**
+ * Flash red tint across screen when taking damage.
+ */
+export function triggerDamageFlash() {
+  let flashOverlay = document.getElementById("damage-flash-overlay");
+
+  if (!flashOverlay) {
+    flashOverlay = document.createElement("div");
+    flashOverlay.id = "damage-flash-overlay";
+    document.body.appendChild(flashOverlay);
+  }
+
+  flashOverlay.classList.remove("flash-active");
+  void flashOverlay.offsetWidth;
+  flashOverlay.classList.add("flash-active");
+
+  setTimeout(() => flashOverlay.classList.remove("flash-active"), 450);
+}
+
+/**
+ * Helper delay function to pace out combat resolutions.
+ */
+export function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

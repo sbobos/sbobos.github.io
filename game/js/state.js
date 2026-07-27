@@ -7,36 +7,53 @@
 */
 
 export let player = {
-  name:'Hunter',
-  maxHp:120, hp:120,
-  maxStamina:100, stamina:100,
+  name: "Hunter",
+  maxHp: 120,
+  hp: 120,
+  maxStamina: 100,
+  stamina: 100,
   staggered: false,
-  weapon:'basic',
-  armorSlots:{ head:'headband', chest:'basic', arms:null, waist:null, legs:null },
-  ownedWeapons:['basic'],
-  ownedArmors:['basic','headband'],
-  goldcoin:60,
-  potions:3,
-  materials:{},
-  stats:{ hunts:0, victories:0, fled:0, defeats:0 },
-  trophies:{}
+  weapon: "basic",
+  armorSlots: {
+    head: "headband",
+    chest: "basic",
+    arms: null,
+    waist: null,
+    legs: null,
+  },
+  ownedWeapons: ["basic"],
+  ownedArmors: ["basic", "headband"],
+  goldcoin: 60,
+  potions: 3,
+  materials: {},
+  forgeLevel: 0,
+  stats: { hunts: 0, victories: 0, fled: 0, defeats: 0 },
+  trophies: {},
 };
 
 export let story = {
-  chapter:1,
-  activeMissionKey:'intro_boar',
-  completedMissionKeys:[],
-  unlockedMissionKeys:['intro_boar']
+  chapter: 1,
+  activeMissionKey: "intro_boar",
+  completedMissionKeys: [],
+  unlockedMissionKeys: ["intro_boar"],
 };
 
 export let hunt = null;
 
 export let world = {
-  day: 1
+  day: 1,
   // future home for: weather, dailyShopSeed, activeEvents, etc.
 };
 
-export function setPlayer(p){ player = p; }
-export function setStory(s){ story = s; }
-export function setHunt(h){ hunt = h; }
-export function setWorld(w){ world = w; }
+export function setPlayer(p) {
+  player = p;
+}
+export function setStory(s) {
+  story = s;
+}
+export function setHunt(h) {
+  hunt = h;
+}
+export function setWorld(w) {
+  world = w;
+}

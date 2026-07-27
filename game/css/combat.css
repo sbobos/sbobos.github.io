@@ -59,58 +59,92 @@
   color: var(--text-dim);
 }
 
-/* Telegraph */
+/* ==========================================================================
+   Monster Telegraph 
+   ========================================================================== */
 
 .telegraph-banner {
-  background: #26201a;
-  border: 1px solid var(--gold-dim);
-  border-radius: 4px;
-  padding: 10px 12px;
-  margin: 10px 0;
+  background: linear-gradient(90deg, #261a1a 0%, #1a1614 100%);
+  border: 1px solid var(--blood-dim);
+  border-left: 4px solid var(--gold); /* Heavy warning accent on the left */
+  border-radius: 0;
+  padding: 10px 14px;
+  margin: 12px 0;
   font-size: 12px;
-  color: var(--gold);
+  color: var(--text);
   line-height: 1.5;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
 }
 
 .telegraph-banner .tt-label {
   display: block;
   margin-bottom: 4px;
   font-size: 10px;
-  letter-spacing: 1px;
+  font-family: var(--font-display);
+  letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: var(--gold-dim);
+  color: var(--gold);
+  text-shadow: 0 0 6px rgba(199, 154, 60, 0.4);
 }
 
-/* Status Bars */
+/* ==========================================================================
+   Enhanced Status Bars & Gauges
+   ========================================================================== */
 
 .barwrap {
   position: relative;
   overflow: hidden;
-  height: 14px;
-  background: #0d1210;
+  height: 12px;
+  background: #080a09; /* Deep cavern black */
   border: 1px solid var(--border);
-  border-radius: 3px;
+  border-radius: 0; /* Kill rounded edges */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9); /* Inset depth shadow */
+
+  /* GAME TRICK: Angled clip on the container end */
+  clip-path: polygon(0 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
 }
 
 .barfill {
   height: 100%;
-  transition: width 0.25s ease;
+  transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
 }
 
+/* Add a diagonal light gloss across all fills */
+.barfill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  pointer-events: none;
+}
+
+/* Health Bar: Deep Blood Red Gradient */
 .barfill.hp {
-  background: var(--blood);
+  background: linear-gradient(90deg, var(--blood-dim) 0%, var(--blood) 100%);
+  box-shadow: 0 0 8px rgba(162, 59, 46, 0.6);
 }
 
+/* Stamina Bar: Vibrant Moss/Emerald */
 .barfill.stam {
-  background: var(--moss);
+  background: linear-gradient(90deg, var(--moss-dim) 0%, var(--moss) 100%);
+  box-shadow: 0 0 8px rgba(122, 154, 110, 0.4);
 }
 
 .barfill.part {
-  background: var(--gold-dim);
+  background: linear-gradient(90deg, var(--gold-dim) 0%, var(--gold) 100%);
 }
 
 .barfill.broken {
-  background: #3a3a3a;
+  background: #2a2a2a;
 }
 
 .barlabel {
@@ -118,6 +152,8 @@
   justify-content: space-between;
   margin-bottom: 3px;
   font-size: 11px;
+  font-family: var(--font-display);
+  letter-spacing: 0.5px;
   color: var(--text-dim);
 }
 
@@ -132,11 +168,31 @@
 
 .part-card {
   position: relative;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  border-radius: 0;
 }
 
 .part-card.broken {
-  border-style: dashed;
-  border-color: #4a4a44;
+  opacity: 1; /* Keep fully visible! */
+  background: linear-gradient(
+    180deg,
+    rgba(162, 59, 46, 0.2) 0%,
+    var(--panel-alt) 100%
+  );
+
+  /* Red shattered outline to signify weakpoint / open flesh */
+  border: 1px solid var(--blood);
+  border-left: 3px solid var(--blood);
+  box-shadow:
+    inset 0 0 12px rgba(162, 59, 46, 0.3),
+    0 0 8px rgba(162, 59, 46, 0.2);
+}
+
+.part-card.broken .pname {
+  color: #ff6b52; /* Bright crimson title */
+  font-weight: bold;
 }
 
 .part-card .pname {
@@ -160,10 +216,13 @@
 }
 
 .part-tag.spent {
-  background: #3a3a3a;
-  color: var(--text-dim);
+  background: var(--blood);
+  color: #ffffff;
+  font-weight: bold;
+  border: 1px solid var(--gold);
+  text-shadow: 0 1px 2px #000;
+  box-shadow: 0 0 6px rgba(162, 59, 46, 0.5);
 }
-
 .part-tag.armored {
   background: #3a2a1a;
   color: var(--frost);
@@ -216,51 +275,100 @@
   margin-bottom: 6px;
 }
 
+/* ==========================================================================
+   Combat Log (Game Style)
+   ========================================================================== */
+
 .log {
   height: 190px;
   overflow-y: auto;
-  padding: 10px 12px;
-  background: #0d1210;
+  padding: 12px 14px;
+  background: #0a0d0c;
+
+  /* Double border trick for a carved recessed frame */
   border: 1px solid var(--border);
-  border-radius: 4px;
-  font-size: 12px;
-  line-height: 1.6;
+  outline: 1px solid #000;
+  outline-offset: -2px;
+  border-radius: 0;
+
+  font-family: var(--font-mono); /* Keeping mono for clean combat readouts */
+  font-size: 11px;
+  line-height: 1.7;
+
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
 }
 
-/* Combat Log Entries */
+/* Custom Themed Scrollbar */
+.log::-webkit-scrollbar {
+  width: 6px;
+}
+
+.log::-webkit-scrollbar-track {
+  background: #080a09;
+  border-left: 1px solid var(--border);
+}
+
+.log::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 0;
+}
+
+.log::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-dim);
+}
 
 .log div {
-  margin-bottom: 2px;
+  margin-bottom: 3px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  padding-bottom: 2px;
 }
 
+/* Regular Hit */
 .log .l-hit {
   color: var(--text);
 }
 
+/* Critical Hits / Big Wins */
 .log .l-crit {
   color: var(--gold);
+  font-weight: bold;
+  text-shadow: 0 0 6px rgba(199, 154, 60, 0.4);
 }
 
+/* Damage Dealt or Taken */
 .log .l-dmg {
-  color: var(--blood);
-}
-
-.log .l-sys {
-  color: var(--text-dim);
-  font-style: italic;
-}
-
-.log .l-break {
-  color: var(--gold);
+  color: #e05244; /* Brighter blood red so it stands out */
   font-weight: bold;
 }
 
-.log .l-telegraph {
-  color: var(--frost);
+/* System Messages / Fluff Text */
+.log .l-sys {
+  color: var(--text-dim);
+  font-style: italic;
+  opacity: 0.8;
 }
 
+/* Part Break / Armor Shatter - Massive Event Feel */
+.log .l-break {
+  color: var(--gold);
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background: rgba(199, 154, 60, 0.1);
+  padding: 1px 4px;
+  border-left: 2px solid var(--gold);
+}
+
+/* Incoming Boss Telegraph / Warning */
+.log .l-telegraph {
+  color: var(--frost);
+  font-style: italic;
+}
+
+/* Positive Buffs / Healing / Parries */
 .log .l-good {
   color: var(--moss);
+  font-weight: bold;
 }
 
 /* Loot Overlay */

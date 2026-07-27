@@ -1,7 +1,13 @@
 import { hunt, player } from "../state.js";
 
 import { doPlayerAttack } from "./combat/attack.js";
-import { currentWeapon } from "../utils.js";
+import {
+  currentWeapon,
+  playSound,
+  triggerShake,
+  triggerDamageFlash,
+  delay,
+} from "../utils.js";
 
 import { logMsg } from "./log.js";
 import { resolvePendingMove } from "./resolve.js";
@@ -10,48 +16,67 @@ import { endHunt } from "./setup.js";
 
 import { renderHunt } from "../ui/hunt.js";
 
-export function playerAction(actionType, payload = {}) {
-  if (hunt.over) {
+// Input lock to prevent rapid spamming while turn sequence plays out
+let isBusy = false;
+
+export async function playerAction(actionType, payload = {}) {
+  if (hunt.over || isBusy) {
     return;
   }
 
-  if (player.staggered) {
-    handleStagger();
-    return;
-  }
+  isBusy = true;
 
-  hunt.playerGuardedThisRound = actionType === "guard";
-
-  if (actionType === "flee") {
-    handleFlee();
-    return;
-  }
-
-  if (hunt.pendingMove) {
-    if (handleReaction(actionType, payload)) {
+  try {
+    if (player.staggered) {
+      await handleStagger();
       return;
     }
+
+    hunt.playerGuardedThisRound = actionType === "guard";
+
+    if (actionType === "flee") {
+      await handleFlee();
+      return;
+    }
+
+    if (hunt.pendingMove) {
+      const handled = await handleReaction(actionType, payload);
+      if (handled) {
+        return;
+      }
+    }
+
+    await performAction(actionType, payload);
+
+    // Stop execution completely if player action ended the hunt (e.g. killed monster)
+    if (combatFinished()) {
+      return;
+    }
+
+    await nextMonsterTurn();
+  } finally {
+    isBusy = false;
   }
-
-  performAction(actionType, payload);
-
-  if (combatFinished()) {
-    return;
-  }
-
-  nextMonsterTurn();
 }
 
-function handleStagger() {
+async function handleStagger() {
   player.staggered = false;
 
   logMsg("You're staggered and lose your footing!", "l-dmg");
+  playSound("player_hurt");
+  triggerShake();
+  triggerDamageFlash();
 
-  nextMonsterTurn();
+  if (combatFinished()) return;
+  renderHunt();
+
+  await delay(600);
+  if (combatFinished()) return;
+
+  await nextMonsterTurn();
 }
 
-// actions.js
-function handleReaction(actionType, payload) {
+async function handleReaction(actionType, payload) {
   if (actionType === "attack") {
     logMsg(
       "You commit to the attack, trading blows as the monster's strike lands!",
@@ -60,14 +85,30 @@ function handleReaction(actionType, payload) {
 
     doPlayerAttack(payload.partKey, payload.moveKey);
 
+    // If attack killed the monster, render log/end and exit
     if (combatFinished()) {
       return true;
     }
 
+    renderHunt();
+
+    // Pacing pause before monster strike connects
+    await delay(500);
+
+    const hpBefore = player.hp;
     resolvePendingMove("attack", payload);
 
-    hunt.recoveryWindow = true;
+    if (player.hp < hpBefore) {
+      playSound("player_hurt");
+      triggerShake();
+      triggerDamageFlash();
+    }
 
+    if (combatFinished()) {
+      return true;
+    }
+
+    hunt.recoveryWindow = true;
     renderHunt();
 
     return true;
@@ -80,17 +121,27 @@ function handleReaction(actionType, payload) {
     );
 
     renderHunt();
-
     return true;
   }
 
+  const hpBefore = player.hp;
   resolvePendingMove(actionType, payload);
-  renderHunt();
 
+  if (player.hp < hpBefore) {
+    playSound("player_hurt");
+    triggerShake();
+    triggerDamageFlash();
+  }
+
+  if (combatFinished()) {
+    return true;
+  }
+
+  renderHunt();
   return true;
 }
 
-function performAction(actionType, payload) {
+async function performAction(actionType, payload) {
   switch (actionType) {
     case "attack":
       attack(payload.partKey, payload.moveKey);
@@ -113,7 +164,7 @@ function performAction(actionType, payload) {
 function attack(partKey, moveKey) {
   doPlayerAttack(partKey, moveKey);
 
-  if (hunt.over) {
+  if (combatFinished()) {
     return;
   }
 
@@ -142,6 +193,7 @@ function guard() {
   if (!hunt.pendingMove) {
     logMsg("You settle into a ready stance, catching your breath.", "l-sys");
   }
+  renderHunt();
 }
 
 function dodge() {
@@ -152,53 +204,70 @@ function dodge() {
   recoverStamina(10);
 
   logMsg("You reposition, staying light on your feet.", "l-sys");
+  renderHunt();
 }
 
 function usePotion() {
   if (player.potions <= 0) {
     logMsg("No potions left in your pack.", "l-sys");
-
+    renderHunt();
     return;
   }
 
   player.potions--;
-
   player.hp = Math.min(player.maxHp, player.hp + 40);
 
   logMsg("You down a potion, recovering 40 HP.", "l-sys");
+  renderHunt();
 }
 
 function recoverStamina(amount) {
   player.stamina = Math.min(player.maxStamina, player.stamina + amount);
 }
 
-function handleFlee() {
+async function handleFlee() {
   if (Math.random() < 0.75) {
     logMsg("You break away and retreat from the hunting grounds.", "l-sys");
 
     hunt.pendingMove = null;
-
     endHunt("flee");
-
     return;
   }
 
   logMsg("You can't find an opening to escape!", "l-sys");
+  renderHunt();
 
   if (hunt.pendingMove) {
+    await delay(500);
+
+    const hpBefore = player.hp;
     resolvePendingMove("flee_fail", {});
+
+    if (player.hp < hpBefore) {
+      playSound("player_hurt");
+      triggerShake();
+      triggerDamageFlash();
+    }
 
     if (combatFinished()) {
       return;
     }
+
+    renderHunt();
   }
 
-  nextMonsterTurn();
+  await nextMonsterTurn();
 }
 
-function nextMonsterTurn() {
-  hunt.pendingMoveWasJustResolved = false;
+async function nextMonsterTurn() {
+  if (combatFinished()) return;
 
+  // Pacing pause (500ms) before monster telegraphs its next move
+  await delay(500);
+
+  if (combatFinished()) return;
+
+  hunt.pendingMoveWasJustResolved = false;
   hunt.recoveryWindow = false;
 
   monsterTelegraphPhase();
@@ -214,8 +283,11 @@ function combatFinished() {
   }
 
   if (player.hp <= 0) {
-    endHunt("defeat");
+    playSound("player_hurt");
+    triggerShake();
+    triggerDamageFlash();
 
+    endHunt("defeat");
     return true;
   }
 

@@ -1,6 +1,7 @@
 import { player } from "../../state.js";
 import { WEAPONS, ARMORS, assembleWeapon } from "../../data/gear.js";
 import { SKILLS } from "../../data/skills.js";
+import { FORGE_LEVELS } from "../../data/forge.js";
 import {
   currentWeapon,
   currentArmor,
@@ -42,12 +43,17 @@ export function renderForgeTab() {
         .join("")
     : `<div class="tree-copy">No skill points from current gear yet.</div>`;
 
+  const forgeInfo = FORGE_LEVELS[player.forgeLevel];
+  const forgeLevelHtml = renderForgeLevelPanel();
+
   const treeSummary = `
   <div class="stat-row">
     <div class="stat-chip">Weapon: ${current.name}</div>
     ${armorChips}
     <div class="stat-chip">Style: ${current.specialDesc}</div>
+    <div class="stat-chip">Forge: ${forgeInfo.name} (Lv ${forgeInfo.level})</div>
   </div>
+  ${forgeLevelHtml}
   <div class="tree-panel">
     <div class="tree-title">Armor Skills</div>
     <div class="tree-copy">Points come from all 5 equipped pieces combined. Reach a skill's threshold to activate it.</div>
@@ -55,7 +61,7 @@ export function renderForgeTab() {
   </div>
   <div class="tree-panel">
     <div class="tree-title">Weapon tree</div>
-    <div class="tree-copy">The first branch is always available. Later paths open after you prove yourself with their predecessor.</div>
+    <div class="tree-copy">The first branch is always available. Later paths open after you prove yourself with their predecessor — and after your forge is upgraded to match.</div>
     <div class="tree-list">
       ${Object.values(WEAPONS)
         .filter(
@@ -95,6 +101,55 @@ export function renderForgeTab() {
   `;
 }
 
+/**
+ * Shows the forge's own upgrade path — separate from any individual
+ * weapon/armor recipe. Once player.forgeLevel is high enough, higher-tier
+ * items stop being forge-locked in renderCraftCard below (they still need
+ * their own materials/goldcoin on top of that).
+ */
+function renderForgeLevelPanel() {
+  const forgeInfo = FORGE_LEVELS[player.forgeLevel];
+  const next = FORGE_LEVELS[player.forgeLevel + 1];
+
+  if (!next) {
+    return `
+      <div class="tree-panel">
+        <div class="tree-title">${forgeInfo.name} · Max Level</div>
+        <div class="tree-copy">Your forge has reached its full potential — every tier is available if you have the materials.</div>
+      </div>
+    `;
+  }
+
+  const goldcoinOk = player.goldcoin >= next.goldcoin;
+  const allOk =
+    goldcoinOk &&
+    Object.entries(next.recipe).every(
+      ([mat, need]) => (player.materials[mat] || 0) >= need,
+    );
+
+  const reqRows = `
+    <ul class="req-list">
+      ${Object.entries(next.recipe)
+        .map(([mat, need]) => {
+          const have = player.materials[mat] || 0;
+          const ok = have >= need;
+          return `<li class="${ok ? "ok" : "bad"}"><span>${mat}</span><span>${have}/${need}</span></li>`;
+        })
+        .join("")}
+      <li class="${goldcoinOk ? "ok" : "bad"}"><span>goldcoin</span><span>${player.goldcoin}/${next.goldcoin}</span></li>
+    </ul>
+  `;
+
+  return `
+    <div class="tree-panel">
+      <div class="tree-title">Next: ${next.name} (Level ${next.level})</div>
+      <div class="tree-copy">${next.desc}</div>
+      ${reqRows}
+      <button ${allOk ? "" : "disabled"} onclick="upgradeForge()">Upgrade Forge</button>
+    </div>
+  `;
+}
+
 export function renderCraftCard(item, isWeapon) {
   const owned = isWeapon
     ? player.ownedWeapons.includes(item.key)
@@ -102,11 +157,15 @@ export function renderCraftCard(item, isWeapon) {
   const equipped = isWeapon
     ? player.weapon === item.key
     : player.armorSlots[item.slot] === item.key;
-  const canUnlock = isWeapon
+
+  const chainOk = isWeapon
     ? !item.unlocksFrom ||
       player.ownedWeapons.includes(item.unlocksFrom) ||
       player.weapon === item.unlocksFrom
     : true;
+  const forgeLevelOk = player.forgeLevel >= (item.forgeLevel ?? 0);
+  const canUnlock = chainOk && forgeLevelOk;
+
   const currentItem = isWeapon ? currentWeapon() : currentArmor()[item.slot];
   const compareText = isWeapon
     ? `vs current: ${item.atk - currentItem.atk >= 0 ? "+" : ""}${item.atk - currentItem.atk} ATK`
@@ -140,10 +199,14 @@ export function renderCraftCard(item, isWeapon) {
   let btnLabel = "Craft & equip";
   if (equipped) btnLabel = "Equipped";
   else if (owned) btnLabel = "Equip";
-  const unlockHint =
-    isWeapon && item.unlocksFrom && !canUnlock
-      ? `<div class="tree-copy">Requires ${WEAPONS[item.unlocksFrom].name}</div>`
-      : "";
+
+  let unlockHint = "";
+  if (isWeapon && item.unlocksFrom && !chainOk) {
+    unlockHint = `<div class="tree-copy">Requires ${WEAPONS[item.unlocksFrom].name}</div>`;
+  } else if (!forgeLevelOk) {
+    const need = FORGE_LEVELS[item.forgeLevel];
+    unlockHint = `<div class="tree-copy">Requires ${need.name} (Forge Level ${item.forgeLevel})</div>`;
+  }
 
   return `
     <div class="card craft-card">
@@ -179,7 +242,7 @@ export function renderCraftCard(item, isWeapon) {
       ${isWeapon ? `<div class="weapon-style">${item.specialDesc}</div>` : ""}
       ${reqRows}
       ${unlockHint}
-      <button ${!owned && !allOk ? "disabled" : ""} ${equipped ? "disabled" : ""} ${isWeapon && item.unlocksFrom && !canUnlock ? "disabled" : ""} onclick="craftItem('${item.key}', ${isWeapon})">
+      <button ${!owned && !allOk ? "disabled" : ""} ${equipped ? "disabled" : ""} ${!canUnlock ? "disabled" : ""} onclick="craftItem('${item.key}', ${isWeapon})">
         ${btnLabel}
       </button>
     </div>
@@ -189,6 +252,7 @@ export function renderCraftCard(item, isWeapon) {
 export function craftItem(key, isWeapon) {
   const item = isWeapon ? WEAPONS[key] : ARMORS[key];
   if (!item) return;
+  if (player.forgeLevel < (item.forgeLevel ?? 0)) return;
   if (
     isWeapon &&
     item.unlocksFrom &&
@@ -214,5 +278,24 @@ export function craftItem(key, isWeapon) {
     const slot = item.slot || "chest";
     player.armorSlots[slot] = key;
   }
+  renderVillage();
+}
+
+export function upgradeForge() {
+  const nextLevel = player.forgeLevel + 1;
+  const next = FORGE_LEVELS[nextLevel];
+  if (!next) return;
+
+  const canAfford =
+    player.goldcoin >= next.goldcoin &&
+    Object.entries(next.recipe).every(
+      ([mat, need]) => (player.materials[mat] || 0) >= need,
+    );
+  if (!canAfford) return;
+
+  player.goldcoin -= next.goldcoin;
+  Object.entries(next.recipe).forEach(([mat, need]) => addMat(mat, -need));
+  player.forgeLevel = nextLevel;
+
   renderVillage();
 }

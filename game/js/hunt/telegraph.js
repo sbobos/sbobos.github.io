@@ -11,7 +11,7 @@ export function monsterTelegraphPhase() {
 
   const m = hunt.monster;
 
-  const chosen = chooseMonsterMove(m);
+  const chosen = chooseMonsterMove(m, hunt.rank);
 
   hunt.pendingMove = {
     ...chosen,

@@ -8,21 +8,19 @@ import {
   doNewGame,
 } from "./ui/village.js";
 
-import {
-  buyShopItem,
-  turnInBounty,
-  doTrade,
-} from "./ui/camp.js";
+import { buyShopItem, turnInBounty, doTrade } from "./ui/camp.js";
 
 import { startHunt } from "./hunt/setup.js";
 import { startExpedition, continueExpedition } from "./hunt/expedition.js";
 import { playerAction } from "./hunt/actions.js";
 import { selectMove } from "./ui/hunt.js";
+import { upgradeForge } from "./ui/village/forge.js";
 
 window.startHunt = startHunt;
 window.selectMove = selectMove;
 window.startExpedition = startExpedition;
 window.continueExpedition = continueExpedition;
+window.upgradeForge = upgradeForge;
 window.playerAction = playerAction;
 window.craftItem = craftItem;
 window.buyShopItem = buyShopItem;

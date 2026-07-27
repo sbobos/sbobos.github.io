@@ -1,48 +1,172 @@
+/* ==========================================================================
+   Base Button Enhancements (De-Webified)
+   ========================================================================== */
+
 button {
-    font-family: var(--font-mono);
-    background: var(--panel-alt);
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 8px 12px;
-    cursor: pointer;
-    font-size: 12px;
-    letter-spacing: 0.5px;
+  font-family: var(
+    --font-display
+  ); /* Swapped to Cinzel for a fantasy feel, but mono works if you want a terminal vibe! */
+  background: var(--panel-alt);
+  color: var(--text-dim);
+
+  /* GAME UI TRICK: Asymmetric borders. A thick left edge grounds the element */
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: 0; /* Kill the web curves */
+
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: bold;
+
+  transition: all 0.1s ease-out; /* Slightly faster snap for games */
+  position: relative;
+  user-select: none;
+
+  /* Flatten the inner shadow, make the outer shadow heavier */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
 }
 
 button:hover:not(:disabled) {
-    border-color: var(--gold-dim);
-    color: var(--gold);
+  background: var(--panel);
+  border-color: var(--gold-dim);
+  border-left-color: var(--gold); /* The thick edge lights up */
+  color: var(--text);
+
+  box-shadow:
+    0 0 15px rgba(199, 154, 60, 0.15),
+    inset 4px 0 0 rgba(199, 154, 60, 0.2); /* Inner side-glow */
+  transform: translateY(-1px);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(2px);
+  /* Physical press-in feeling */
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.8),
+    inset 0 4px 8px rgba(0, 0, 0, 0.6);
+  border-left-color: var(--gold-dim);
 }
 
 button:focus-visible {
-    outline: 2px solid var(--gold);
-    outline-offset: 2px;
+  outline: 1px solid var(--gold);
+  outline-offset: 2px;
 }
 
 button:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.8);
+  box-shadow: none;
 }
 
+/* ==========================================================================
+   Button Variants (Combat / Actions)
+   ========================================================================== */
+
+/* Primary / Aggressive Action */
 button.primary {
-    border-color: var(--blood);
-    color: var(--text);
+  border-left: 3px solid var(--blood);
+  color: var(--text);
+  background: linear-gradient(
+    180deg,
+    rgba(162, 59, 46, 0.15) 0%,
+    /* Uses your --blood variable roughly */ var(--panel-alt) 100%
+  );
 }
 
 button.primary:hover:not(:disabled) {
-    background: var(--blood-dim);
-    color: var(--text);
-    border-color: var(--blood);
+  background: linear-gradient(
+    180deg,
+    rgba(162, 59, 46, 0.3) 0%,
+    var(--panel-alt) 100%
+  );
+  border-color: var(--blood);
+  box-shadow:
+    0 0 15px rgba(162, 59, 46, 0.3),
+    inset 4px 0 0 rgba(162, 59, 46, 0.3);
+}
+
+/* Dodge / Arcane */
+button.dodge {
+  border-left: 3px solid var(--frost);
 }
 
 button.dodge:hover:not(:disabled) {
-    border-color: var(--frost);
-    color: var(--frost);
+  border-color: var(--frost);
+  color: #fff;
+  box-shadow:
+    0 0 15px rgba(111, 155, 176, 0.3),
+    inset 4px 0 0 rgba(111, 155, 176, 0.3);
 }
 
+/* Full Width Option */
 button.wide {
-    width: 100%;
-    text-align: left;
-    margin-top: 8px;
+  width: 100%;
+  text-align: left;
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ==========================================================================
+   Tabs Component (Clipped Game Style)
+   ========================================================================== */
+
+.tab-group {
+  display: flex;
+  gap: 2px; /* Tighter gap for interlocking shapes */
+  border-bottom: 2px solid var(--border); /* Thicker base */
+  padding-bottom: 0;
+}
+
+.tab-button {
+  background: #101412; /* Darker than panel to show inactivity */
+  border: none; /* Strip border because clip-path will cut it weirdly */
+
+  /* GAME UI TRICK: Angled chamfer cuts on the top left/right */
+  clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 100%, 0% 100%);
+
+  color: var(--text-dim);
+  padding: 8px 24px;
+  font-size: 11px;
+  font-family: var(--font-display);
+  letter-spacing: 1px;
+  opacity: 0.8;
+  box-shadow: none;
+  margin-bottom: -2px; /* Overlap the thicker base border */
+}
+
+.tab-button:hover:not(:disabled) {
+  opacity: 1;
+  color: var(--text);
+  background: var(--panel-alt);
+  transform: none;
+}
+
+/* Active Selected Tab */
+.tab-button.active {
+  background: linear-gradient(180deg, var(--panel-alt) 0%, var(--panel) 100%);
+  color: var(--gold);
+  opacity: 1;
+  font-weight: bold;
+
+  /* The active tab acts as a physical cap over the border line */
+  border-bottom: 2px solid var(--panel);
+
+  /* We use a pseudo-element for the gold top-highlight since borders are clipped */
+}
+
+.tab-button.active::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  background: var(--gold);
+  box-shadow: 0 2px 10px var(--gold);
 }

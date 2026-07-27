@@ -1,74 +1,63 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>IRONVEIL — A Hunter's Log</title>
 
-    <link rel="stylesheet" href="css/variables.css">
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/common.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/buttons.css">
-    <link rel="stylesheet" href="css/forge.css">
-    <link rel="stylesheet" href="css/inventory.css">
-    <link rel="stylesheet" href="css/combat.css">
-    <link rel="stylesheet" href="css/utilities.css">
-</head>
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/buttons.css" />
+    <link rel="stylesheet" href="css/forge.css" />
+    <link rel="stylesheet" href="css/inventory.css" />
+    <link rel="stylesheet" href="css/combat.css" />
+    <link rel="stylesheet" href="css/utilities.css" />
+  </head>
 
-<body>
-
+  <body>
     <main id="app">
+      <!-- Game HUD Header Bar -->
+      <header class="hud-topbar" aria-label="Hunter Status">
+        <div class="hud-brand">
+          <span class="eyebrow">LOWLANDS</span>
+          <h1 class="title">IRONVEIL</h1>
+        </div>
 
-        <header class="banner">
-            <div class="eyebrow">Field Log · Lowland Hunting Grounds</div>
+        <div class="hud-stats">
+          <div class="stat-badge">
+            <span class="label">HUNTER</span>
+            <b id="tb-name">—</b>
+          </div>
+          <div class="stat-badge">
+            <span class="label">GOLD</span>
+            <b id="tb-goldcoin">0</b>
+          </div>
+          <div class="stat-badge">
+            <span class="label">WEAPON</span>
+            <b id="tb-weapon">—</b>
+          </div>
+          <div class="stat-badge">
+            <span class="label">ARMOR</span>
+            <b id="tb-armor">—</b>
+          </div>
+        </div>
+      </header>
 
-            <h1>IRONVEIL</h1>
-
-            <p class="sub">
-                A hunter's log — no levels, only the gear and reflexes you earn.
-            </p>
-        </header>
-
-        <nav class="topbar" aria-label="Hunter Status">
-
-            <div class="stat">
-                Hunter:
-                <b id="tb-name">—</b>
-            </div>
-
-            <div class="stat">
-                Gold Coin:
-                <b id="tb-goldcoin">0</b>
-            </div>
-
-            <div class="stat">
-                Weapon:
-                <b id="tb-weapon">—</b>
-            </div>
-
-            <div class="stat">
-                Armor:
-                <b id="tb-armor">—</b>
-            </div>
-
-        </nav>
-
+      <!-- Main Game Canvas / Viewport Area -->
+      <div class="game-viewport">
         <section id="village-screen"></section>
-
         <section id="hunt-screen" class="hidden"></section>
+      </div>
 
-        <footer class="footer-note">
-            IRONVEIL • Prototype Build
-        </footer>
-
+      <footer class="hud-footer">
+        <span>IRONVEIL • Build 0.1</span>
+      </footer>
     </main>
 
     <script type="module" src="js/main.js"></script>
-
-</body>
-
+  </body>
 </html>

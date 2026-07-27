@@ -9,6 +9,7 @@ import { LOOT_TABLES } from "../data/loot.js";
 import { smallMonsterToHuntShape } from "./monsteradapter.js";
 import { getRegisteredMission } from "../questregistry.js";
 import { expandExpedition } from "./expeditionbuilder.js";
+import { advanceDay } from "./day.js";
 
 let currentMission = null;
 let step = 0;
@@ -64,12 +65,18 @@ function nextExpeditionEvent() {
 }
 
 function startMonsterQueue(queue, missionKey, rank, onQueueDone) {
+  console.log("QUEUE START", queue);
+
   const [head, ...rest] = queue;
 
   startHunt(head, missionKey, rank, () => {
+    console.log("AFTER HUNT CALLBACK", rest.length);
+
     if (rest.length === 0) {
+      console.log("QUEUE FINISHED");
       onQueueDone();
     } else {
+      console.log("NEXT MONSTER");
       startMonsterQueue(rest, missionKey, rank, onQueueDone);
     }
   });
@@ -86,6 +93,8 @@ function showEncounter(encounter) {
 }
 
 function finishEncounter() {
+  console.log("FINISH ENCOUNTER");
+  console.log(step, currentMission.expedition.length);
   step++;
 
   if (step >= currentMission.expedition.length) {
@@ -232,6 +241,8 @@ function getButtons(encounter) {
 }
 
 export function continueExpedition() {
+  console.log("CONTINUE EXPEDITION");
+  console.log(hunt.afterHunt);
   if (hunt.result !== "victory") {
     returnToCamp();
     return;
@@ -245,6 +256,16 @@ export function continueExpedition() {
 }
 
 function returnToCamp() {
+  if (hunt?.missionKey) {
+    const mission = getRegisteredMission(hunt.missionKey);
+
+    if (mission?.category === "side") {
+      unregisterMission(mission.key);
+      refreshQuestBoard();
+    }
+  }
+
+  advanceDay();
   player.hp = player.maxHp;
   player.stamina = player.maxStamina;
   renderVillage();

@@ -6,13 +6,23 @@
    requiresBroken      key of another part that must break first, or null
                        (thick plating protecting a softer part underneath)
    lockedMultiplier    hitzone multiplier while requiresBroken is unmet
-   postBreakImmune     if true, hits here stop damaging monster.hp once broken
+                       (>1 = broken part is now a real weak point, not dead weight)
+   postBreakImmune    if true, hits here stop damaging monster.hp once broken
                         (the "one-time payload" pattern — use sparingly)
-   disablesMoves       move keys removed from the pool once this part breaks
-   unlocksMove         a move key added to the pool once this part breaks
+   disablesMoves      move keys removed from the pool once this part breaks
+   unlocksMove        a move key added to the pool once this part breaks
 
    Move keys referenced here (defaultMoveKeys, disablesMoves, unlocksMove) are
    looked up by string key in MOVES at runtime — no direct import needed.
+
+   RANK fields (optional `ranks` block, see js/data/ranks.js):
+   ranks.elite / ranks.master   { hpMult, damageMult, addMoveKeys }
+   hpMult/damageMult scale this monster's maxHp / outgoing move damage at
+   that rank. addMoveKeys are new moves that unlock at that rank, added
+   cumulatively (master keeps elite's moves too). A monster with no
+   `ranks` block falls back to js/data/ranks.js DEFAULT_RANK_SCALING with
+   no bonus moves — fine for WIP content, not recommended for anything
+   actually fought at elite/master.
 */
 
 export const BOSSES = {
@@ -25,6 +35,10 @@ export const BOSSES = {
       "Agile, agresive, and large sized dune hog. Hostile toward everything it faces.",
     maxHp: 160,
     defaultMoveKeys: ["boar_ram", "boar_headbut", "boar_kick"],
+    ranks: {
+      elite: { hpMult: 2.4, damageMult: 1.3, addMoveKeys: ["boar_frenzy"] },
+      master: { hpMult: 5.6, damageMult: 1.6, addMoveKeys: ["boar_rampage"] },
+    },
     parts: [
       {
         key: "head",
@@ -75,6 +89,18 @@ export const BOSSES = {
       "wyrm_spikeslam",
       "wyrm_sandcharge",
     ],
+    ranks: {
+      elite: {
+        hpMult: 2.4,
+        damageMult: 1.3,
+        addMoveKeys: ["wyrm_burrowstrike"],
+      },
+      master: {
+        hpMult: 5.6,
+        damageMult: 1.6,
+        addMoveKeys: ["wyrm_sandmaelstrom"],
+      },
+    },
     parts: [
       {
         key: "head",
@@ -148,6 +174,10 @@ export const BOSSES = {
       "A tundra brute built like a landslide. Slow to anger, unstoppable once roused.",
     maxHp: 300,
     defaultMoveKeys: ["bear_paw", "bear_charge", "bear_slam", "bear_roar"],
+    ranks: {
+      elite: { hpMult: 2.4, damageMult: 1.3, addMoveKeys: ["bear_mauling"] },
+      master: { hpMult: 5.6, damageMult: 1.6, addMoveKeys: ["bear_avalanche"] },
+    },
     parts: [
       {
         key: "head",
