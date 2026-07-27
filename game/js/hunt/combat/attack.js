@@ -4,7 +4,7 @@ import { spendStamina, findMonsterPart } from "./helpers.js";
 import { logMsg } from "../log.js";
 import { endHunt } from "../setup.js";
 import { currentWeapon, playSound, triggerShake } from "../../utils.js"; // <-- Updated Imports
-import { movesetFor } from "../../data/playerMoves.js";
+import { movesetFor } from "../../data/playermoves.js";
 
 export function doPlayerAttack(partKey, moveKey) {
   const weapon = currentWeapon();
