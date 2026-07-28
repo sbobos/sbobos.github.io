@@ -1,6 +1,11 @@
 import { player } from "../../state.js";
-import { WEAPONS, ARMORS, assembleWeapon } from "../../data/gear.js";
-import { currentWeapon, currentArmor } from "../../utils.js";
+import {
+  WEAPONS,
+  ARMORS,
+  assembleWeapon,
+  assembleFromPartKeys,
+} from "../../data/gear.js";
+import { renderPaperdoll } from "../shared/equipmentloadout.js";
 import { renderVillage } from "../village.js";
 
 export function renderInventoryTab() {
@@ -21,6 +26,32 @@ export function renderInventoryTab() {
         <div class="shop-actions">
           <span class="status-text">${equipped ? "Equipped" : "In Storage"}</span>
           <button ${equipped ? "disabled" : ""} onclick="equipOwnedItem('${item.key}', true)">
+            ${equipped ? "Ready" : "Equip"}
+          </button>
+        </div>
+      </div>
+    `;
+    })
+    .join("");
+
+  const customWeaponCards = Object.values(player.customWeapons || {})
+    .map((w) => {
+      const item = assembleFromPartKeys(w);
+      if (!item) return "";
+      const equipped = player.weapon === w.id;
+      return `
+      <div class="card inventory-card gear-card ${equipped ? "equipped" : ""}">
+        <div class="gear-header">
+          <span class="gear-title">${w.name}</span>
+          <span class="gear-tag">${item.damageType}</span>
+        </div>
+        <div class="gear-stats">
+          <span class="stat-badge atk"><b>ATK</b> ${item.atk}</span>
+          ${item.element !== "none" ? `<span class="stat-badge elem"><b>${item.element.toUpperCase()}</b> +${item.elementPower}</span>` : ""}
+        </div>
+        <div class="shop-actions">
+          <span class="status-text">${equipped ? "Equipped" : "In Storage"}</span>
+          <button ${equipped ? "disabled" : ""} onclick="equipCustomWeapon('${w.id}')">
             ${equipped ? "Ready" : "Equip"}
           </button>
         </div>
@@ -92,44 +123,7 @@ export function renderInventoryTab() {
         
         <div class="card summary-card wide-card">
           <div class="summary-label">Equipment Loadout</div>
-          
-          <div class="paperdoll-layout">
-            <!-- Center Character Avatar / Silhouette -->
-            <div class="paperdoll-avatar">
-              <div class="avatar-silhouette">⚔️</div>
-              <div class="avatar-title">HUNTER</div>
-            </div>
-
-            <!-- Equipment Slots placed spatially -->
-            <div class="doll-slot slot-head">
-              <span class="slot-label">Head</span>
-              <span class="slot-item">${currentArmor().head?.name || "Empty"}</span>
-            </div>
-
-            <div class="doll-slot slot-chest">
-              <span class="slot-label">Chest</span>
-              <span class="slot-item">${currentArmor().chest?.name || "Empty"}</span>
-            </div>
-
-            <div class="doll-slot slot-arms">
-              <span class="slot-label">Arms</span>
-              <span class="slot-item">${currentArmor().arms?.name || "Empty"}</span>
-            </div>
-
-            <div class="doll-slot slot-waist">
-              <span class="slot-label">Waist</span>
-              <span class="slot-item">${currentArmor().waist?.name || "Empty"}</span>
-            </div>
-
-            <div class="doll-slot slot-legs">
-              <span class="slot-label">Legs</span>
-              <span class="slot-item">${currentArmor().legs?.name || "Empty"}</span>
-            </div>
-
-            <div class="doll-slot slot-weapon">
-              <span class="slot-label">Weapon</span>
-              <span class="slot-item highlight">${currentWeapon().name}</span>
-            </div>
+          ${renderPaperdoll()}
           </div>
         </div>
       </div>
@@ -137,7 +131,7 @@ export function renderInventoryTab() {
 
     <div class="panel">
       <h2>Owned Weapons</h2>
-      <div class="shop-grid">${weaponCards || '<div class="inv-empty">No weapons unlocked yet.</div>'}</div>
+      <div class="shop-grid">${weaponCards}${customWeaponCards}${!weaponCards && !customWeaponCards ? '<div class="inv-empty">No weapons unlocked yet.</div>' : ""}</div>
     </div>
 
     <div class="panel">

@@ -6,6 +6,11 @@ export const ARENAS = {
 
     desc: "Wind-carved dunes stretch to the horizon.",
 
+    theme: {
+      from: "#3a2c14", // deep sand-shadow
+      to: "#7a5a2a", // warm dune gold
+    },
+
     hazard: {
       key: "sandstorm",
 
@@ -38,6 +43,11 @@ export const ARENAS = {
     name: "Frostmaul Hollow",
 
     desc: "A frozen ravine covered in ancient ice.",
+
+    theme: {
+      from: "#0f2a30", // deep ice-shadow
+      to: "#3a6a78", // pale frost blue
+    },
 
     hazard: {
       key: "icefall",

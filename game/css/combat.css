@@ -456,3 +456,139 @@
   letter-spacing: 0.5px;
   color: var(--moss);
 }
+
+.arena-scene {
+  --scene-from: #20201c;
+  --scene-to: var(--panel-alt);
+  background: linear-gradient(
+    160deg,
+    var(--scene-from) 0%,
+    var(--scene-to) 70%
+  );
+  padding: 14px 14px 10px;
+  margin: -1px -1px 14px;
+  border-radius: 4px 4px 0 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.arena-scene .telegraph-banner {
+  background: rgba(10, 10, 10, 0.35);
+}
+
+/* Part Icon Strip (choose a part to strike)
+   Reuses the .icon-strip layout convention from the Forge sub-tabs;
+   .hunt-part-icon is the hunt-specific icon variant, same idea as
+   .gear-icon there. Worth unifying naming once the .armor-* -> .gear-*
+   rename pass happens. */
+
+.hunt-icon-strip {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  margin: 8px 0 14px;
+}
+
+.hunt-part-icon {
+  flex: 0 0 auto;
+  min-width: 100px;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 10px;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.hunt-part-icon:hover {
+  border-color: var(--gold-dim);
+}
+
+.hunt-part-icon.selected {
+  background: #26201a;
+  border-color: var(--gold);
+}
+
+.hunt-part-icon.broken {
+  border-left: 3px solid var(--blood);
+}
+
+.hunt-part-icon-name {
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.barwrap.mini {
+  height: 6px;
+}
+
+/* Part Detail Panel
+   Opens below the icon strip once a part is selected; shows the sprite
+   placeholder, full status, hitzone hints, and the move list scoped to
+   that part. Clicking a move fires the attack directly — no separate
+   "confirm" step. */
+
+/* ==========================================================================
+   Append to combat.css (or wherever expedition/village visuals live) —
+   Expedition trail strip placeholder
+   ========================================================================== */
+
+.expedition-trail {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 10px 4px;
+  overflow-x: auto;
+}
+
+.trail-node {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  font-size: 15px;
+  opacity: 0.55;
+}
+
+.trail-node.done {
+  opacity: 0.4;
+  border-color: var(--moss-dim);
+  background: rgba(122, 154, 110, 0.12);
+}
+
+.trail-node.current {
+  opacity: 1;
+  border-color: var(--gold);
+  box-shadow: 0 0 8px rgba(199, 154, 60, 0.5);
+  transform: scale(1.15);
+}
+
+.trail-node.upcoming {
+  opacity: 0.55;
+}
+
+.trail-node.boss {
+  border-color: var(--blood);
+}
+
+.trail-node.boss.current {
+  border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(162, 59, 46, 0.6);
+}
+
+.trail-line {
+  flex: 1 1 16px;
+  min-width: 10px;
+  height: 2px;
+  background: var(--border);
+  margin: 0 2px;
+}

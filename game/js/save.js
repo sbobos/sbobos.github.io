@@ -43,8 +43,9 @@ function applyPlayerDefaults(loaded) {
   merged.trophies = { ...(loaded.trophies || {}) };
   merged.weapon = def.weapon;
   merged.customWeapons = {};
-  merged.ownedWeapons = [...def.ownedWeapons];
-  merged.ownedArmors = loaded.ownedArmors || def.ownedArmors;
+  merged.weapon = loaded.weapon ?? def.weapon;
+  merged.customWeapons = { ...(loaded.customWeapons || {}) };
+  merged.ownedWeapons = loaded.ownedWeapons || def.ownedWeapons;
 
   if (!merged.ownedArmors.includes(merged.armorSlots.chest))
     merged.ownedArmors.push(merged.armorSlots.chest);

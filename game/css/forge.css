@@ -2,6 +2,9 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 12px;
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .tree-panel {
@@ -133,51 +136,122 @@
   margin-bottom: 12px;
 }
 
-.part-slots {
-  display: grid;
-  gap: 14px;
-  margin-bottom: 12px;
+.slot-options {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 6px;
 }
 
-.part-slot-label {
+.slot-options .craft-card {
+  flex: 0 0 240px;
+  box-sizing: border-box;
+}
+
+.forge-layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 16px;
+  align-items: start;
+}
+
+.forge-sprite-placeholder {
+  margin-top: 12px;
+  border: 1px dashed var(--border);
+  border-radius: 4px;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--text-dim);
+  font-size: 12px;
+  text-align: center;
+  padding: 12px;
+}
+
+.placeholder-note {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.armor-tab-layout {
+  display: grid;
+  grid-template-columns: 1fr 240px;
+  gap: 16px;
+  align-items: start;
+}
+
+.armor-slot-row {
+  margin-bottom: 14px;
+}
+
+.slot-row-label {
   font-family: var(--font-display);
   font-size: 12px;
   color: var(--gold);
   margin-bottom: 6px;
 }
 
-.part-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 6px;
+.icon-strip {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 6px;
 }
 
-.part-option {
+.gear-icon {
+  flex: 0 0 56px;
+  height: 56px;
   border: 1px solid var(--border);
-  border-radius: 3px;
-  padding: 6px 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 10px;
+  color: var(--text-dim);
+  text-align: center;
+  box-sizing: border-box;
 }
 
-.part-option.selected {
+.gear-icon.selected {
   border-color: var(--gold-dim);
   color: var(--gold);
 }
 
-.part-option.locked {
+.gear-icon.equipped {
+  border-color: var(--moss-dim);
+  color: var(--moss);
+}
+
+.armor-detail-panel {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.gear-sprite-placeholder {
+  border: 1px dashed var(--border);
+  border-radius: 4px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--text-dim);
+  font-size: 12px;
+  margin-bottom: 10px;
+  text-align: center;
+  padding: 10px;
+}
+
+.gear-icon.locked {
   opacity: 0.4;
   cursor: not-allowed;
-}
-
-.part-cost {
-  font-size: 10px;
-  color: var(--text-dim);
-  margin-top: 2px;
-}
-
-.part-locked {
-  font-size: 10px;
-  color: var(--blood);
-  margin-top: 2px;
 }

@@ -13,7 +13,7 @@ function renderShopSection(){
       <div class="shop-title">${item.name}</div>
       <div class="shop-desc">${item.desc}</div>
       <div class="shop-actions">
-        <span>${item.price} goldcoin</span>
+        <span>${item.price} Gold Coin</span>
         <button ${player.goldcoin < item.price ? 'disabled' : ''} onclick="buyShopItem('${item.key}')">Buy</button>
       </div>
     </div>
@@ -55,7 +55,7 @@ function renderBountyCard(bounty){
   const canTurnIn = costEntries.every(([mat,need]) => (player.materials[mat]||0) >= need);
 
   const rewardParts = Object.entries(bounty.rewardMaterials||{}).map(([mat,n]) => `${n}x ${mat}`);
-  if (bounty.rewardgoldcoin) rewardParts.push(`${bounty.rewardgoldcoin} goldcoin`);
+  if (bounty.rewardgoldcoin) rewardParts.push(`${bounty.rewardgoldcoin} Gold Coin`);
 
   return `
     <div class="card craft-card">
@@ -63,7 +63,7 @@ function renderBountyCard(bounty){
       <div class="cname">${bounty.title}</div>
       <div class="cstat">${bounty.desc}</div>
       ${reqListHtml(costEntries)}
-      <div class="compare-text">Reward: ${rewardParts.join(', ') || 'goldcoin only'}</div>
+      <div class="compare-text">Reward: ${rewardParts.join(', ') || 'Gold Coin only'}</div>
       <button ${canTurnIn ? '' : 'disabled'} onclick="turnInBounty('${bounty.key}')">Turn in</button>
     </div>
   `;
@@ -97,7 +97,7 @@ export function turnInBounty(key){
 
 function tradeGetLabel(trade){
   const parts = [];
-  if (trade.get.goldcoin) parts.push(`${trade.get.goldcoin} goldcoin`);
+  if (trade.get.goldcoin) parts.push(`${trade.get.goldcoin} Gold Coin`);
   Object.entries(trade.get.materials||{}).forEach(([mat,n]) => parts.push(`${n}x ${mat}`));
   return parts.join(', ');
 }
@@ -122,7 +122,7 @@ function renderTradeSection(){
   return `
     <div class="panel">
       <h2>Trader's Stall</h2>
-      <p class="section-copy">Dump excess common materials for goldcoin, or barter up toward rarer ones. Rates are fixed and the stall is always open.</p>
+      <p class="section-copy">Dump excess common materials for Gold Coin, or barter up toward rarer ones. Rates are fixed and the stall is always open.</p>
       <div class="forge-grid">${cards}</div>
     </div>
   `;

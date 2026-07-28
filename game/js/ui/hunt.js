@@ -7,7 +7,13 @@ import { renderTopbar } from "./topbar.js";
 import { HAZARDS } from "../hunt/combat/hazards.js";
 import { movesetFor } from "../data/playermoves.js";
 
-/* ---------- HUNT SCREEN RENDER ---------- */
+/* ---------- HUNT SCREEN RENDER ----------
+   Part-first flow: player picks a part from the icon-strip, which opens a
+   detail panel listing every move for the current weapon. Picking a move
+   there fires the attack immediately — there is no persisted "selected
+   move" anymore; the panel always opens neutral per part selection
+   (this was an explicit design call, not an oversight).
+*/
 
 export function renderHunt() {
   document.getElementById("village-screen").classList.add("hidden");
@@ -19,64 +25,54 @@ export function renderHunt() {
   const weapon = currentWeapon();
   const arena = ARENAS[m.arenaKey];
   const hazard = HAZARDS[arena.hazard];
+  const theme = arena.theme ?? { from: "#20201c", to: "var(--panel-alt)" };
 
-  // Move selection lives on hunt (not local state) so it survives re-renders
-  // and resets naturally each new hunt via setup.js's fresh hunt object.
   const moveset = movesetFor(weapon);
+
+  // Selected part is render-persistent state living on `hunt` (mirrors the
+  // old selectedMoveKey pattern) so it survives re-renders but resets clean
+  // on every new hunt via setup.js's fresh hunt object.
   if (
-    !hunt.selectedMoveKey ||
-    !moveset.moves.some((mv) => mv.key === hunt.selectedMoveKey)
+    hunt.selectedPartKey &&
+    !m.parts.some((p) => p.key === hunt.selectedPartKey)
   ) {
-    hunt.selectedMoveKey = moveset.moves[0].key;
+    hunt.selectedPartKey = null;
   }
-  const selectedMove = moveset.moves.find(
-    (mv) => mv.key === hunt.selectedMoveKey,
-  );
-  const selectedCost = Math.round(
-    selectedMove.staminaCost * (weapon.staminaMult ?? 1),
-  );
-  const canAffordSelected = player.stamina >= selectedCost;
+  const selectedPart = hunt.selectedPartKey
+    ? m.parts.find((p) => p.key === hunt.selectedPartKey)
+    : null;
 
-  const moveSelectHtml = moveset.moves
-    .map((mv) => {
-      const cost = Math.round(mv.staminaCost * (weapon.staminaMult ?? 1));
-      const active = mv.key === hunt.selectedMoveKey;
-      return `
-      <button class="move-pick ${active ? "selected" : ""}" onclick="selectMove('${mv.key}')">
-        <div class="move-name">${mv.name}</div>
-        <div class="move-desc">${mv.desc}</div>
-        <div class="move-cost">${cost} stamina</div>
-      </button>
-    `;
-    })
-    .join("");
-
-  const partsHtml = m.parts
+  const partIconsHtml = m.parts
     .map((p) => {
       const locked =
         p.requiresBroken &&
         !m.parts.find((x) => x.key === p.requiresBroken).broken;
       let tag = "";
-      if (p.broken && p.postBreakImmune)
-        tag = '<span class="part-tag spent">SPENT</span>';
-      else if (p.broken) tag = '<span class="part-tag exposed">EXPOSED</span>';
-      else if (locked) tag = '<span class="part-tag armored">ARMORED</span>';
-      const hints = hitzoneHints(p)
-        .map((hn) => `<span class="hint-chip">${hn}</span>`)
-        .join("");
-      const attackDisabled = canAffordSelected ? "" : "disabled";
+      if (p.broken && p.postBreakImmune) tag = "SPENT";
+      else if (p.broken) tag = "EXPOSED";
+      else if (locked) tag = "ARMORED";
+
+      const active = p.key === hunt.selectedPartKey;
+
       return `
-      <div class="card part-card ${p.broken ? "broken" : ""}">
-        <div class="pname"><span>${p.name}</span>${tag}</div>
-        <div class="barwrap" style="margin-top:6px;">
-          <div class="barfill ${p.broken ? "broken" : "part"}" style="width:${pct(p.hp, p.maxHp)}%"></div>
-        </div>
-        <div class="hint-row">${hints}</div>
-        <button class="wide" style="margin-top:8px;" onclick="playerAction('attack',{partKey:'${p.key}',moveKey:'${hunt.selectedMoveKey}'})" ${attackDisabled}>${selectedMove.name} → ${p.name.toLowerCase()}</button>
-      </div>
+      <button class="gear-icon hunt-part-icon ${p.broken ? "broken" : ""} ${active ? "selected" : ""}"
+              onclick="selectPart('${p.key}')">
+        <div class="hunt-part-icon-name">${p.name}</div>
+        <div class="barwrap mini"><div class="barfill ${p.broken ? "broken" : "part"}" style="width:${pct(p.hp, p.maxHp)}%"></div></div>
+        ${tag ? `<span class="part-tag ${tag.toLowerCase()}">${tag}</span>` : ""}
+      </button>
     `;
     })
     .join("");
+
+  const detailPanelHtml = selectedPart
+    ? renderPartDetailPanel(selectedPart, moveset, weapon)
+    : `
+      <div class="part-detail-panel empty">
+        <div class="forge-sprite-placeholder">?</div>
+        <p class="section-copy">Select a part above to see hitzone info and choose an attack.</p>
+      </div>
+    `;
 
   const telegraphHtml = hunt.pendingMove
     ? `
@@ -120,25 +116,26 @@ export function renderHunt() {
 
   h.innerHTML = `
     <div class="panel">
-      <div class="arena-tag">${rank.toUpperCase()} • ${arena.name} — ${arena.desc}</div>
-      <div class="monster-head">
-        <span class="micon">${m.icon}</span>
-        <div>
-          <span class="mname">${m.name}</span>
-          ${m.enraged ? '<span class="mtag">Enraged</span>' : ""}
+      <div class="arena-scene" style="--scene-from:${theme.from};--scene-to:${theme.to};">
+        <div class="arena-tag">${rank.toUpperCase()} • ${arena.name} — ${arena.desc}</div>
+        <div class="monster-head">
+          <span class="micon">${m.icon}</span>
+          <div>
+            <span class="mname">${m.name}</span>
+            ${m.enraged ? '<span class="mtag">Enraged</span>' : ""}
+          </div>
         </div>
+        <div class="barlabel"><span>Vitality</span><span>${m.hp} / ${m.maxHp}</span></div>
+        <div class="barwrap"><div class="barfill hp" style="width:${pct(m.hp, m.maxHp)}%"></div></div>
+        ${telegraphHtml}
       </div>
-      <div class="barlabel"><span>Vitality</span><span>${m.hp} / ${m.maxHp}</span></div>
-      <div class="barwrap"><div class="barfill hp" style="width:${pct(m.hp, m.maxHp)}%"></div></div>
 
-      ${telegraphHtml}
       ${loadoutHint}
 
-      <div class="action-group-label">Choose your move</div>
-      <div class="move-select">${moveSelectHtml}</div>
+      <div class="action-group-label">Choose a part to strike</div>
+      <div class="icon-strip hunt-icon-strip">${partIconsHtml}</div>
 
-      <div class="action-group-label">Then target a part</div>
-      <div class="parts-grid">${partsHtml}</div>
+      ${detailPanelHtml}
 
       <div class="player-status">
         <div class="col">
@@ -151,7 +148,7 @@ export function renderHunt() {
         </div>
       </div>
 
-      <div class="action-group-label">Attack or react to the telegraph</div>
+      <div class="action-group-label">React to the telegraph</div>
       <div class="actions">
         <button class="dodge" onclick="playerAction('dodge',{dir:'left'})">Dodge left</button>
         <button class="dodge" onclick="playerAction('dodge',{dir:'right'})">Dodge right</button>
@@ -164,7 +161,7 @@ export function renderHunt() {
         <button onclick="playerAction('item')" ${player.potions <= 0 || hunt.pendingMove ? "disabled" : ""}>Use potion (${player.potions})</button>
         <button onclick="playerAction('flee')">Flee hunt</button>
       </div>
-      <div style="font-size:11px;color:var(--text-dim);margin-bottom:8px;">Weapon: ${weapon.name} (ATK ${weapon.atk}) · ${selectedMove.name} costs ${selectedCost} stamina · dodging ignores your weapon's swing this round</div>
+      <div style="font-size:11px;color:var(--text-dim);margin-bottom:8px;">Weapon: ${weapon.name} (ATK ${weapon.atk}) · dodging ignores your weapon's swing this round</div>
 
       <div id="hunt-log" class="log"></div>
     </div>
@@ -173,12 +170,46 @@ export function renderHunt() {
   renderTopbar();
 }
 
+function renderPartDetailPanel(part, moveset, weapon) {
+  const hints = hitzoneHints(part)
+    .map((hn) => `<span class="hint-chip">${hn}</span>`)
+    .join("");
+
+  const moveListHtml = moveset.moves
+    .map((mv) => {
+      const cost = Math.round(mv.staminaCost * (weapon.staminaMult ?? 1));
+      const disabled = player.stamina < cost ? "disabled" : "";
+      return `
+      <button class="move-pick" ${disabled}
+              onclick="playerAction('attack',{partKey:'${part.key}',moveKey:'${mv.key}'})">
+        <div class="move-name">${mv.name}</div>
+        <div class="move-desc">${mv.desc}</div>
+        <div class="move-cost">${cost} stamina</div>
+      </button>
+    `;
+    })
+    .join("");
+
+  return `
+    <div class="part-detail-panel">
+      <div class="forge-sprite-placeholder">${part.name}</div>
+      <div class="pname"><span>${part.name}</span></div>
+      <div class="barwrap" style="margin:6px 0;">
+        <div class="barfill ${part.broken ? "broken" : "part"}" style="width:${pct(part.hp, part.maxHp)}%"></div>
+      </div>
+      <div class="hint-row">${hints}</div>
+      <div class="action-group-label">Choose a move</div>
+      <div class="move-select">${moveListHtml}</div>
+    </div>
+  `;
+}
+
 /**
- * Sets which move the part-attack buttons below will use. Purely a UI
- * selection — doesn't spend a turn, doesn't call playerAction — so it's
- * safe to change mid-telegraph while reacting to a monster's pending move.
+ * Sets which part the detail panel below shows. Purely a UI selection —
+ * doesn't spend a turn, doesn't call playerAction — so it's safe to change
+ * mid-telegraph while reacting to a monster's pending move.
  */
-export function selectMove(moveKey) {
-  hunt.selectedMoveKey = moveKey;
+export function selectPart(partKey) {
+  hunt.selectedPartKey = partKey;
   renderHunt();
 }

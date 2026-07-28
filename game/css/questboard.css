@@ -1,0 +1,89 @@
+/* ==========================================================================
+   Append to village.css (or wherever Quest Board styling lives) —
+   Quest Board list+detail-panel layout
+   ========================================================================== */
+
+.quest-tab-layout {
+  display: flex;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.quest-list {
+  flex: 0 0 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quest-list-item {
+  text-align: left;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.quest-list-item:hover {
+  border-color: var(--gold-dim);
+}
+
+.quest-list-item.selected {
+  background: #26201a;
+  border-color: var(--gold);
+}
+
+.quest-list-icon {
+  font-size: 22px;
+}
+
+.quest-list-name {
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.quest-list-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+.quest-detail-panel {
+  flex: 1;
+  --scene-from: #20201c;
+  --scene-to: var(--panel-alt);
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.quest-detail-scene {
+  background: linear-gradient(
+    160deg,
+    var(--scene-from) 0%,
+    var(--scene-to) 70%
+  );
+  border-radius: 4px;
+  padding: 14px;
+  margin: -16px -16px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+
+.quest-detail-icon {
+  font-size: 40px;
+  display: block;
+}
+
+.quest-detail-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  margin: 6px 0;
+}

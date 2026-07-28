@@ -10,6 +10,59 @@ import {
 } from "../../utils.js";
 import { renderVillage } from "../village.js";
 import { renderCustomForgeTab } from "./weaponforge.js";
+import { renderArmorTab } from "./armorforge.js";
+import { renderPaperdoll } from "../shared/equipmentloadout.js";
+
+let selectedWeaponKey = null; // mirrors selectedArmorKey in armorforge.js
+
+export function selectWeaponPresetItem(key) {
+  selectedWeaponKey = key;
+  renderVillage();
+}
+
+function renderWeaponIcon(item, selected, equipped) {
+  return `
+    <div class="gear-icon ${selected ? "selected" : ""} ${equipped ? "equipped" : ""}"
+         onclick="selectWeaponPresetItem('${item.key}')" title="${item.name}">
+      <div class="gear-icon-label">${item.name.slice(0, 3).toUpperCase()}</div>
+    </div>
+  `;
+}
+
+function renderWeaponPresetDetail() {
+  const item = selectedWeaponKey ? assembleWeapon(selectedWeaponKey) : null;
+  if (!item) {
+    return `<div class="tree-copy">Select a weapon above to see its full stats.</div>`;
+  }
+  return `
+    <div class="gear-sprite-placeholder">
+      ${item.name} Sprite
+      <span class="placeholder-note">Visual coming later</span>
+    </div>
+    ${renderCraftCard(item, true)}
+  `;
+}
+
+function renderWeaponPresetsView() {
+  const icons = Object.keys(WEAPONS)
+    .map((key) => {
+      const item = assembleWeapon(key);
+      return renderWeaponIcon(item, key === selectedWeaponKey, key === player.weapon);
+    })
+    .join("");
+
+  return `
+    <div class="armor-tab-layout">
+      <div class="armor-slot-list">
+        <div class="armor-slot-row">
+          <div class="slot-row-label">Preset Weapons</div>
+          <div class="icon-strip">${icons}</div>
+        </div>
+      </div>
+      <div class="armor-detail-panel">${renderWeaponPresetDetail()}</div>
+    </div>
+  `;
+}
 
 let weaponSubTab = "presets"; // module-level, mirrors your existing tab pattern
 
@@ -18,29 +71,15 @@ export function setWeaponSubTab(tab) {
   renderVillage();
 }
 
-export function renderForgeTab() {
-  const weaponCards = Object.keys(WEAPONS)
-    .map((key) => renderCraftCard(assembleWeapon(key), true))
-    .join("");
-  const armorCards = Object.values(ARMORS)
-    .map((item) => renderCraftCard(item, false))
-    .join("");
+let forgeSubTab = "upgrade"; // module-level, same pattern as weaponSubTab
 
-  const current = currentWeapon();
+export function setForgeSubTab(tab) {
+  forgeSubTab = tab;
+  renderVillage();
+}
+
+export function renderForgeTab() {
   const stats = getArmorStats();
-  const slotLabels = {
-    head: "Head",
-    chest: "Chest",
-    arms: "Arms",
-    waist: "Waist",
-    legs: "Legs",
-  };
-  const armorChips = Object.entries(currentArmor())
-    .map(
-      ([slot, item]) =>
-        `<div class="stat-chip">${slotLabels[slot]}: ${item ? item.name : "—"}</div>`,
-    )
-    .join("");
 
   const skillsHtml = stats.skillProgress.length
     ? stats.skillProgress
@@ -52,65 +91,65 @@ export function renderForgeTab() {
     : `<div class="tree-copy">No skill points from current gear yet.</div>`;
 
   const forgeInfo = FORGE_LEVELS[player.forgeLevel];
-  const forgeLevelHtml = renderForgeLevelPanel();
 
-  const treeSummary = `
-  <div class="stat-row">
-    <div class="stat-chip">Weapon: ${current.name}</div>
-    ${armorChips}
-    <div class="stat-chip">Style: ${current.specialDesc}</div>
-    <div class="stat-chip">Forge: ${forgeInfo.name} (Lv ${forgeInfo.level})</div>
-  </div>
-  ${forgeLevelHtml}
-  <div class="tree-panel">
-    <div class="tree-title">Armor Skills</div>
-    <div class="tree-copy">Points come from all 5 equipped pieces combined. Reach a skill's threshold to activate it.</div>
-    <div class="tree-list">${skillsHtml}</div>
-  </div>
-  <div class="tree-panel">
-    <div class="tree-title">Weapon tree</div>
-    <div class="tree-copy">The first branch is always available. Later paths open after you prove yourself with their predecessor — and after your forge is upgraded to match.</div>
-    <div class="tree-list">
-      ${Object.values(WEAPONS)
-        .filter(
-          (item) =>
-            item.tree === "starter" ||
-            item.tree === "boar" ||
-            item.tree === "wyrm" ||
-            item.tree === "bear" ||
-            item.tree === "master",
-        )
-        .map((item) => {
-          const unlocked =
-            item.key === "basic" ||
-            player.ownedWeapons.includes(item.unlocksFrom || item.key) ||
-            player.ownedWeapons.includes(item.key);
-          const active = player.weapon === item.key;
-          return `<div class="tree-node ${active ? "active" : ""} ${unlocked ? "unlocked" : ""}">${item.name}${active ? " · Equipped" : ""}</div>`;
-        })
-        .join("")}
+  const summaryHtml = `
+    ${renderPaperdoll()}
+    <div class="stat-row">
+      <div class="stat-chip">Forge: ${forgeInfo.name} (Lv ${forgeInfo.level})</div>
     </div>
-  </div>
-`;
-  return `
-    <div class="panel">
-      <h2>Forge</h2>
-      <p class="section-copy">Craft reliable tools and armor from the materials you carve from each hunt. Your loadout is the real progression here.</p>
-      ${treeSummary}
+  `;
+
+  const armorSkillsSidebar = `
+    <div class="tree-panel">
+      <div class="tree-title">Armor Skills</div>
+      <div class="tree-copy">Points come from all 5 equipped pieces combined. Reach a skill's threshold to activate it.</div>
+      <div class="tree-list">${skillsHtml}</div>
     </div>
-    <div class="panel">
-      <h2>Weapons</h2>
+  `;
+
+  let mainContent = "";
+  if (forgeSubTab === "upgrade") {
+    mainContent = renderForgeLevelPanel() + renderForgeSpritePlaceholder();
+  } else if (forgeSubTab === "weapons") {
+    mainContent = `
       <div class="subtab-row">
         <button class="subtab-btn ${weaponSubTab === "presets" ? "active" : ""}" onclick="setWeaponSubTab('presets')">Presets</button>
         <button class="subtab-btn ${weaponSubTab === "custom" ? "active" : ""}" onclick="setWeaponSubTab('custom')">Custom Forge</button>
       </div>
-      ${weaponSubTab === "presets"
-        ? `<div class="forge-grid">${weaponCards}</div>`
-        : renderCustomForgeTab()}
-    </div>
+      ${
+        weaponSubTab === "presets"
+          ? renderWeaponPresetsView()
+          : renderCustomForgeTab()
+      }
+    `;
+  } else if (forgeSubTab === "armor") {
+    mainContent = renderArmorTab();
+  }
+
+  return `
     <div class="panel">
-      <h2>Armor</h2>
-      <div class="forge-grid">${armorCards}</div>
+      <h2>Forge</h2>
+      <p class="section-copy">Craft reliable tools and armor from the materials you carve from each hunt. Your loadout is the real progression here.</p>
+      ${summaryHtml}
+      <div class="subtab-row">
+        <button class="subtab-btn ${forgeSubTab === "upgrade" ? "active" : ""}" onclick="setForgeSubTab('upgrade')">Upgrade</button>
+        <button class="subtab-btn ${forgeSubTab === "weapons" ? "active" : ""}" onclick="setForgeSubTab('weapons')">Weapons</button>
+        <button class="subtab-btn ${forgeSubTab === "armor" ? "active" : ""}" onclick="setForgeSubTab('armor')">Armor</button>
+      </div>
+      <div class="forge-layout">
+        <div class="forge-main">${mainContent}</div>
+        <div class="forge-sidebar">${armorSkillsSidebar}</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderForgeSpritePlaceholder() {
+  const forgeInfo = FORGE_LEVELS[player.forgeLevel];
+  return `
+    <div class="forge-sprite-placeholder">
+      Forge Sprite — ${forgeInfo.name} (Lv ${forgeInfo.level})
+      <span class="placeholder-note">Visual coming later</span>
     </div>
   `;
 }
@@ -150,7 +189,7 @@ function renderForgeLevelPanel() {
           return `<li class="${ok ? "ok" : "bad"}"><span>${mat}</span><span>${have}/${need}</span></li>`;
         })
         .join("")}
-      <li class="${goldcoinOk ? "ok" : "bad"}"><span>goldcoin</span><span>${player.goldcoin}/${next.goldcoin}</span></li>
+      <li class="${goldcoinOk ? "ok" : "bad"}"><span>Gold Coin</span><span>${player.goldcoin}/${next.goldcoin}</span></li>
     </ul>
   `;
 
@@ -205,7 +244,7 @@ export function renderCraftCard(item, isWeapon) {
             return `<li class="${ok ? "ok" : "bad"}"><span>${mat}</span><span>${have}/${need}</span></li>`;
           })
           .join("")}
-        <li class="${goldcoinOk ? "ok" : "bad"}"><span>goldcoin</span><span>${player.goldcoin}/${item.goldcoin}</span></li>
+        <li class="${goldcoinOk ? "ok" : "bad"}"><span>Gold Coin</span><span>${player.goldcoin}/${item.goldcoin}</span></li>
       </ul>
     `;
   }

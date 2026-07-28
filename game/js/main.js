@@ -13,16 +13,22 @@ import { buyShopItem, turnInBounty, doTrade } from "./ui/camp.js";
 import { startHunt } from "./hunt/setup.js";
 import { startExpedition, continueExpedition } from "./hunt/expedition.js";
 import { playerAction } from "./hunt/actions.js";
-import { selectMove } from "./ui/hunt.js";
+import { selectPart } from "./ui/hunt.js";
 import {
   selectWeaponPart,
   craftCustomWeapon,
   equipCustomWeapon,
 } from "./ui/village/weaponforge.js";
-import { setWeaponSubTab, upgradeForge } from "./ui/village/forge.js";
+import {
+  setWeaponSubTab,
+  setForgeSubTab,
+  upgradeForge,
+  selectWeaponPresetItem
+} from "./ui/village/forge.js";
+import { selectArmorItem } from "./ui/village/armorforge.js";
 
 window.startHunt = startHunt;
-window.selectMove = selectMove;
+window.selectPart = selectPart;
 window.startExpedition = startExpedition;
 window.continueExpedition = continueExpedition;
 window.upgradeForge = upgradeForge;
@@ -30,6 +36,9 @@ window.selectWeaponPart = selectWeaponPart;
 window.craftCustomWeapon = craftCustomWeapon;
 window.equipCustomWeapon = equipCustomWeapon;
 window.setWeaponSubTab = setWeaponSubTab;
+window.setForgeSubTab = setForgeSubTab;
+window.selectArmorItem = selectArmorItem;
+window.selectWeaponPresetItem = selectWeaponPresetItem;
 window.playerAction = playerAction;
 window.craftItem = craftItem;
 window.buyShopItem = buyShopItem;

@@ -2,18 +2,34 @@ import { MISSIONS } from "../data/missions.js";
 import { ENCOUNTERS } from "../data/encounters.js";
 import { startHunt } from "./setup.js";
 import { renderEncounter, setEncounterHandler } from "../ui/expedition.js";
-import { renderVillage } from "../ui/village.js";
+import { renderVillage, refreshQuestBoard } from "../ui/village.js";
 import { hunt, player } from "../state.js";
 import { addMat, clamp, rollLoot } from "../utils.js";
 import { LOOT_TABLES } from "../data/loot.js";
 import { smallMonsterToHuntShape } from "./monsteradapter.js";
-import { getRegisteredMission } from "../questregistry.js";
+import { getRegisteredMission, unregisterMission } from "../questregistry.js";
 import { expandExpedition } from "./expeditionbuilder.js";
 import { advanceDay } from "./day.js";
 
 let currentMission = null;
 let step = 0;
 let currentEncounter = null;
+
+/**
+ * Flat progress snapshot for the trail strip UI. No fog of war — every
+ * node's type is revealed upfront, including the boss node, so the whole
+ * path is visible from the first encounter screen.
+ */
+export function getExpeditionProgress() {
+  const nodes = currentMission.expedition.map((eventDef) => {
+    const eventKey = typeof eventDef === "string" ? eventDef : eventDef.node;
+    const encounter = ENCOUNTERS[eventKey];
+
+    return { type: encounter?.type ?? "event" };
+  });
+
+  return { nodes, step };
+}
 
 export function startExpedition(missionKey) {
   const rawMission =
@@ -65,18 +81,12 @@ function nextExpeditionEvent() {
 }
 
 function startMonsterQueue(queue, missionKey, rank, onQueueDone) {
-  console.log("QUEUE START", queue);
-
   const [head, ...rest] = queue;
 
   startHunt(head, missionKey, rank, () => {
-    console.log("AFTER HUNT CALLBACK", rest.length);
-
     if (rest.length === 0) {
-      console.log("QUEUE FINISHED");
       onQueueDone();
     } else {
-      console.log("NEXT MONSTER");
       startMonsterQueue(rest, missionKey, rank, onQueueDone);
     }
   });
@@ -85,7 +95,7 @@ function startMonsterQueue(queue, missionKey, rank, onQueueDone) {
 function showEncounter(encounter) {
   const buttons = getButtons(encounter);
 
-  renderEncounter(encounter, buttons);
+  renderEncounter(encounter, buttons, getExpeditionProgress());
 
   setEncounterHandler((choice) => {
     resolveEncounter(encounter, buttons[choice].action);
@@ -93,8 +103,6 @@ function showEncounter(encounter) {
 }
 
 function finishEncounter() {
-  console.log("FINISH ENCOUNTER");
-  console.log(step, currentMission.expedition.length);
   step++;
 
   if (step >= currentMission.expedition.length) {
@@ -241,8 +249,6 @@ function getButtons(encounter) {
 }
 
 export function continueExpedition() {
-  console.log("CONTINUE EXPEDITION");
-  console.log(hunt.afterHunt);
   if (hunt.result !== "victory") {
     returnToCamp();
     return;
@@ -272,7 +278,11 @@ function returnToCamp() {
 }
 
 function finishEncounterWithText(title, text) {
-  renderEncounter({ title, text }, [{ label: "Continue", action: "continue" }]);
+  renderEncounter(
+    { title, text },
+    [{ label: "Continue", action: "continue" }],
+    getExpeditionProgress(),
+  );
 
   setEncounterHandler(() => {
     finishEncounter();

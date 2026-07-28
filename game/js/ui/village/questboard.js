@@ -9,9 +9,16 @@ import { renderVillage } from "../village.js";
    Side-hunt picks are cached per story/chapter key so switching tabs and
    back doesn't reroll the board. refreshQuestBoard() is the only way to
    force a reroll (e.g. after a save load or new game).
+
+   selectedQuestIndex mirrors the same "render-persistent selection" pattern
+   used by Forge's sub-tabs / Hunt's part selection — it lives at module
+   scope here (rather than on a shared state object) since the quest board
+   entries themselves are also module-scoped. It resets to 0 whenever the
+   board rerolls, so a stale index never points past the new entry list.
 */
 let cachedEntries = null;
 let cachedBoardKey = null;
+let selectedQuestIndex = 0;
 
 export function getActiveStoryMission() {
   return (
@@ -23,6 +30,7 @@ export function getActiveStoryMission() {
 
 export function refreshQuestBoard() {
   cachedEntries = null;
+  selectedQuestIndex = 0;
 }
 
 export function getQuestBoardEntries() {
@@ -68,28 +76,32 @@ export function getQuestBoardEntries() {
 
 export function renderQuestsTab() {
   const activeMission = getActiveStoryMission();
-  const questCards = getQuestBoardEntries()
-    .map((entry) => {
+  const entries = getQuestBoardEntries();
+
+  if (selectedQuestIndex >= entries.length) {
+    selectedQuestIndex = 0;
+  }
+
+  const listHtml = entries
+    .map((entry, index) => {
       const monster = entry.monster;
-      const mission = entry.mission;
-      const actionLabel =
-        entry.type === "main" ? "Take assignment" : "Accept hunt";
-      const subtitle =
-        entry.type === "main"
-          ? `${activeMission.description}`
-          : mission.description || "A fresh lead has surfaced nearby.";
+      const active = index === selectedQuestIndex;
+
       return `
-      <div class="card quest-card">
-        <div><span class="qicon">${monster.icon}</span><span class="qname">${monster.name}</span></div>
-        <div class="qflavor">${monster.flavor}</div>
-        <div class="qarena">Territory: ${ARENAS[monster.arenaKey].name}</div>
-        <div class="story-pill">${entry.label}</div>
-        <div class="story-subtitle">${subtitle}</div>
-        <button class="primary wide" onclick="startExpedition('${mission.key}')">${actionLabel}</button>
-      </div>
+      <button class="gear-icon quest-list-item ${active ? "selected" : ""}"
+              onclick="selectQuestItem(${index})">
+        <span class="quest-list-icon">${monster.icon}</span>
+        <div class="quest-list-name">${monster.name}</div>
+        <div class="quest-list-label">${entry.label}</div>
+      </button>
     `;
     })
     .join("");
+
+  const detailHtml = renderQuestDetail(
+    entries[selectedQuestIndex],
+    activeMission,
+  );
 
   return `
     <div class="panel">
@@ -100,7 +112,46 @@ export function renderQuestsTab() {
         <div class="story-copy">Chapter ${story.chapter} · ${activeMission.title}</div>
         <div class="story-copy">${activeMission.description}</div>
       </div>
-      <div class="quest-grid">${questCards}</div>
+      <div class="quest-tab-layout">
+        <div class="quest-list">${listHtml}</div>
+        ${detailHtml}
+      </div>
     </div>
   `;
+}
+
+function renderQuestDetail(entry, activeMission) {
+  const monster = entry.monster;
+  const mission = entry.mission;
+  const arena = ARENAS[monster.arenaKey];
+  const theme = arena.theme ?? { from: "#20201c", to: "var(--panel-alt)" };
+  const actionLabel = entry.type === "main" ? "Take assignment" : "Accept hunt";
+  const subtitle =
+    entry.type === "main"
+      ? activeMission.description
+      : mission.description || "A fresh lead has surfaced nearby.";
+
+  return `
+    <div class="quest-detail-panel" style="--scene-from:${theme.from};--scene-to:${theme.to};">
+      <div class="quest-detail-scene">
+        <span class="quest-detail-icon">${monster.icon}</span>
+        <div class="quest-detail-name">${monster.name}</div>
+        <span class="story-pill">${entry.label}</span>
+      </div>
+      <div class="qflavor">${monster.flavor}</div>
+      <div class="qarena">Territory: ${arena.name} — ${arena.desc}</div>
+      <div class="story-subtitle">${subtitle}</div>
+      <button class="primary wide" onclick="startExpedition('${mission.key}')">${actionLabel}</button>
+    </div>
+  `;
+}
+
+/**
+ * Sets which quest entry the detail panel shows. Purely a selection —
+ * doesn't accept the quest, doesn't call startExpedition — so switching
+ * between the main assignment and side hunts to compare them is free.
+ */
+export function selectQuestItem(index) {
+  selectedQuestIndex = index;
+  renderVillage();
 }

@@ -43,19 +43,13 @@ function sumCost(parts) {
 
 function renderPartOption(slotType, key, part, selected) {
   const locked = !partForgeOk(part);
-  const costLine = part.recipe
-    ? Object.entries(part.recipe)
-        .map(([mat, need]) => `${mat} x${need}`)
-        .join(", ") + (part.goldcoin ? ` · ${part.goldcoin}z` : "")
-    : "";
 
   return `
-    <div class="part-option ${selected ? "selected" : ""} ${locked ? "locked" : ""}"
-         ${locked ? "" : `onclick="selectWeaponPart('${slotType}','${key}')"`}>
-      <div class="part-name">${part.name || "—"}</div>
-      ${costLine ? `<div class="part-cost">${costLine}</div>` : ""}
-      ${locked ? `<div class="part-locked">Forge Lv ${part.forgeLevel} required</div>` : ""}
-    </div>
+     <div class="gear-icon ${selected ? "selected" : ""} ${locked ? "locked" : ""}"
+          ${locked ? "" : `onclick="selectWeaponPart('${slotType}','${key}')"`}
+          title="${part.name || "—"}${locked ? ` (Forge Lv ${part.forgeLevel} required)` : ""}">
+       <div class="gear-icon-label">${(part.name || "—").slice(0, 3).toUpperCase()}</div>
+     </div>
   `;
 }
 
@@ -66,9 +60,9 @@ function renderSlot(slotType, catalog, label) {
     )
     .join("");
   return `
-    <div class="part-slot">
-      <div class="part-slot-label">${label}</div>
-      <div class="part-options">${options}</div>
+    <div class="armor-slot">
+      <div class="slot-row-label">${label}</div>
+      <div class="icon-strip">${options}</div>
     </div>
   `;
 }
@@ -76,19 +70,22 @@ function renderSlot(slotType, catalog, label) {
 function renderOwnedCustomList() {
   const entries = Object.values(player.customWeapons || {});
   if (!entries.length) return "";
+  const icons = entries
+    .map((w) => {
+      const equipped = player.weapon === w.id;
+      return `
+        <div class="gear-icon ${equipped ? "equipped" : ""}"
+             onclick="equipCustomWeapon('${w.id}')"
+             title="${w.name}${equipped ? " (Equipped)" : ""}">
+          <div class="gear-icon-label">${w.name.slice(0, 3).toUpperCase()}</div>
+        </div>
+      `;
+    })
+    .join("");
   return `
-    <div class="tree-panel">
-      <div class="tree-title">Your Custom Weapons</div>
-      <div class="tree-list">
-        ${entries
-          .map((w) => {
-            const equipped = player.weapon === w.id;
-            return `<div class="tree-node ${equipped ? "active unlocked" : ""}">
-              ${w.name}${equipped ? " · Equipped" : ` <button onclick="equipCustomWeapon('${w.id}')">Equip</button>`}
-            </div>`;
-          })
-          .join("")}
-      </div>
+    <div class="armor-slot-row">
+      <div class="slot-row-label">Your Custom Weapons</div>
+      <div class="icon-strip">${icons}</div>
     </div>
   `;
 }
@@ -128,27 +125,35 @@ export function renderCustomForgeTab() {
           return `<li class="${have >= need ? "ok" : "bad"}"><span>${mat}</span><span>${have}/${need}</span></li>`;
         })
         .join("")}
-      <li class="${goldcoinOk ? "ok" : "bad"}"><span>goldcoin</span><span>${player.goldcoin}/${goldcoin}</span></li>
+      <li class="${goldcoinOk ? "ok" : "bad"}"><span>Gold Coin</span><span>${player.goldcoin}/${goldcoin}</span></li>
       ${!forgeLevelOk ? `<li class="bad"><span>forge level</span><span>${player.forgeLevel}/${requiredForgeLevel}</span></li>` : ""}
     </ul>
   `;
 
   return `
     <p class="section-copy">Mix one part per category. A custom weapon is fixed once forged — no swapping parts afterward, so choose deliberately.</p>
-    <div class="weapon-preview card">
-      <div class="cname">${name}</div>
-      <div class="cstat">ATK ${preview.atk} · ${preview.damageType}${preview.element !== "none" ? ` · +${preview.elementPower} ${preview.element}` : ""}</div>
-      <div class="weapon-style">${preview.specialDesc}</div>
+    <div class="armor-tab-layout">
+      <div class="armor-slot-list">
+        ${renderSlot("headKey", HEADS, "Head")}
+        ${renderSlot("handleKey", HANDLES, "Handle")}
+        ${renderSlot("coreKey", CORES, "Core")}
+        ${renderSlot("mechanismKey", MECHANISMS, "Mechanism")}
+        ${renderOwnedCustomList()}
+      </div>
+      <div class="armor-detail-panel">
+        <div class="gear-sprite-placeholder">
+          ${name} Sprite
+          <span class="placeholder-note">Visual coming later</span>
+        </div>
+        <div class="weapon-preview card">
+          <div class="cname">${name}</div>
+          <div class="cstat">ATK ${preview.atk} · ${preview.damageType}${preview.element !== "none" ? ` · +${preview.elementPower} ${preview.element}` : ""}</div>
+          <div class="weapon-style">${preview.specialDesc}</div>
+        </div>
+        ${reqRows}
+        <button ${canCraft ? "" : "disabled"} onclick="craftCustomWeapon()">Forge Weapon</button>
+      </div>
     </div>
-    <div class="part-slots">
-      ${renderSlot("headKey", HEADS, "Head")}
-      ${renderSlot("handleKey", HANDLES, "Handle")}
-      ${renderSlot("coreKey", CORES, "Core")}
-      ${renderSlot("mechanismKey", MECHANISMS, "Mechanism")}
-    </div>
-    ${reqRows}
-    <button ${canCraft ? "" : "disabled"} onclick="craftCustomWeapon()">Forge Weapon</button>
-    ${renderOwnedCustomList()}
   `;
 }
 

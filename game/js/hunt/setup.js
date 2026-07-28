@@ -45,6 +45,7 @@ export function startHunt(
     sandstormActive: false,
     playerGuardedThisRound: false,
     recoveryWindow: false,
+    selectedPartKey: null,
     log: [],
     over: false,
     missionKey,
@@ -65,37 +66,35 @@ export function endHunt(result) {
   let rewardsHtml = "";
 
   player.stats.hunts += 1;
+
   if (hunt.missionKey && result === "victory") {
     const mission = getRegisteredMission(hunt.missionKey);
 
-    if (hunt.missionKey && result === "victory") {
-      const mission = getRegisteredMission(hunt.missionKey);
+    if (mission) {
+      if (
+        mission.category === "main" &&
+        !story.completedMissionKeys.includes(mission.key)
+      ) {
+        story.completedMissionKeys.push(mission.key);
 
-      if (mission) {
-        if (
-          mission.category === "main" &&
-          !story.completedMissionKeys.includes(mission.key)
-        ) {
-          story.completedMissionKeys.push(mission.key);
+        const nextMission = MISSIONS.find(
+          (m) => m.category === "main" && m.chapter === mission.chapter + 1,
+        );
 
-          const nextMission = MISSIONS.find(
-            (m) => m.category === "main" && m.chapter === mission.chapter + 1,
-          );
-
-          if (nextMission) {
-            story.unlockedMissionKeys.push(nextMission.key);
-            story.activeMissionKey = nextMission.key;
-            story.chapter = Math.max(story.chapter, nextMission.chapter);
-          }
+        if (nextMission) {
+          story.unlockedMissionKeys.push(nextMission.key);
+          story.activeMissionKey = nextMission.key;
+          story.chapter = Math.max(story.chapter, nextMission.chapter);
         }
+      }
 
-        if (mission.category === "side") {
-          unregisterMission(mission.key);
-          refreshQuestBoard();
-        }
+      if (mission.category === "side") {
+        unregisterMission(mission.key);
+        refreshQuestBoard();
       }
     }
   }
+
   if (result === "victory") player.stats.victories += 1;
   else if (result === "flee") player.stats.fled += 1;
   else if (result === "defeat") player.stats.defeats += 1;
@@ -152,6 +151,21 @@ export function endHunt(result) {
   }
 
   const h = document.getElementById("hunt-screen");
-  console.log("overlay");
-  h.innerHTML += `<div class="overlay">${rewardsHtml}<button class="primary" style="margin-top:10px;" onclick="continueExpedition()">Continue</button></div>`;
+
+  // Softlock fix: the reward overlay used to just be appended on top of a
+  // still-live combat screen, so a mis-timed click could land on a move
+  // button underneath instead of the overlay's Continue button. Disabling
+  // every button in the combat panel before injecting the overlay makes
+  // the overlay's Continue the only thing that responds to clicks.
+  const panel = h.querySelector(".panel");
+  if (panel) {
+    panel.querySelectorAll("button").forEach((btn) => (btn.disabled = true));
+  }
+
+  h.insertAdjacentHTML(
+    "beforeend",
+    `<div class="overlay">${rewardsHtml}<button class="primary" style="margin-top:10px;" onclick="continueExpedition()">Continue</button></div>`,
+  );
+
+  h.scrollIntoView({ behavior: "smooth", block: "start" });
 }
