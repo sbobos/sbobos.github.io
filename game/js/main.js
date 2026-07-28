@@ -26,7 +26,9 @@ import {
   selectWeaponPresetItem
 } from "./ui/village/forge.js";
 import { selectArmorItem } from "./ui/village/armorforge.js";
+import { selectQuestItem } from "./ui/village/questboard.js";
 
+window.selectQuestItem = selectQuestItem;
 window.startHunt = startHunt;
 window.selectPart = selectPart;
 window.startExpedition = startExpedition;
