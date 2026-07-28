@@ -11,6 +11,9 @@ export const MISSIONS = [
 
     monsterId: "boar",
     rank: "normal",
+    stars: 1,
+
+    client: "Caravan Master Ressa",
 
     expedition: [
       "herb_patch",
@@ -35,6 +38,9 @@ export const MISSIONS = [
 
     monsterId: "boar",
     rank: "normal",
+    stars: 2,
+
+    client: "Guild Liaison Tobrin",
 
     expedition: [
       { node: "random_fill", arena: "dunes", min: 1, max: 2 },
@@ -58,6 +64,9 @@ export const MISSIONS = [
 
     monsterId: "boar",
     rank: "normal",
+    stars: 2,
+
+    client: "Guild Liaison Tobrin",
 
     expedition: [
       { node: "random_fill", arena: "dunes", min: 2, max: 4 },
@@ -80,6 +89,9 @@ export const MISSIONS = [
 
     monsterId: "wyrm",
     rank: "normal",
+    stars: 3,
+
+    client: "Investigator Halewyn",
 
     expedition: [
       "herb_patch",
@@ -104,6 +116,9 @@ export const MISSIONS = [
 
     monsterId: "wyrm",
     rank: "normal",
+    stars: 3,
+
+    client: "Guild Liaison Tobrin",
 
     expedition: [
       { node: "random_fill", arena: "dunes", min: 1, max: 3 },
@@ -128,6 +143,12 @@ export const MISSIONS = [
 
     monsterId: "bear",
     rank: "normal",
+    stars: 4,
+
+    client: "Investigator Halewyn",
+    timeLimit: 50,
+    conditions: ["HR 7 or higher", "Solo"],
+    failureConditions: ["Time expires", "Faint 3 times"],
 
     expedition: [
       "herb_patch",

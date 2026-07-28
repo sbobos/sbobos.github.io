@@ -45,7 +45,9 @@ function applyPlayerDefaults(loaded) {
   merged.customWeapons = {};
   merged.weapon = loaded.weapon ?? def.weapon;
   merged.customWeapons = { ...(loaded.customWeapons || {}) };
-  merged.ownedWeapons = loaded.ownedWeapons || def.ownedWeapons;
+  merged.ownedWeapons = (loaded.ownedWeapons || def.ownedWeapons).filter(
+    (weapon) => weapon in merged.customWeapons,
+  );
 
   if (!merged.ownedArmors.includes(merged.armorSlots.chest))
     merged.ownedArmors.push(merged.armorSlots.chest);

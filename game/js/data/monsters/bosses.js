@@ -23,6 +23,11 @@
    `ranks` block falls back to js/data/ranks.js DEFAULT_RANK_SCALING with
    no bonus moves — fine for WIP content, not recommended for anything
    actually fought at elite/master.
+
+   ECOLOGY fields (timeOfDay, population):
+   Flavor-only, shown on the Quest Board detail panel next to the arena
+   name. Not read by any hunt/combat logic — safe to leave off a monster
+   entirely (falls back to "Unknown" in the UI) if not decided yet.
 */
 
 export const BOSSES = {
@@ -33,6 +38,8 @@ export const BOSSES = {
     arenaKey: "dunes",
     flavor:
       "Agile, agresive, and large sized dune hog. Hostile toward everything it faces.",
+    timeOfDay: "Daytime",
+    population: "Plenty",
     maxHp: 160,
     defaultMoveKeys: ["boar_ram", "boar_headbut", "boar_kick"],
     ranks: {
@@ -82,6 +89,8 @@ export const BOSSES = {
     arenaKey: "dunes",
     flavor:
       "A sand-armored wyrm that stalks the dunes at dusk. Fast, low, and vicious in a scrap.",
+    timeOfDay: "Dusk",
+    population: "Rare",
     maxHp: 320,
     defaultMoveKeys: [
       "wyrm_bite",
@@ -172,6 +181,8 @@ export const BOSSES = {
     arenaKey: "tundra",
     flavor:
       "A tundra brute built like a landslide. Slow to anger, unstoppable once roused.",
+    timeOfDay: "Daytime",
+    population: "Scarce",
     maxHp: 300,
     defaultMoveKeys: ["bear_paw", "bear_charge", "bear_slam", "bear_roar"],
     ranks: {

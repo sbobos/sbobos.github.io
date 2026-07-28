@@ -1,61 +1,88 @@
 /* ==========================================================================
    Append to village.css (or wherever Quest Board styling lives) —
-   Quest Board list+detail-panel layout
+   Quest Board card-grid + fixed detail sidebar
+   (Layout mirrors .armor-tab-layout from Forge: flexible grid + fixed
+   sidebar, not a 50/50 split.)
    ========================================================================== */
 
 .quest-tab-layout {
   display: flex;
   gap: 14px;
   margin-top: 14px;
+  align-items: flex-start;
 }
 
-.quest-list {
-  flex: 0 0 180px;
-  display: flex;
-  flex-direction: column;
+/* Card grid (left side) — fixed card size, wraps as more quests appear */
+
+.quest-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 96px);
+  grid-auto-rows: 112px;
   gap: 8px;
 }
 
-.quest-list-item {
-  text-align: left;
+.quest-card {
+  position: relative;
+  width: 96px;
+  height: 112px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   background: var(--panel-alt);
   border: 1px solid var(--border);
   border-radius: 4px;
-  padding: 10px;
+  padding: 8px 6px;
+  text-align: center;
   cursor: pointer;
   transition:
     border-color 0.15s ease,
     background 0.15s ease;
 }
 
-.quest-list-item:hover {
+.quest-card:hover {
   border-color: var(--gold-dim);
 }
 
-.quest-list-item.selected {
+.quest-card.selected {
   background: #26201a;
   border-color: var(--gold);
+  box-shadow: 0 0 8px rgba(199, 154, 60, 0.4);
 }
 
-.quest-list-icon {
-  font-size: 22px;
+.quest-card-top {
+  position: absolute;
+  top: 6px;
+  right: 8px;
 }
 
-.quest-list-name {
-  font-size: 13px;
-  margin-top: 4px;
-}
-
-.quest-list-label {
+.quest-star {
   font-size: 10px;
-  color: var(--text-dim);
-  text-transform: uppercase;
+  color: var(--gold);
   letter-spacing: 0.5px;
-  margin-top: 2px;
 }
+
+.quest-card-icon {
+  font-size: 30px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.quest-card-name {
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--text);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Detail sidebar (right side) — fixed width, not flex-grow */
 
 .quest-detail-panel {
-  flex: 1;
+  flex: 0 0 280px;
   --scene-from: #20201c;
   --scene-to: var(--panel-alt);
   background: var(--panel-alt);
@@ -65,6 +92,11 @@
 }
 
 .quest-detail-scene {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
   background: linear-gradient(
     160deg,
     var(--scene-from) 0%,
@@ -74,16 +106,63 @@
   padding: 14px;
   margin: -16px -16px 12px;
   border-bottom: 1px solid var(--border);
-  text-align: center;
 }
 
 .quest-detail-icon {
   font-size: 40px;
-  display: block;
 }
 
-.quest-detail-name {
+.quest-detail-title {
   font-family: var(--font-display);
-  font-size: 20px;
-  margin: 6px 0;
+  font-size: 16px;
+  color: var(--gold);
+}
+
+.quest-detail-subtitle {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.quest-info-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}
+
+.quest-reward-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 12px;
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.quest-stat-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.quest-stat-value {
+  font-size: 14px;
+  color: var(--gold);
+}
+
+.quest-conditions-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.quest-client-block {
+  margin-bottom: 14px;
+  padding-top: 8px;
 }

@@ -82,26 +82,27 @@ export function renderQuestsTab() {
     selectedQuestIndex = 0;
   }
 
-  const listHtml = entries
+  const cardsHtml = entries
     .map((entry, index) => {
       const monster = entry.monster;
+      const mission = entry.mission;
       const active = index === selectedQuestIndex;
+      const stars = mission.stars ?? 1;
 
       return `
-      <button class="gear-icon quest-list-item ${active ? "selected" : ""}"
+      <button class="quest-card ${active ? "selected" : ""}"
               onclick="selectQuestItem(${index})">
-        <span class="quest-list-icon">${monster.icon}</span>
-        <div class="quest-list-name">${monster.name}</div>
-        <div class="quest-list-label">${entry.label}</div>
+        <div class="quest-card-top">
+          <span class="quest-star">★${stars}</span>
+        </div>
+        <span class="quest-card-icon">${monster.icon}</span>
+        <div class="quest-card-name">${mission.title}</div>
       </button>
     `;
     })
     .join("");
 
-  const detailHtml = renderQuestDetail(
-    entries[selectedQuestIndex],
-    activeMission,
-  );
+  const detailHtml = renderQuestDetail(entries[selectedQuestIndex], activeMission);
 
   return `
     <div class="panel">
@@ -113,11 +114,19 @@ export function renderQuestsTab() {
         <div class="story-copy">${activeMission.description}</div>
       </div>
       <div class="quest-tab-layout">
-        <div class="quest-list">${listHtml}</div>
+        <div class="quest-grid">${cardsHtml}</div>
         ${detailHtml}
       </div>
     </div>
   `;
+}
+
+function formatReward(mission, monster) {
+  if (mission.rewards?.goldcoin) {
+    return `${mission.rewards.goldcoin}g`;
+  }
+  const [lo, hi] = monster.goldcoinRange ?? [0, 0];
+  return `~${Math.round((lo + hi) / 2)}g (est.)`;
 }
 
 function renderQuestDetail(entry, activeMission) {
@@ -125,8 +134,9 @@ function renderQuestDetail(entry, activeMission) {
   const mission = entry.mission;
   const arena = ARENAS[monster.arenaKey];
   const theme = arena.theme ?? { from: "#20201c", to: "var(--panel-alt)" };
-  const actionLabel = entry.type === "main" ? "Take assignment" : "Accept hunt";
-  const subtitle =
+  const actionLabel =
+    entry.type === "main" ? "Take assignment" : "Accept hunt";
+  const requestText =
     entry.type === "main"
       ? activeMission.description
       : mission.description || "A fresh lead has surfaced nearby.";
@@ -135,12 +145,29 @@ function renderQuestDetail(entry, activeMission) {
     <div class="quest-detail-panel" style="--scene-from:${theme.from};--scene-to:${theme.to};">
       <div class="quest-detail-scene">
         <span class="quest-detail-icon">${monster.icon}</span>
-        <div class="quest-detail-name">${monster.name}</div>
+        <div class="quest-detail-titles">
+          <div class="quest-detail-title">${mission.title}</div>
+          <div class="quest-detail-subtitle">Hunt the ${monster.name}</div>
+        </div>
         <span class="story-pill">${entry.label}</span>
       </div>
-      <div class="qflavor">${monster.flavor}</div>
-      <div class="qarena">Territory: ${arena.name} — ${arena.desc}</div>
-      <div class="story-subtitle">${subtitle}</div>
+
+      <div class="quest-info-strip">
+        <span>${arena.name}</span>
+        <span>${monster.timeOfDay ?? "Unknown"}</span>
+        <span>Pop: ${monster.population ?? "Unknown"}</span>
+      </div>
+
+      <div class="quest-reward-line">
+        <span class="quest-stat-label">Reward</span>
+        <span class="quest-stat-value">${formatReward(mission, monster)}</span>
+      </div>
+
+      <div class="quest-client-block">
+        <div class="quest-conditions-label">Client: ${mission.client ?? "Unknown"}</div>
+        <p class="section-copy">${requestText}</p>
+      </div>
+
       <button class="primary wide" onclick="startExpedition('${mission.key}')">${actionLabel}</button>
     </div>
   `;
