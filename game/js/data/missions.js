@@ -16,6 +16,7 @@ export const MISSIONS = [
     client: "Caravan Master Ressa",
 
     expedition: [
+      "merchant",
       "herb_patch",
       "small_boar",
       "iron_mine",

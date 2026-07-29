@@ -177,12 +177,7 @@
   opacity: 0.7;
 }
 
-.armor-tab-layout {
-  display: grid;
-  grid-template-columns: 1fr 240px;
-  gap: 16px;
-  align-items: start;
-}
+/* .armor-tab-layout removed — use shared .detail-layout (see inventory.css) */
 
 .armor-slot-row {
   margin-bottom: 14px;
@@ -228,12 +223,7 @@
   color: var(--moss);
 }
 
-.armor-detail-panel {
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.03);
-}
+/* .armor-detail-panel removed — use shared .detail-sidebar (see inventory.css) */
 
 .gear-sprite-placeholder {
   border: 1px dashed var(--border);

@@ -102,7 +102,10 @@ export function renderQuestsTab() {
     })
     .join("");
 
-  const detailHtml = renderQuestDetail(entries[selectedQuestIndex], activeMission);
+  const detailHtml = renderQuestDetail(
+    entries[selectedQuestIndex],
+    activeMission,
+  );
 
   return `
     <div class="panel">
@@ -113,8 +116,8 @@ export function renderQuestsTab() {
         <div class="story-copy">Chapter ${story.chapter} · ${activeMission.title}</div>
         <div class="story-copy">${activeMission.description}</div>
       </div>
-      <div class="quest-tab-layout">
-        <div class="quest-grid">${cardsHtml}</div>
+      <div class="detail-layout">
+        <div class="detail-strip quest-grid">${cardsHtml}</div>
         ${detailHtml}
       </div>
     </div>
@@ -134,15 +137,14 @@ function renderQuestDetail(entry, activeMission) {
   const mission = entry.mission;
   const arena = ARENAS[monster.arenaKey];
   const theme = arena.theme ?? { from: "#20201c", to: "var(--panel-alt)" };
-  const actionLabel =
-    entry.type === "main" ? "Take assignment" : "Accept hunt";
+  const actionLabel = entry.type === "main" ? "Take assignment" : "Accept hunt";
   const requestText =
     entry.type === "main"
       ? activeMission.description
       : mission.description || "A fresh lead has surfaced nearby.";
 
   return `
-    <div class="quest-detail-panel" style="--scene-from:${theme.from};--scene-to:${theme.to};">
+    <div class="detail-sidebar quest-detail-panel" style="--scene-from:${theme.from};--scene-to:${theme.to};">
       <div class="quest-detail-scene">
         <span class="quest-detail-icon">${monster.icon}</span>
         <div class="quest-detail-titles">

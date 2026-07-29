@@ -5,17 +5,12 @@
    sidebar, not a 50/50 split.)
    ========================================================================== */
 
-.quest-tab-layout {
-  display: flex;
-  gap: 14px;
-  margin-top: 14px;
-  align-items: flex-start;
-}
+/* .quest-tab-layout removed — use shared .detail-layout (see inventory.css) */
 
-/* Card grid (left side) — fixed card size, wraps as more quests appear */
+/* Card grid (left side) — fixed card size, wraps as more quests appear.
+   Pair with shared .detail-strip in markup for flex sizing. */
 
 .quest-grid {
-  flex: 1;
   display: grid;
   grid-template-columns: repeat(auto-fill, 96px);
   grid-auto-rows: 112px;
@@ -81,14 +76,11 @@
 
 /* Detail sidebar (right side) — fixed width, not flex-grow */
 
+/* Pair with shared .detail-sidebar in markup for box model/width;
+   this class now only supplies scene-color fallback defaults. */
 .quest-detail-panel {
-  flex: 0 0 280px;
   --scene-from: #20201c;
   --scene-to: var(--panel-alt);
-  background: var(--panel-alt);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 16px;
 }
 
 .quest-detail-scene {

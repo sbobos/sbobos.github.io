@@ -68,9 +68,9 @@ export function renderArmorTab() {
   }).join("");
 
   return `
-    <div class="armor-tab-layout">
-      <div class="armor-slot-list">${slotRows}</div>
-      <div class="armor-detail-panel">${renderArmorDetail()}</div>
+    <div class="detail-layout">
+      <div class="detail-strip armor-slot-list">${slotRows}</div>
+      <div class="detail-sidebar">${renderArmorDetail()}</div>
     </div>
   `;
 }

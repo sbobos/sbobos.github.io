@@ -241,7 +241,11 @@
 
 .gear-card.equipped {
   border-color: var(--gold);
-  background: linear-gradient(180deg, var(--panel-alt) 0%, rgba(199, 154, 60, 0.08) 100%);
+  background: linear-gradient(
+    180deg,
+    var(--panel-alt) 0%,
+    rgba(199, 154, 60, 0.08) 100%
+  );
   box-shadow: 0 0 10px rgba(199, 154, 60, 0.15);
 }
 
@@ -292,10 +296,19 @@
   color: var(--text-dim);
 }
 
-.stat-badge b { color: var(--text); }
-.stat-badge.atk b { color: var(--blood); }
-.stat-badge.def b { color: var(--frost); }
-.stat-badge.elem { border-color: var(--gold-dim); color: var(--gold); }
+.stat-badge b {
+  color: var(--text);
+}
+.stat-badge.atk b {
+  color: var(--blood);
+}
+.stat-badge.def b {
+  color: var(--frost);
+}
+.stat-badge.elem {
+  border-color: var(--gold-dim);
+  color: var(--gold);
+}
 
 /* --- Summary & Paperdoll HUD --- */
 .inventory-summary-grid {
@@ -303,6 +316,11 @@
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 12px;
   margin-top: 12px;
+  align-items: start; /* stop the compact vitals card stretching to paperdoll height */
+}
+
+.summary-card.compact {
+  padding-bottom: 12px;
 }
 
 .summary-label {
@@ -329,9 +347,15 @@
   color: var(--text-dim);
 }
 
-.vital-badge b { color: var(--text); }
-.vital-badge.hp b { color: var(--blood); }
-.vital-badge.stamina b { color: var(--moss); }
+.vital-badge b {
+  color: var(--text);
+}
+.vital-badge.hp b {
+  color: var(--blood);
+}
+.vital-badge.stamina b {
+  color: var(--moss);
+}
 
 .paperdoll-grid {
   display: grid;
@@ -445,12 +469,25 @@
 }
 
 /* Map CSS Grid areas to slot positions */
-.slot-head   { grid-area: head; }
-.slot-chest  { grid-area: chest; }
-.slot-arms   { grid-area: arms; }
-.slot-waist  { grid-area: waist; }
-.slot-legs   { grid-area: legs; }
-.slot-weapon { grid-area: weapon; border-color: rgba(199, 154, 60, 0.4); }
+.slot-head {
+  grid-area: head;
+}
+.slot-chest {
+  grid-area: chest;
+}
+.slot-arms {
+  grid-area: arms;
+}
+.slot-waist {
+  grid-area: waist;
+}
+.slot-legs {
+  grid-area: legs;
+}
+.slot-weapon {
+  grid-area: weapon;
+  border-color: rgba(199, 154, 60, 0.4);
+}
 
 /* Mobile fallback */
 @media (max-width: 600px) {
@@ -462,4 +499,205 @@
       "chest  arms"
       "waist  legs";
   }
+}
+
+/* ==========================================================================
+   SHARED: STRIP + DETAIL SIDEBAR LAYOUT
+   Canonical definition for the "flexible strip/grid feeding a fixed-width
+   detail sidebar" pattern used across Forge (Armor tab, Weapon Presets),
+   Quest Board, Inventory, and Camp. Each feature keeps its own inner card/
+   tile classes (they render very different content) but shares this outer
+   scaffold instead of redefining it four times.
+
+   Usage: <div class="detail-layout">
+            <div class="detail-strip [feature-grid-class]">...</div>
+            <div class="detail-sidebar [feature-panel-class]">...</div>
+          </div>
+
+   NOTE: this lives here for now since Inventory/Camp were the last to adopt
+   the pattern — worth moving to a genuinely shared stylesheet (layout.css?)
+   next time any of these files gets touched.
+   ========================================================================== */
+
+.detail-layout {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.detail-strip {
+  flex: 1 1 auto;
+}
+
+.detail-sidebar {
+  flex: 0 0 280px;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px;
+}
+
+@media (max-width: 700px) {
+  .detail-layout {
+    flex-direction: column;
+  }
+  .detail-sidebar {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   INVENTORY / CAMP — TAB BAR + ICON STRIP TILES
+   (paired with the shared .detail-layout/.detail-strip/.detail-sidebar above)
+   ========================================================================== */
+
+.inv-tab-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+}
+
+.inv-tab {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: var(--font-display);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 6px 14px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.inv-tab:hover {
+  border-color: var(--gold-dim);
+  color: var(--text);
+}
+
+.inv-tab.active {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(199, 154, 60, 0.08);
+}
+
+/* .inv-tab-layout removed — use shared .detail-layout above.
+   Pair .inv-icon-strip with .detail-strip in markup for flex sizing. */
+
+.inv-icon-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-content: flex-start;
+}
+
+.inv-icon-item {
+  position: relative;
+  width: 84px;
+  min-height: 68px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.inv-icon-item:hover {
+  border-color: var(--gold-dim);
+}
+
+.inv-icon-item.selected {
+  border-color: var(--gold);
+  box-shadow: 0 0 8px rgba(199, 154, 60, 0.25);
+  background: rgba(199, 154, 60, 0.08);
+}
+
+.inv-icon-item.equipped::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+.inv-icon-item.ready::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--moss);
+}
+
+.inv-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.inv-icon-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.inv-icon-item.selected .inv-icon-label {
+  color: var(--text);
+}
+
+.inv-icon-badge {
+  display: none; /* dot indicator (::after) already covers this; kept for text-based fallback if needed */
+}
+
+/* .inv-detail-panel removed — use shared .detail-sidebar above */
+
+.inv-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed rgba(56, 67, 61, 0.8);
+}
+
+.inv-detail-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.inv-detail-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.inv-detail-tag {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+.inv-detail-tag.slot {
+  color: var(--frost);
 }

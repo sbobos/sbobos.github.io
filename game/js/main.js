@@ -23,10 +23,15 @@ import {
   setWeaponSubTab,
   setForgeSubTab,
   upgradeForge,
-  selectWeaponPresetItem
+  selectWeaponPresetItem,
 } from "./ui/village/forge.js";
 import { selectArmorItem } from "./ui/village/armorforge.js";
 import { selectQuestItem } from "./ui/village/questboard.js";
+import {
+  selectInventoryTab,
+  selectInventoryItem,
+} from "./ui/village/inventory.js";
+import { selectCampTab, selectCampItem } from "./ui/camp.js";
 
 window.selectQuestItem = selectQuestItem;
 window.startHunt = startHunt;
@@ -43,12 +48,16 @@ window.selectArmorItem = selectArmorItem;
 window.selectWeaponPresetItem = selectWeaponPresetItem;
 window.playerAction = playerAction;
 window.craftItem = craftItem;
+window.selectCampTab = selectCampTab;
+window.selectCampItem = selectCampItem;
 window.buyShopItem = buyShopItem;
 window.turnInBounty = turnInBounty;
 window.doTrade = doTrade;
 window.equipOwnedItem = equipOwnedItem;
 window.renderVillage = renderVillage;
 window.setVillageTab = setVillageTab;
+window.selectInventoryTab = selectInventoryTab;
+window.selectInventoryItem = selectInventoryItem;
 window.doGenerateSave = doGenerateSave;
 window.doLoadSave = doLoadSave;
 window.doNewGame = doNewGame;

@@ -132,15 +132,15 @@ export function renderCustomForgeTab() {
 
   return `
     <p class="section-copy">Mix one part per category. A custom weapon is fixed once forged — no swapping parts afterward, so choose deliberately.</p>
-    <div class="armor-tab-layout">
-      <div class="armor-slot-list">
+    <div class="detail-layout">
+      <div class="detail-strip armor-slot-list">
         ${renderSlot("headKey", HEADS, "Head")}
         ${renderSlot("handleKey", HANDLES, "Handle")}
         ${renderSlot("coreKey", CORES, "Core")}
         ${renderSlot("mechanismKey", MECHANISMS, "Mechanism")}
         ${renderOwnedCustomList()}
       </div>
-      <div class="armor-detail-panel">
+      <div class="detail-sidebar">
         <div class="gear-sprite-placeholder">
           ${name} Sprite
           <span class="placeholder-note">Visual coming later</span>

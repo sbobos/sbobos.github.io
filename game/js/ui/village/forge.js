@@ -47,19 +47,23 @@ function renderWeaponPresetsView() {
   const icons = Object.keys(WEAPONS)
     .map((key) => {
       const item = assembleWeapon(key);
-      return renderWeaponIcon(item, key === selectedWeaponKey, key === player.weapon);
+      return renderWeaponIcon(
+        item,
+        key === selectedWeaponKey,
+        key === player.weapon,
+      );
     })
     .join("");
 
   return `
-    <div class="armor-tab-layout">
-      <div class="armor-slot-list">
+    <div class="detail-layout">
+      <div class="detail-strip armor-slot-list">
         <div class="armor-slot-row">
           <div class="slot-row-label">Preset Weapons</div>
           <div class="icon-strip">${icons}</div>
         </div>
       </div>
-      <div class="armor-detail-panel">${renderWeaponPresetDetail()}</div>
+      <div class="detail-sidebar">${renderWeaponPresetDetail()}</div>
     </div>
   `;
 }

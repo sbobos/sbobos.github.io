@@ -4,7 +4,7 @@ import { startHunt } from "./setup.js";
 import { renderEncounter, setEncounterHandler } from "../ui/expedition.js";
 import { renderVillage, refreshQuestBoard } from "../ui/village.js";
 import { hunt, player } from "../state.js";
-import { addMat, clamp, rollLoot } from "../utils.js";
+import { addMat, clamp, rollLoot, getArmorStats } from "../utils.js";
 import { LOOT_TABLES } from "../data/loot.js";
 import { smallMonsterToHuntShape } from "./monsteradapter.js";
 import { getRegisteredMission, unregisterMission } from "../questregistry.js";
@@ -113,6 +113,17 @@ function finishEncounter() {
   nextExpeditionEvent();
 }
 
+/**
+ * Armor def shaves down injury odds on risky actions (deep dig, thorough
+ * forage, etc) — a small, generic stat check rather than a dedicated
+ * "luck" or "skill" stat we don't have yet. Floor/ceiling keep it from
+ * ever hitting 0% (always some risk) or over 95%.
+ */
+function injuryChance(baseChance) {
+  const { def } = getArmorStats();
+  return clamp(baseChance - def * 0.5, 2, 95);
+}
+
 function resolveEncounter(encounter, action) {
   switch (encounter.type) {
     case "foraging": {
@@ -124,21 +135,23 @@ function resolveEncounter(encounter, action) {
         return;
       }
 
-      player.stamina = clamp(
-        player.stamina - encounter.staminaCost,
-        0,
-        player.maxStamina,
-      );
+      const deep = action === "gather_deep";
+      const cost = deep
+        ? (encounter.deepStaminaCost ?? encounter.staminaCost * 2)
+        : encounter.staminaCost;
+      const rolls = deep ? 4 : 2;
+      const injury = deep ? encounter.deepInjury : encounter.injury;
 
-      const rewards = gatherFromTable(LOOT_TABLES.foraging.dunes);
+      player.stamina = clamp(player.stamina - cost, 0, player.maxStamina);
 
-      let text =
-        `Spent ${encounter.staminaCost} stamina.\n\n` + rewardText(rewards);
+      const rewards = gatherFromTable(LOOT_TABLES.foraging.dunes, rolls);
 
-      if (encounter.injury && Math.random() * 100 < encounter.injury.chance) {
-        player.hp = clamp(player.hp - encounter.injury.damage, 0, player.maxHp);
+      let text = `Spent ${cost} stamina.\n\n` + rewardText(rewards);
 
-        text += `\n\nYou were scratched while gathering (-${encounter.injury.damage} HP).`;
+      if (injury && Math.random() * 100 < injuryChance(injury.chance)) {
+        player.hp = clamp(player.hp - injury.damage, 0, player.maxHp);
+
+        text += `\n\nYou were scratched while gathering (-${injury.damage} HP).`;
       }
 
       finishEncounterWithText(encounter.title, text);
@@ -155,18 +168,33 @@ function resolveEncounter(encounter, action) {
         return;
       }
 
-      player.stamina = clamp(
-        player.stamina - encounter.staminaCost,
-        0,
-        player.maxStamina,
-      );
+      const deep = action === "mine_deep";
+      const cost = deep
+        ? (encounter.deepStaminaCost ?? encounter.staminaCost * 2)
+        : encounter.staminaCost;
+      const rolls = deep ? 4 : 2;
 
-      const rewards = gatherFromTable(LOOT_TABLES.mining.dunes);
+      player.stamina = clamp(player.stamina - cost, 0, player.maxStamina);
 
-      finishEncounterWithText(
-        encounter.title,
-        `Spent ${encounter.staminaCost} stamina.\n\n${rewardText(rewards)}`,
-      );
+      const rewards = gatherFromTable(LOOT_TABLES.mining.dunes, rolls);
+
+      let text = `Spent ${cost} stamina.\n\n${rewardText(rewards)}`;
+
+      if (
+        deep &&
+        encounter.deepInjury &&
+        Math.random() * 100 < injuryChance(encounter.deepInjury.chance)
+      ) {
+        player.hp = clamp(
+          player.hp - encounter.deepInjury.damage,
+          0,
+          player.maxHp,
+        );
+
+        text += `\n\nA support beam gives way (-${encounter.deepInjury.damage} HP).`;
+      }
+
+      finishEncounterWithText(encounter.title, text);
 
       return;
     }
@@ -183,6 +211,118 @@ function resolveEncounter(encounter, action) {
     }
 
     case "event": {
+      if (encounter.event === "merchant") {
+        if (action === "buy_potion") {
+          const price = encounter.potionPrice ?? 15;
+
+          if (player.goldcoin >= price) {
+            player.goldcoin -= price;
+            player.potions += 1;
+
+            finishEncounterWithText(
+              encounter.title,
+              `Bought a potion for ${price} gold.`,
+            );
+          } else {
+            finishEncounterWithText(
+              encounter.title,
+              "You don't have enough gold for that.",
+            );
+          }
+
+          return;
+        }
+
+        if (action === "buy_rations") {
+          const price = encounter.rationsPrice ?? 10;
+          const staminaGain = encounter.rationsStamina ?? 20;
+
+          if (player.goldcoin >= price) {
+            player.goldcoin -= price;
+            player.stamina = clamp(
+              player.stamina + staminaGain,
+              0,
+              player.maxStamina,
+            );
+
+            finishEncounterWithText(
+              encounter.title,
+              `Bought rations for ${price} gold.\nRecovered ${staminaGain} stamina.`,
+            );
+          } else {
+            finishEncounterWithText(
+              encounter.title,
+              "You don't have enough gold for that.",
+            );
+          }
+
+          return;
+        }
+
+        finishEncounterWithText(encounter.title, "You move on down the trail.");
+
+        return;
+      }
+
+      if (encounter.event === "lost_hunter") {
+        if (action === "escort") {
+          const cost = encounter.escortStaminaCost ?? 10;
+
+          player.stamina = clamp(player.stamina - cost, 0, player.maxStamina);
+
+          const ambushChance = encounter.ambushChance ?? 0;
+
+          if (ambushChance && Math.random() * 100 < ambushChance) {
+            startSmallMonsterFight(
+              encounter.ambushMonster ?? "boarling",
+              finishEncounter,
+            );
+
+            return;
+          }
+
+          const rewardChance = encounter.escortRewardChance ?? 50;
+
+          if (Math.random() * 100 < rewardChance) {
+            const reward = encounter.escortRewardGold ?? 20;
+
+            player.goldcoin += reward;
+
+            finishEncounterWithText(
+              encounter.title,
+              `You guide them to safety. They thank you with ${reward} gold.`,
+            );
+          } else {
+            finishEncounterWithText(
+              encounter.title,
+              "You guide them to safety, though they have little to offer in return.",
+            );
+          }
+
+          return;
+        }
+
+        if (action === "direct") {
+          const reward = encounter.aloneReward ?? 10;
+
+          player.goldcoin += reward;
+
+          finishEncounterWithText(
+            encounter.title,
+            `You point them in the right direction. They leave you ${reward} gold for the help.`,
+          );
+
+          return;
+        }
+
+        finishEncounterWithText(
+          encounter.title,
+          "You leave them to find their own way.",
+        );
+
+        return;
+      }
+
       finishEncounterWithText(encounter.title, "The encounter passes.");
 
       return;
@@ -202,9 +342,43 @@ function resolveEncounter(encounter, action) {
           encounter.title,
           `Recovered ${encounter.heal} HP.\nRecovered ${encounter.stamina} stamina.`,
         );
-      } else {
-        finishEncounterWithText(encounter.title, "You decide not to rest.");
+
+        return;
       }
+
+      if (action === "rest_full") {
+        const ambushChance = encounter.ambushChance ?? 0;
+
+        if (ambushChance && Math.random() * 100 < ambushChance) {
+          const partialHeal = Math.round(
+            (encounter.fullHeal ?? encounter.heal * 2) / 2,
+          );
+
+          player.hp = clamp(player.hp + partialHeal, 0, player.maxHp);
+
+          startSmallMonsterFight(
+            encounter.ambushMonster ?? "boarling",
+            finishEncounter,
+          );
+
+          return;
+        }
+
+        const heal = encounter.fullHeal ?? encounter.heal * 2;
+        const stamina = encounter.fullStamina ?? encounter.stamina * 2;
+
+        player.hp = clamp(player.hp + heal, 0, player.maxHp);
+        player.stamina = clamp(player.stamina + stamina, 0, player.maxStamina);
+
+        finishEncounterWithText(
+          encounter.title,
+          `Recovered ${heal} HP.\nRecovered ${stamina} stamina.`,
+        );
+
+        return;
+      }
+
+      finishEncounterWithText(encounter.title, "You decide not to rest.");
 
       return;
     }
@@ -218,13 +392,15 @@ function getButtons(encounter) {
   switch (encounter.type) {
     case "mining":
       return [
-        { label: "Mine", action: "mine" },
+        { label: "Careful Dig", action: "mine" },
+        { label: "Dig Deeper", action: "mine_deep" },
         { label: "Leave", action: "leave" },
       ];
 
     case "foraging":
       return [
-        { label: "Gather", action: "gather" },
+        { label: "Quick Gather", action: "gather" },
+        { label: "Forage Thoroughly", action: "gather_deep" },
         { label: "Leave", action: "leave" },
       ];
 
@@ -235,11 +411,34 @@ function getButtons(encounter) {
       ];
 
     case "event":
+      if (encounter.event === "merchant") {
+        return [
+          {
+            label: `Buy Potion (${encounter.potionPrice ?? 15}g)`,
+            action: "buy_potion",
+          },
+          {
+            label: `Buy Rations (${encounter.rationsPrice ?? 10}g)`,
+            action: "buy_rations",
+          },
+          { label: "Move On", action: "leave" },
+        ];
+      }
+
+      if (encounter.event === "lost_hunter") {
+        return [
+          { label: "Escort Them", action: "escort" },
+          { label: "Point the Way", action: "direct" },
+          { label: "Ignore", action: "leave" },
+        ];
+      }
+
       return [{ label: "Continue", action: "continue" }];
 
     case "rest":
       return [
-        { label: "Rest", action: "rest" },
+        { label: "Short Rest", action: "rest" },
+        { label: "Full Rest", action: "rest_full" },
         { label: "Continue", action: "leave" },
       ];
 
