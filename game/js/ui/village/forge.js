@@ -9,21 +9,31 @@ import {
   getArmorStats,
 } from "../../utils.js";
 import { renderVillage } from "../village.js";
-import { renderCustomForgeTab } from "./weaponforge.js";
-import { renderArmorTab } from "./armorforge.js";
-import { renderPaperdoll } from "../shared/equipmentloadout.js";
+import {
+  renderCustomForgeTab,
+  selectWeaponPart,
+  equipCustomWeapon,
+} from "./weaponforge.js";
+import { renderArmorTab, selectArmorItem } from "./armorforge.js";
 
-let selectedWeaponKey = null; // mirrors selectedArmorKey in armorforge.js
+let selectedWeaponKey = null;
+let weaponSubTab = "presets";
 
 export function selectWeaponPresetItem(key) {
   selectedWeaponKey = key;
-  renderVillage();
+}
+
+export function setWeaponSubTab(tab) {
+  weaponSubTab = tab;
 }
 
 function renderWeaponIcon(item, selected, equipped) {
   return `
-    <div class="gear-icon ${selected ? "selected" : ""} ${equipped ? "equipped" : ""}"
-         onclick="selectWeaponPresetItem('${item.key}')" title="${item.name}">
+    <div
+      class="gear-icon ${selected ? "selected" : ""} ${equipped ? "equipped" : ""}"
+      data-action="select-weapon"
+      data-key="${item.key}"
+      title="${item.name}">
       <div class="gear-icon-label">${item.name.slice(0, 3).toUpperCase()}</div>
     </div>
   `;
@@ -68,84 +78,158 @@ function renderWeaponPresetsView() {
   `;
 }
 
-let weaponSubTab = "presets"; // module-level, mirrors your existing tab pattern
+export function buildForgeTabs() {
+  return [
+    {
+      key: "upgrade",
+      label: "Upgrade",
 
-export function setWeaponSubTab(tab) {
-  weaponSubTab = tab;
-  renderVillage();
-}
+      render() {
+        const stats = getArmorStats();
+        const skillsHtml = stats.skillProgress.length
+          ? stats.skillProgress
+              .map(
+                (s) =>
+                  `<div class="tree-node ${s.active ? "active unlocked" : ""}">
+                    ${s.name} ${s.points}/${s.threshold}${s.active ? " · Active" : ""}
+                  </div>`,
+              )
+              .join("")
+          : `<div class="tree-copy">No skill points from current gear yet.</div>`;
 
-let forgeSubTab = "upgrade"; // module-level, same pattern as weaponSubTab
+        const forgeInfo = FORGE_LEVELS[player.forgeLevel];
 
-export function setForgeSubTab(tab) {
-  forgeSubTab = tab;
-  renderVillage();
-}
+        return `
+          <div class="stat-row">
+            <div class="stat-chip">
+              Forge: ${forgeInfo.name} (Lv ${forgeInfo.level})
+            </div>
+          </div>
 
-export function renderForgeTab() {
-  const stats = getArmorStats();
+          <div class="forge-layout">
+            <div class="forge-main">
+              ${renderForgeLevelPanel()}
+              ${renderForgeSpritePlaceholder()}
+            </div>
 
-  const skillsHtml = stats.skillProgress.length
-    ? stats.skillProgress
-        .map(
-          (s) =>
-            `<div class="tree-node ${s.active ? "active unlocked" : ""}">${s.name} ${s.points}/${s.threshold}${s.active ? " · Active" : ""}</div>`,
-        )
-        .join("")
-    : `<div class="tree-copy">No skill points from current gear yet.</div>`;
+            <div class="forge-sidebar">
+              <div class="tree-panel">
+                <div class="tree-title">Armor Skills</div>
+                <div class="tree-copy">
+                  Points come from all equipped pieces combined.
+                </div>
+                <div class="tree-list">
+                  ${skillsHtml}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      },
 
-  const forgeInfo = FORGE_LEVELS[player.forgeLevel];
+      onAction(body, action, key, event, overlay) {
+        if (action === "upgrade-forge") {
+          upgradeForge();
+          overlay.refresh(); // INSTANTLY refreshes the tab state!
+        }
+      },
+    },
 
-  const summaryHtml = `
-    ${renderPaperdoll()}
-    <div class="stat-row">
-      <div class="stat-chip">Forge: ${forgeInfo.name} (Lv ${forgeInfo.level})</div>
-    </div>
-  `;
+    {
+      key: "weapons",
+      label: "Weapons",
 
-  const armorSkillsSidebar = `
-    <div class="tree-panel">
-      <div class="tree-title">Armor Skills</div>
-      <div class="tree-copy">Points come from all 5 equipped pieces combined. Reach a skill's threshold to activate it.</div>
-      <div class="tree-list">${skillsHtml}</div>
-    </div>
-  `;
+      render() {
+        return `
+          <div class="subtab-row">
+            <button
+              class="subtab-btn ${weaponSubTab === "presets" ? "active" : ""}"
+              data-action="weapon-subtab"
+              data-key="presets">
+              Presets
+            </button>
 
-  let mainContent = "";
-  if (forgeSubTab === "upgrade") {
-    mainContent = renderForgeLevelPanel() + renderForgeSpritePlaceholder();
-  } else if (forgeSubTab === "weapons") {
-    mainContent = `
-      <div class="subtab-row">
-        <button class="subtab-btn ${weaponSubTab === "presets" ? "active" : ""}" onclick="setWeaponSubTab('presets')">Presets</button>
-        <button class="subtab-btn ${weaponSubTab === "custom" ? "active" : ""}" onclick="setWeaponSubTab('custom')">Custom Forge</button>
-      </div>
-      ${
-        weaponSubTab === "presets"
-          ? renderWeaponPresetsView()
-          : renderCustomForgeTab()
-      }
-    `;
-  } else if (forgeSubTab === "armor") {
-    mainContent = renderArmorTab();
-  }
+            <button
+              class="subtab-btn ${weaponSubTab === "custom" ? "active" : ""}"
+              data-action="weapon-subtab"
+              data-key="custom">
+              Custom Forge
+            </button>
+          </div>
 
-  return `
-    <div class="panel">
-      <h2>Forge</h2>
-      <p class="section-copy">Craft reliable tools and armor from the materials you carve from each hunt. Your loadout is the real progression here.</p>
-      ${summaryHtml}
-      <div class="subtab-row">
-        <button class="subtab-btn ${forgeSubTab === "upgrade" ? "active" : ""}" onclick="setForgeSubTab('upgrade')">Upgrade</button>
-        <button class="subtab-btn ${forgeSubTab === "weapons" ? "active" : ""}" onclick="setForgeSubTab('weapons')">Weapons</button>
-        <button class="subtab-btn ${forgeSubTab === "armor" ? "active" : ""}" onclick="setForgeSubTab('armor')">Armor</button>
-      </div>
-      <div class="forge-layout">
-        <div class="forge-main">${mainContent}</div>
-        <div class="forge-sidebar">${armorSkillsSidebar}</div>
-      </div>
-    </div>
-  `;
+          ${
+            weaponSubTab === "presets"
+              ? renderWeaponPresetsView()
+              : renderCustomForgeTab()
+          }
+        `;
+      },
+
+      onAction(body, action, key, event, overlay) {
+        if (action === "weapon-subtab") {
+          weaponSubTab = key;
+          overlay.refresh();
+          return;
+        }
+
+        if (action === "select-weapon") {
+          selectedWeaponKey = key;
+          overlay.refresh();
+          return;
+        }
+
+        if (action === "select-part") {
+          const slot = event.target.closest("[data-slot]")?.dataset.slot;
+          if (slot && key) {
+            selectWeaponPart(slot, key);
+            overlay.refresh();
+          }
+          return;
+        }
+
+        if (action === "equip-custom") {
+          equipCustomWeapon(key);
+          overlay.refresh();
+          return;
+        }
+
+        if (action === "craft-preset") {
+          craftItem(key, true);
+          overlay.refresh();
+          return;
+        }
+
+        if (action === "craft-custom") {
+          craftCustomWeapon();
+          overlay.refresh();
+          return;
+        }
+      },
+    },
+
+    {
+      key: "armor",
+      label: "Armor",
+
+      render() {
+        return renderArmorTab();
+      },
+
+      onAction(body, action, key, event, overlay) {
+        if (action === "select-armor") {
+          selectArmorItem(key);
+          overlay.refresh();
+          return;
+        }
+
+        if (action === "craft-armor") {
+          craftItem(key, false);
+          overlay.refresh();
+          return;
+        }
+      },
+    },
+  ];
 }
 
 function renderForgeSpritePlaceholder() {
@@ -158,12 +242,6 @@ function renderForgeSpritePlaceholder() {
   `;
 }
 
-/**
- * Shows the forge's own upgrade path — separate from any individual
- * weapon/armor recipe. Once player.forgeLevel is high enough, higher-tier
- * items stop being forge-locked in renderCraftCard below (they still need
- * their own materials/goldcoin on top of that).
- */
 function renderForgeLevelPanel() {
   const forgeInfo = FORGE_LEVELS[player.forgeLevel];
   const next = FORGE_LEVELS[player.forgeLevel + 1];
@@ -202,7 +280,7 @@ function renderForgeLevelPanel() {
       <div class="tree-title">Next: ${next.name} (Level ${next.level})</div>
       <div class="tree-copy">${next.desc}</div>
       ${reqRows}
-      <button ${allOk ? "" : "disabled"} onclick="upgradeForge()">Upgrade Forge</button>
+      <button ${allOk ? "" : "disabled"} data-action="upgrade-forge">Upgrade Forge</button>
     </div>
   `;
 }
@@ -265,6 +343,8 @@ export function renderCraftCard(item, isWeapon) {
     unlockHint = `<div class="tree-copy">Requires ${need.name} (Forge Level ${item.forgeLevel})</div>`;
   }
 
+  const actionName = isWeapon ? "craft-preset" : "craft-armor";
+
   return `
     <div class="card craft-card">
       <div class="ctag">${item.tag}${owned && !equipped ? " · Owned" : ""}</div>
@@ -299,7 +379,7 @@ export function renderCraftCard(item, isWeapon) {
       ${isWeapon ? `<div class="weapon-style">${item.specialDesc}</div>` : ""}
       ${reqRows}
       ${unlockHint}
-      <button ${!owned && !allOk ? "disabled" : ""} ${equipped ? "disabled" : ""} ${!canUnlock ? "disabled" : ""} onclick="craftItem('${item.key}', ${isWeapon})">
+      <button ${!owned && !allOk ? "disabled" : ""} ${equipped ? "disabled" : ""} ${!canUnlock ? "disabled" : ""} data-action="${actionName}" data-key="${item.key}">
         ${btnLabel}
       </button>
     </div>

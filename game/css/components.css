@@ -1,109 +1,216 @@
 .banner {
-    text-align: center;
-    padding: 18px 10px 14px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 18px;
+  text-align: center;
+  padding: 18px 10px 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 18px;
 }
 
 .banner .eyebrow {
-    letter-spacing: 3px;
-    font-size: 11px;
-    color: var(--gold-dim);
-    text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 11px;
+  color: var(--gold-dim);
+  text-transform: uppercase;
 }
 
 .banner h1 {
-    font-family: var(--font-display);
-    font-size: 30px;
-    margin: 6px 0 4px;
-    letter-spacing: 1px;
-    color: var(--text);
+  font-family: var(--font-display);
+  font-size: 30px;
+  margin: 6px 0 4px;
+  letter-spacing: 1px;
+  color: var(--text);
 }
 
 .banner .sub {
-    font-size: 12px;
-    color: var(--text-dim);
+  font-size: 12px;
+  color: var(--text-dim);
 }
 
 /* Story */
 
 .story-banner {
-    background: linear-gradient(
-        135deg,
-        rgba(199,154,60,0.15),
-        rgba(106,148,176,0.12)
-    );
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 12px;
-    margin-bottom: 14px;
+  background: linear-gradient(
+    135deg,
+    rgba(199, 154, 60, 0.15),
+    rgba(106, 148, 176, 0.12)
+  );
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 14px;
 }
 
 .story-pill {
-    display: inline-block;
-    font-size: 10px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--gold);
-    border: 1px solid var(--gold-dim);
-    border-radius: 999px;
-    padding: 3px 7px;
-    margin-bottom: 6px;
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid var(--gold-dim);
+  border-radius: 999px;
+  padding: 3px 7px;
+  margin-bottom: 6px;
 }
 
 .story-title {
-    font-family: var(--font-display);
-    font-size: 14px;
-    color: var(--gold);
-    margin-bottom: 4px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--gold);
+  margin-bottom: 4px;
 }
 
 .story-subtitle {
-    font-size: 11px;
-    color: var(--text-dim);
-    margin-bottom: 10px;
-    line-height: 1.5;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+  line-height: 1.5;
 }
 
 .story-copy {
-    font-size: 12px;
-    color: var(--text-dim);
-    line-height: 1.5;
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
 }
 
 /* Quests */
 
 .quest-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
 }
 
 .quest-card {
-    position: relative;
+  position: relative;
 }
 
 .quest-card .qicon {
-    font-size: 26px;
-    margin-right: 8px;
-    vertical-align: middle;
+  font-size: 26px;
+  margin-right: 8px;
+  vertical-align: middle;
 }
 
 .quest-card .qname {
-    font-family: var(--font-display);
-    font-size: 16px;
-    color: var(--text);
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--text);
 }
 
 .quest-card .qflavor {
-    font-size: 12px;
-    color: var(--text-dim);
-    margin: 6px 0 4px;
-    line-height: 1.5;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin: 6px 0 4px;
+  line-height: 1.5;
 }
 
 .quest-card .qarena {
-    font-size: 11px;
-    color: var(--frost);
-    margin-bottom: 8px;
+  font-size: 11px;
+  color: var(--frost);
+  margin-bottom: 8px;
+}
+
+.detail-layout {
+  display: flex;
+  height: 100%;
+}
+.icon-strip {
+  display: flex;
+  width: 100%;
+  overflow-y: auto;
+  border-right: 1px solid var(--line);
+  padding: 10px;
+}
+.icon-item {
+  display: flex;
+  width: 56px;
+  height: 56px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  margin-bottom: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  opacity: 0.8;
+}
+.icon-item:hover {
+  background: rgba(255, 255, 255, 0.03);
+  opacity: 1;
+}
+.icon-item.selected {
+  background: rgba(226, 149, 74, 0.08);
+  border-color: var(--bronze-dim);
+  opacity: 1;
+}
+.icon-item .icon {
+  font-size: 18px;
+  width: 22px;
+  text-align: center;
+}
+.icon-item .icon-label {
+  font-size: 13px;
+}
+.icon-item .ready-dot {
+  margin-left: auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--moss);
+  opacity: 0;
+}
+.icon-item.ready .ready-dot {
+  opacity: 1;
+  background: var(--good);
+}
+.detail-pane {
+  flex: 1;
+  padding: 16px 18px;
+  overflow-y: auto;
+}
+.detail-title {
+  font-family: Georgia, serif;
+  font-variant: small-caps;
+  letter-spacing: 1.5px;
+  color: var(--ember);
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+.detail-tag {
+  font-size: 11px;
+  opacity: 0.5;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+.detail-desc {
+  font-size: 13px;
+  opacity: 0.8;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.detail-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.detail-actions button {
+  background: var(--bronze-dim);
+  color: var(--parchment-text);
+  border: 1px solid var(--bronze);
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.detail-actions button:hover:not(:disabled) {
+  background: var(--bronze);
+}
+.detail-actions button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.detail-empty {
+  opacity: 0.4;
+  font-size: 13px;
+  padding: 16px;
 }

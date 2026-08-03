@@ -27,7 +27,7 @@ export const HEADS = {
     key: "hunterEdge",
     name: "Hunter",
     damageType: "cut",
-    atk: 10,
+    atk: 100,
     critMod: 0,
     forgeLevel: 0,
   },

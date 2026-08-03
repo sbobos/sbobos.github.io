@@ -4,9 +4,6 @@ import { assembleFromPartKeys, generateWeaponName } from "../../data/gear.js";
 import { addMat } from "../../utils.js";
 import { renderVillage } from "../village.js";
 
-/* Draft is the picker's in-progress selection — resets to starter parts
-   each session (module-level, not persisted). It's UI-only state; nothing
-   is spent until craftCustomWeapon() succeeds. */
 let draft = {
   headKey: "hunterEdge",
   handleKey: "basicGrip",
@@ -16,7 +13,6 @@ let draft = {
 
 export function selectWeaponPart(slotType, key) {
   draft[slotType] = key;
-  renderVillage();
 }
 
 export function equipCustomWeapon(id) {
@@ -46,7 +42,11 @@ function renderPartOption(slotType, key, part, selected) {
 
   return `
      <div class="gear-icon ${selected ? "selected" : ""} ${locked ? "locked" : ""}"
-          ${locked ? "" : `onclick="selectWeaponPart('${slotType}','${key}')"`}
+          ${
+            locked
+              ? ""
+              : `data-action="select-part" data-slot="${slotType}" data-key="${key}"`
+          }
           title="${part.name || "—"}${locked ? ` (Forge Lv ${part.forgeLevel} required)` : ""}">
        <div class="gear-icon-label">${(part.name || "—").slice(0, 3).toUpperCase()}</div>
      </div>
@@ -75,7 +75,8 @@ function renderOwnedCustomList() {
       const equipped = player.weapon === w.id;
       return `
         <div class="gear-icon ${equipped ? "equipped" : ""}"
-             onclick="equipCustomWeapon('${w.id}')"
+             data-action="equip-custom"
+             data-key="${w.id}"
              title="${w.name}${equipped ? " (Equipped)" : ""}">
           <div class="gear-icon-label">${w.name.slice(0, 3).toUpperCase()}</div>
         </div>
@@ -131,9 +132,9 @@ export function renderCustomForgeTab() {
   `;
 
   return `
-    <p class="section-copy">Mix one part per category. A custom weapon is fixed once forged — no swapping parts afterward, so choose deliberately.</p>
     <div class="detail-layout">
-      <div class="detail-strip armor-slot-list">
+      <div class="custom-forge-sections">
+        <p class="section-copy">Mix one part per category. A custom weapon is fixed once forged — no swapping parts afterward, so choose deliberately.</p>
         ${renderSlot("headKey", HEADS, "Head")}
         ${renderSlot("handleKey", HANDLES, "Handle")}
         ${renderSlot("coreKey", CORES, "Core")}
@@ -151,7 +152,7 @@ export function renderCustomForgeTab() {
           <div class="weapon-style">${preview.specialDesc}</div>
         </div>
         ${reqRows}
-        <button ${canCraft ? "" : "disabled"} onclick="craftCustomWeapon()">Forge Weapon</button>
+        <button ${canCraft ? "" : "disabled"} data-action="craft-custom">Forge Weapon</button>
       </div>
     </div>
   `;

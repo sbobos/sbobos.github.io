@@ -282,11 +282,20 @@ function combatFinished() {
     return true;
   }
 
+  // 1. Monster Defeated (Victory)
+  if (hunt.monster.hp <= 0) {
+    logMsg(`THE ${hunt.monster.name.toUpperCase()} COLLAPSES. THE HUNT IS OVER.`, "l-break");
+    endHunt("victory");
+    return true;
+  }
+
+  // 2. Player Defeated (Defeat)
   if (player.hp <= 0) {
     playSound("player_hurt");
     triggerShake();
     triggerDamageFlash();
 
+    logMsg("You have fainted...", "l-dmg");
     endHunt("defeat");
     return true;
   }

@@ -6,6 +6,32 @@
   margin-bottom: 12px;
 }
 
+/* ==========================================================================
+   Arena Card Gradient Styling (Matches Quest Board look)
+   ========================================================================== */
+
+.arena-scene.arena-card {
+  /* Use --scene-from and --scene-to inline variables passed by JS */
+  background: linear-gradient(
+    160deg,
+    var(--scene-from, #3a2c14) 0%,
+    var(--scene-to, #7a5a2a) 100%
+  ) !important;
+  
+  border: 1px solid var(--border);
+  border-bottom: 2px solid var(--gold-dim);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.5);
+  padding: 12px 14px;
+}
+
+/* Semi-transparent telegraph box over the rich colored gradient */
+.arena-scene .telegraph-banner {
+  background: rgba(10, 10, 10, 0.45);
+  backdrop-filter: blur(2px);
+  border-left: 4px solid var(--gold);
+  margin-top: 10px;
+}
+
 .monster-head {
   display: flex;
   align-items: center;
@@ -592,3 +618,242 @@
   background: var(--border);
   margin: 0 2px;
 }
+
+/* ==========================================================================
+   1280x720 Fixed Viewport Layout for Hunt Screen
+   ========================================================================== */
+
+#hunt-screen {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Master 2-Column Grid Layout */
+.hunt-grid-layout {
+  display: grid;
+  grid-template-columns: 440px 1fr;
+  gap: 12px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* Left Column: Monster Visuals, Player Stats & Defense */
+.hunt-col-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  min-height: 0;
+}
+
+/* Right Column: Part Targeting, Move Execution & Combat Log */
+.hunt-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  min-height: 0;
+}
+
+/* Modular Panels inside the Columns */
+.hunt-panel {
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  outline: 1px solid rgba(0, 0, 0, 0.8);
+  outline-offset: -3px;
+  padding: 10px 12px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.arena-card {
+  border-radius: 0;
+  margin: 0;
+}
+
+.player-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Grid layout for Dodge and Defense buttons */
+.actions.dodge-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.actions.util-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+/* Targeting & Moves Layout */
+.targeting-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.move-select-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  max-height: 130px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.move-select-grid::-webkit-scrollbar {
+  width: 4px;
+}
+.move-select-grid::-webkit-scrollbar-thumb {
+  background: var(--border);
+}
+
+/* Log Container with Header Bar */
+.log-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Crucial for internal scrolling flexbox */
+  padding: 8px 12px;
+}
+
+.loadout-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-dim);
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+
+.loadout-bar strong {
+  color: var(--gold);
+}
+
+/* Override combat log fixed height to fit flexbox nicely */
+.log-card .log {
+  flex: 1;
+  height: 100% !important;
+  margin: 0;
+}
+
+/* ==========================================================================
+   Centered Modal Overlay for End Hunt (Victory/Defeat)
+   ========================================================================== */
+
+.hunt-grid-layout {
+  position: relative; /* Container reference for absolute modal placement */
+}
+
+.hunt-overlay-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  background: rgba(8, 10, 9, 0.85);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.hunt-overlay-card {
+  width: 440px;
+  background: var(--panel-alt);
+  border: 1px solid var(--gold);
+  outline: 1px solid rgba(0, 0, 0, 0.9);
+  outline-offset: -4px;
+  padding: 24px;
+  text-align: center;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.9),
+    inset 0 0 15px rgba(0, 0, 0, 0.6);
+}
+
+.overlay-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: 2px;
+  margin: 0 0 10px 0;
+}
+
+.overlay-title.victory {
+  color: var(--gold);
+  text-shadow: 0 0 10px rgba(199, 154, 60, 0.5);
+}
+
+.overlay-title.defeat {
+  color: var(--blood);
+  text-shadow: 0 0 10px rgba(162, 59, 46, 0.5);
+}
+
+.overlay-sub {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}
+
+.overlay-actions {
+  display: flex;
+  justify-content: center;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.hunt-overlay-card .loot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 6px;
+  max-height: 140px;
+  overflow-y: auto;
+  margin: 8px 0;
+  padding: 4px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+
+.hunt-overlay-card .loot-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  font-size: 11px;
+}
+
+.loot-qty {
+  color: var(--gold);
+  font-weight: bold;
+}
+
+/* Add to combat.css */
+button:disabled,
+button[disabled],
+.gear-icon:disabled,
+.move-pick:disabled {
+  opacity: 0.35 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  filter: grayscale(80%);
+}
+

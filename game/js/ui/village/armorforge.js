@@ -15,14 +15,15 @@ let selectedArmorKey = null; // module-level, mirrors the weapon-forge draft pat
 
 export function selectArmorItem(key) {
   selectedArmorKey = key;
-  renderVillage();
 }
 
 function renderArmorIcon(item, selected, equipped) {
-  const forgeLevelOk = true; // renderCraftCard already handles lock/afford logic in the detail panel
   return `
-    <div class="gear-icon ${selected ? "selected" : ""} ${equipped ? "equipped" : ""}"
-         onclick="selectArmorItem('${item.key}')" title="${item.name}">
+    <div
+      class="gear-icon ${selected ? "selected" : ""} ${equipped ? "equipped" : ""}"
+      data-action="select-armor"
+      data-key="${item.key}"
+      title="${item.name}">
       <div class="gear-icon-label">${item.name.slice(0, 3).toUpperCase()}</div>
     </div>
   `;
@@ -67,9 +68,11 @@ export function renderArmorTab() {
     `;
   }).join("");
 
+  /* CHANGED: Replaced 'detail-strip' with 'armor-sections-container' 
+     so it stacks vertically without flex-wrap rules interfering */
   return `
     <div class="detail-layout">
-      <div class="detail-strip armor-slot-list">${slotRows}</div>
+      <div class="armor-sections-container">${slotRows}</div>
       <div class="detail-sidebar">${renderArmorDetail()}</div>
     </div>
   `;

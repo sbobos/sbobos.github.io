@@ -70,3 +70,5 @@
 .shake {
   animation: screen-shake 0.35s ease-in-out;
 }
+
+.flash{ animation: flashPulse 500ms ease; }

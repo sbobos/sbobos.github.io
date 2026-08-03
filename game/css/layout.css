@@ -5,7 +5,7 @@ body {
   padding: 0;
   /* Allow normal vertical scrolling if content overflows */
   overflow-x: hidden;
-  overflow-y: auto; 
+  overflow-y: auto;
   background:
     radial-gradient(
       circle at center,
@@ -21,16 +21,17 @@ body {
 
 #app {
   /* Flexbox centering without forcing absolute positioning */
+  position: relative;
   width: 100%;
-  max-width: 1280px;
-  min-height: 100vh; /* Fills screen vertically at minimum */
-  margin: 0 auto;    /* Centers horizontally */
+  width: 1280px;
+  height: 720px; /* Fills screen vertically at minimum */
+  margin: 0 auto; /* Centers horizontally */
   padding: 16px;
-  
+
   display: flex;
   flex-direction: column;
   gap: 12px;
-  
+
   background: var(--bg);
   border-left: 1px solid var(--border);
   border-right: 1px solid var(--border);
@@ -227,4 +228,195 @@ body {
   color: var(--gold);
   font-weight: bold;
   margin-left: 4px;
+}
+/* =========================================================================
+   REUSABLE — Camera / world container. Required by engine/camera.js.
+   ========================================================================= */
+#world {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+  transition: transform 1000ms cubic-bezier(0.65, 0, 0.35, 1);
+  will-change: transform;
+}
+#world.zooming {
+  transform: scale(2.6);
+}
+
+/* =========================================================================
+   REUSABLE — Wipe transition layer. Required by engine/wipe.js.
+   ========================================================================= */
+#wipe {
+  position: absolute;
+  inset: 0;
+  background: var(--slate-deep);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 260ms ease;
+  z-index: 5;
+}
+#wipe.show {
+  opacity: 1;
+}
+
+/* =========================================================================
+   REUSABLE — Overlay panel shell. Required by engine/overlay.js.
+   The KEY FIX from earlier: pointer-events is OFF by default so the
+   invisible/inactive shell can never sit on top of the world and eat clicks.
+   ========================================================================= */
+#overlay-layer {
+  position: absolute;
+  inset: 48px 0 56px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.panel-shell {
+  pointer-events: none;
+  width: 1240px;
+  height: 590px;
+  display: flex;
+  flex-direction: column;
+  position: relative; /* Essential for corner brackets ::before & ::after */
+
+  /* 1. Radial vignette inside the dark gradient background */
+  background:
+    radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.6) 100%),
+    linear-gradient(to bottom, var(--panel-alt), var(--panel));
+
+  /* 2. Double-framed edge */
+  border: 1px solid var(--border);
+  outline: 1px solid rgba(0, 0, 0, 0.85);
+  outline-offset: -4px;
+  border-radius: 0px; /* Sharp tactical corners like your original */
+
+  /* 3. Deep carved drop-shadow & inset highlight */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 20px rgba(0, 0, 0, 0.7),
+    0 12px 35px rgba(0, 0, 0, 0.85);
+
+  transform: translateY(40px);
+  opacity: 0;
+  transition:
+    transform 380ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 380ms ease;
+  overflow: hidden;
+}
+
+.panel-shell.active {
+  pointer-events: auto;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* 4. Restore Decorative Gold Corner Brackets */
+.panel-shell::before,
+.panel-shell::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: var(--gold);
+  border-style: solid;
+  pointer-events: none;
+  z-index: 15; /* Sits over headers/borders */
+}
+
+.panel-shell::before {
+  top: 0px;
+  left: 0px;
+  border-width: 2px 0 0 2px;
+}
+
+.panel-shell::after {
+  bottom: 0px;
+  right: 0px;
+  border-width: 0 2px 2px 0;
+}
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 10px;
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.8); /* Carved drop underneath line */
+  flex: 0 0 auto;
+}
+
+.panel-header h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-variant: small-caps;
+  letter-spacing: 2px;
+  color: var(--gold);
+  font-size: 16px;
+  text-shadow:
+    0 0 10px rgba(199, 154, 60, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.9);
+}
+.panel-close {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  opacity: 0.75;
+}
+.panel-close:hover {
+  opacity: 1;
+  border-color: var(--gold);
+}
+.panel-tabbar {
+  display: flex;
+  gap: 4px;
+  padding: 10px 20px 0;
+  flex: 0 0 auto;
+  border-bottom: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.25); /* Subtle dark contrast under tabs */
+}
+
+.panel-tab {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  padding: 8px 16px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.panel-tab:hover {
+  color: var(--text);
+}
+
+.panel-tab.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+  text-shadow: 0 0 8px rgba(199, 154, 60, 0.5);
+  background: linear-gradient(to top, rgba(199, 154, 60, 0.12), transparent);
+}
+
+/* Sunken Panel Body for content contrast */
+.panel-body {
+  flex: 1 1 auto;
+  overflow: hidden;
+  background: rgba(
+    10,
+    14,
+    13,
+    0.35
+  ); /* Darker inset bed for cards/shop items */
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.7);
 }

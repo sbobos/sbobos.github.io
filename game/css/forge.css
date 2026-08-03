@@ -245,3 +245,48 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+/* ==========================================================================
+   FORGE — ARMOR TAB LAYOUT FIX
+   ========================================================================== */
+
+/* 1. Main Left Area in Armor Forge: Forces strict vertical stacking */
+.custom-forge-sections,
+.armor-sections-container,
+.detail-layout-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  min-height: 0;        /* CRITICAL: Unlocks CSS scroll behavior inside flexbox */
+  overflow-y: auto;     /* Enables vertical scrolling */
+  padding-right: 12px;  /* Leaves breathing room for scrollbar */
+}
+
+/* 2. Individual Armor Slot Rows (Head, Chest, Arms...) */
+.armor-slot-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;            /* Ensure each slot spans the full width of left pane */
+}
+
+/* 3. Override .icon-strip ONLY when inside an armor slot row */
+.armor-slot-row .icon-strip {
+  display: flex;
+  flex-wrap: nowrap;      /* Prevent horizontal gear icons from wrapping vertically */
+  overflow-x: auto;       /* Allow side-scrolling for icons if too many exist */
+  overflow-y: hidden;
+  padding-bottom: 6px;
+  height: auto;           /* Do not inherit height: 100% from shared strip */
+}
+/* Ensure horizontal part selection rows don't wrap onto each other */
+.custom-forge-sections .slot-options,
+.custom-forge-sections .icon-strip {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 4px;
+}

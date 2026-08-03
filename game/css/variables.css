@@ -1,16 +1,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Faustina:ital,wght@0,400;0,600;1,400&display=swap");
 
 :root {
-  --bg: #12171a;
-  --panel: #1b2320;
-  --panel-alt: #212a26;
-  --border: #38433d;
-  --text: #e4d9c0;
-  --text-dim: #9aa39a;
+  --bg: #0e1214;
+  --panel: #141a18;
+  --panel-alt: #1e2622;
+  --border: #3b4a42;
+  --text: #eee3cb;
+  --text-dim: #8b968a;
   --blood: #a23b2e;
   --blood-dim: #6e2c22;
-  --gold: #c79a3c;
-  --gold-dim: #8a6b28;
+  --gold: #dfac43;
+  --gold-dim: #99752b;
+  --gold-glow: rgba(223, 172, 67, 0.15);
   --moss: #7a9a6e;
   --moss-dim: #4f6a47;
   --frost: #6f9bb0;

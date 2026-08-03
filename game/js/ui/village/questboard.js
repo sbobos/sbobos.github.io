@@ -74,54 +74,77 @@ export function getQuestBoardEntries() {
   return entries;
 }
 
-export function renderQuestsTab() {
-  const activeMission = getActiveStoryMission();
-  const entries = getQuestBoardEntries();
+export function buildQuestTabs() {
+  return [
+    {
+      key: "quests",
+      label: "Assignments",
 
-  if (selectedQuestIndex >= entries.length) {
-    selectedQuestIndex = 0;
-  }
+      render() {
+        const activeMission = getActiveStoryMission();
+        const entries = getQuestBoardEntries();
 
-  const cardsHtml = entries
-    .map((entry, index) => {
-      const monster = entry.monster;
-      const mission = entry.mission;
-      const active = index === selectedQuestIndex;
-      const stars = mission.stars ?? 1;
+        if (selectedQuestIndex >= entries.length) {
+          selectedQuestIndex = 0;
+        }
 
-      return `
-      <button class="quest-card ${active ? "selected" : ""}"
-              onclick="selectQuestItem(${index})">
-        <div class="quest-card-top">
-          <span class="quest-star">★${stars}</span>
-        </div>
-        <span class="quest-card-icon">${monster.icon}</span>
-        <div class="quest-card-name">${mission.title}</div>
-      </button>
-    `;
-    })
-    .join("");
+        const cardsHtml = entries
+          .map((entry, index) => {
+            const monster = entry.monster;
+            const mission = entry.mission;
+            const active = index === selectedQuestIndex;
+            const stars = mission.stars ?? 1;
 
-  const detailHtml = renderQuestDetail(
-    entries[selectedQuestIndex],
-    activeMission,
-  );
+            return `
+              <button
+                class="quest-card ${active ? "selected" : ""}"
+                data-action="select-quest"
+                data-key="${index}">
+                <div class="quest-card-top">
+                  <span class="quest-star">★${stars}</span>
+                </div>
+                <span class="quest-card-icon">${monster.icon}</span>
+                <div class="quest-card-name">${mission.title}</div>
+              </button>
+            `;
+          })
+          .join("");
 
-  return `
-    <div class="panel">
-      <h2>Quest Board</h2>
-      <p class="section-copy">Your current assignment is the core of the story. The rest of the board shifts as the region opens up.</p>
-      <div class="story-banner">
-        <div class="story-title">Story progress</div>
-        <div class="story-copy">Chapter ${story.chapter} · ${activeMission.title}</div>
-        <div class="story-copy">${activeMission.description}</div>
-      </div>
-      <div class="detail-layout">
-        <div class="detail-strip quest-grid">${cardsHtml}</div>
-        ${detailHtml}
-      </div>
-    </div>
-  `;
+        return `
+          <div class="story-banner">
+            <div class="story-title">Story progress</div>
+            <div class="story-copy">
+              Chapter ${story.chapter} · ${activeMission.title}
+            </div>
+            <div class="story-copy">
+              ${activeMission.description}
+            </div>
+          </div>
+
+          <div class="detail-layout">
+            <div class="detail-strip quest-grid">
+              ${cardsHtml}
+            </div>
+
+            ${renderQuestDetail(entries[selectedQuestIndex], activeMission)}
+          </div>
+        `;
+      },
+
+      onAction(body, action, key, event, overlay) {
+        if (action === "select-quest") {
+          selectedQuestIndex = Number(key);
+          overlay.refresh();
+        } else if (action === "start-expedition") {
+          // 1. Hide/unmount the overlay shell
+          overlay.hide();
+
+          // 2. Trigger the expedition scene
+          startExpedition(key);
+        }
+      },
+    },
+  ];
 }
 
 function formatReward(mission, monster) {
@@ -170,7 +193,9 @@ function renderQuestDetail(entry, activeMission) {
         <p class="section-copy">${requestText}</p>
       </div>
 
-      <button class="primary wide" onclick="startExpedition('${mission.key}')">${actionLabel}</button>
+      <button class="primary wide" data-action="start-expedition" data-key="${mission.key}">
+  ${actionLabel}
+</button>
     </div>
   `;
 }

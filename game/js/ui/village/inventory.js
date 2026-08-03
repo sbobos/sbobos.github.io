@@ -7,22 +7,8 @@ import {
 } from "../../data/gear.js";
 import { renderPaperdoll } from "../shared/equipmentloadout.js";
 import { renderVillage } from "../village.js";
-
-/* ---------- LOCAL UI STATE (ephemeral — not saved) ---------- */
-let activeInvTab = "weapons";
-let selectedKeys = {
-  weapons: null,
-  armor: null,
-  materials: null,
-  trophies: null,
-};
-
-const INV_TABS = [
-  { key: "weapons", label: "Weapons" },
-  { key: "armor", label: "Armor" },
-  { key: "materials", label: "Materials" },
-  { key: "trophies", label: "Trophies" },
-];
+import { iconStripDetail } from "../components/iconStripDetail.js";
+import { equipCustomWeapon } from "./weaponforge.js";
 
 /* ---------- ICON HELPERS (no icon data on items yet — type-based fallback) ---------- */
 function weaponIcon(damageType) {
@@ -84,251 +70,176 @@ function getArmorList() {
   });
 }
 
-/* ---------- ICON STRIP ---------- */
-function renderIconStrip(items, tab, selectedKey, iconFn) {
-  return `
-    <div class="detail-strip inv-icon-strip">
-      ${items
-        .map(
-          (it) => `
-        <div class="inv-icon-item ${it.key === selectedKey ? "selected" : ""} ${it.equipped ? "equipped" : ""}"
-             onclick="selectInventoryItem('${tab}', '${it.key}')">
-          <span class="inv-icon">${iconFn(it)}</span>
-          <span class="inv-icon-label">${it.name}</span>
-          ${it.equipped ? '<span class="inv-icon-badge">E</span>' : ""}
-        </div>
-      `,
-        )
-        .join("")}
-    </div>
-  `;
+function weaponItems() {
+  return getWeaponList().map((item) => ({
+    key: item.key,
+    icon: weaponIcon(item.damageType),
+    label: item.name,
+
+    ready: item.equipped,
+
+    tag: item.damageType,
+
+    desc:
+      `Attack: ${item.atk}` +
+      (item.element !== "none"
+        ? `\n${item.element} +${item.elementPower}`
+        : ""),
+
+    cost: item.equipped ? "Equipped" : "Stored",
+
+    actionLabel: item.equipped ? "Equipped" : "Equip",
+
+    disabled: item.equipped,
+
+    onAction() {
+      if (item.custom) {
+        equipCustomWeapon(item.key);
+      } else {
+        equipOwnedItem(item.key, true);
+      }
+
+      return true;
+    },
+  }));
 }
 
-/* ---------- DETAIL PANELS ---------- */
-function renderWeaponDetail(item) {
-  if (!item) return `<div class="inv-empty">Select a weapon.</div>`;
-  const equipAction = item.custom
-    ? `equipCustomWeapon('${item.key}')`
-    : `equipOwnedItem('${item.key}', true)`;
+const weaponTab = iconStripDetail({
+  items: weaponItems,
+});
 
-  return `
-    <div class="inv-detail-header">
-      <span class="inv-detail-icon">${weaponIcon(item.damageType)}</span>
-      <div>
-        <div class="inv-detail-title">${item.name}</div>
-        <div class="inv-detail-tag">${item.damageType}</div>
-      </div>
-    </div>
-    <div class="gear-stats">
-      <span class="stat-badge atk"><b>ATK</b> ${item.atk}</span>
-      ${item.element !== "none" ? `<span class="stat-badge elem"><b>${item.element.toUpperCase()}</b> +${item.elementPower}</span>` : ""}
-    </div>
-    <div class="shop-actions">
-      <span class="status-text">${item.equipped ? "Equipped" : "In Storage"}</span>
-      <button ${item.equipped ? "disabled" : ""} onclick="${equipAction}">
-        ${item.equipped ? "Ready" : "Equip"}
-      </button>
-    </div>
-  `;
+function armorItems() {
+  return getArmorList().map((item) => {
+    let desc = `Defense: ${item.def}`;
+
+    const resist = Object.entries(item.resist || {})
+      .filter(([, v]) => v > 0)
+      .map(([k, v]) => `${k} +${v}%`)
+      .join(" · ");
+
+    if (resist) {
+      desc += `\n${resist}`;
+    }
+
+    return {
+      key: item.key,
+      icon: armorIcon(item.slot),
+      label: item.name,
+
+      ready: item.equipped,
+
+      tag: item.slot,
+
+      desc,
+
+      cost: item.equipped ? "Equipped" : "Stored",
+
+      actionLabel: item.equipped ? "Equipped" : "Equip",
+
+      disabled: item.equipped,
+
+      onAction() {
+        equipOwnedItem(item.key, false);
+        return true;
+      },
+    };
+  });
 }
 
-function renderArmorDetail(item) {
-  if (!item) return `<div class="inv-empty">Select a piece of armor.</div>`;
-  const resists =
-    item.resist && (item.resist.fire || item.resist.ice)
-      ? Object.entries(item.resist)
-          .filter(([, v]) => v > 0)
-          .map(([k, v]) => `${k} +${v}%`)
-          .join(" · ")
-      : null;
+const armorTab = iconStripDetail({
+  items: armorItems,
+});
 
-  return `
-    <div class="inv-detail-header">
-      <span class="inv-detail-icon">${armorIcon(item.slot)}</span>
-      <div>
-        <div class="inv-detail-title">${item.name}</div>
-        <div class="inv-detail-tag slot">${item.slot}</div>
-      </div>
-    </div>
-    <div class="gear-stats">
-      <span class="stat-badge def"><b>DEF</b> ${item.def}</span>
-      ${resists ? `<span class="stat-badge resist">${resists}</span>` : ""}
-    </div>
-    <div class="shop-actions">
-      <span class="status-text">${item.equipped ? "Equipped" : "In Storage"}</span>
-      <button ${item.equipped ? "disabled" : ""} onclick="equipOwnedItem('${item.key}', false)">
-        ${item.equipped ? "Ready" : "Equip"}
-      </button>
-    </div>
-  `;
-}
-
-function renderMaterialDetail(entry) {
-  if (!entry) return `<div class="inv-empty">Select a material.</div>`;
-  const [name, count] = entry;
-  return `
-    <div class="inv-detail-header">
-      <span class="inv-detail-icon">📦</span>
-      <div>
-        <div class="inv-detail-title">${name}</div>
-        <div class="inv-detail-tag">Material</div>
-      </div>
-    </div>
-    <div class="gear-stats">
-      <span class="stat-badge"><b>Owned</b> ${count}</span>
-    </div>
-  `;
-}
-
-function renderTrophyDetail(entry) {
-  if (!entry) return `<div class="inv-empty">Select a trophy.</div>`;
-  const [name, count] = entry;
-  return `
-    <div class="inv-detail-header">
-      <span class="inv-detail-icon">🏆</span>
-      <div>
-        <div class="inv-detail-title">${name}</div>
-        <div class="inv-detail-tag">Trophy</div>
-      </div>
-    </div>
-    <div class="gear-stats">
-      <span class="stat-badge"><b>Owned</b> ${count}</span>
-    </div>
-  `;
-}
-
-/* ---------- TAB CONTENT ---------- */
-function renderTabContent() {
-  if (activeInvTab === "weapons") {
-    const items = getWeaponList();
-    if (!items.length)
-      return `<div class="inv-empty">No weapons unlocked yet.</div>`;
-    if (!items.find((i) => i.key === selectedKeys.weapons))
-      selectedKeys.weapons = items[0].key;
-    const selected = items.find((i) => i.key === selectedKeys.weapons);
-    return `
-      <div class="detail-layout">
-        ${renderIconStrip(items, "weapons", selectedKeys.weapons, (it) => weaponIcon(it.damageType))}
-        <div class="detail-sidebar">${renderWeaponDetail(selected)}</div>
-      </div>
-    `;
-  }
-
-  if (activeInvTab === "armor") {
-    const items = getArmorList();
-    if (!items.length)
-      return `<div class="inv-empty">No armor unlocked yet.</div>`;
-    if (!items.find((i) => i.key === selectedKeys.armor))
-      selectedKeys.armor = items[0].key;
-    const selected = items.find((i) => i.key === selectedKeys.armor);
-    return `
-      <div class="detail-layout">
-        ${renderIconStrip(items, "armor", selectedKeys.armor, (it) => armorIcon(it.slot))}
-        <div class="detail-sidebar">${renderArmorDetail(selected)}</div>
-      </div>
-    `;
-  }
-
-  if (activeInvTab === "materials") {
-    const entries = Object.entries(player.materials).filter(([, n]) => n > 0);
-    if (!entries.length)
-      return `<div class="inv-empty">No materials yet — every hunt adds more.</div>`;
-    if (!entries.find(([name]) => name === selectedKeys.materials))
-      selectedKeys.materials = entries[0][0];
-    const selected = entries.find(([name]) => name === selectedKeys.materials);
-    const items = entries.map(([name, count]) => ({
+function materialItems() {
+  return Object.entries(player.materials)
+    .filter(([, count]) => count > 0)
+    .map(([name, count]) => ({
       key: name,
-      name,
-      equipped: false,
-      count,
-    }));
-    return `
-      <div class="detail-layout">
-        ${renderIconStrip(items, "materials", selectedKeys.materials, () => "📦")}
-        <div class="detail-sidebar">${renderMaterialDetail(selected)}</div>
-      </div>
-    `;
-  }
+      icon: "📦",
+      label: name,
 
-  if (activeInvTab === "trophies") {
-    const entries = Object.entries(player.trophies);
-    if (!entries.length)
-      return `<div class="inv-empty">No trophies collected yet.</div>`;
-    if (!entries.find(([name]) => name === selectedKeys.trophies))
-      selectedKeys.trophies = entries[0][0];
-    const selected = entries.find(([name]) => name === selectedKeys.trophies);
-    const items = entries.map(([name, count]) => ({
+      ready: false,
+
+      tag: "Material",
+
+      desc: `Owned: ${count}`,
+
+      cost: "",
+
+      actionLabel: "",
+
+      disabled: true,
+
+      onAction() {
+        return false;
+      },
+    }));
+}
+
+const materialTab = iconStripDetail({
+  items: materialItems,
+});
+
+function trophyItems() {
+  return Object.entries(player.trophies)
+    .filter(([, count]) => count > 0)
+    .map(([name, count]) => ({
       key: name,
-      name,
-      equipped: false,
-      count,
+      icon: "🏆",
+      label: name,
+
+      ready: false,
+
+      tag: "Trophy",
+
+      desc: `Owned: ${count}`,
+
+      cost: "",
+
+      actionLabel: "",
+
+      disabled: true,
+
+      onAction() {
+        return false;
+      },
     }));
-    return `
-      <div class="detail-layout">
-        ${renderIconStrip(items, "trophies", selectedKeys.trophies, () => "🏆")}
-        <div class="detail-sidebar">${renderTrophyDetail(selected)}</div>
-      </div>
-    `;
-  }
-
-  return "";
 }
 
-/* ---------- TAB BAR ---------- */
-function renderTabBar() {
-  return `
-    <div class="inv-tab-bar">
-      ${INV_TABS.map(
-        (t) => `
-        <button class="inv-tab ${activeInvTab === t.key ? "active" : ""}" onclick="selectInventoryTab('${t.key}')">
-          ${t.label}
-        </button>
-      `,
-      ).join("")}
-    </div>
-  `;
-}
+const trophyTab = iconStripDetail({
+  items: trophyItems,
+});
 
-/* ---------- TAB ENTRY POINT ---------- */
-export function renderInventoryTab() {
-  return `
-    <div class="panel">
-      <h2>Inventory</h2>
-      <p class="section-copy">Track your gear, resources, and the trophies that mark your path across the wilds.</p>
+export function buildInventoryTabs() {
+  return [
+    {
+      key: "weapons",
+      label: "Weapons",
+      render: weaponTab.render,
+      onAction: weaponTab.onAction,
+    },
 
-      <div class="inventory-summary-grid">
-        <div class="card summary-card compact">
-          <div class="summary-label">Vitals & Supplies</div>
-          <div class="vital-row">
-            <span class="vital-badge hp">HP <b>${player.hp}/${player.maxHp}</b></span>
-            <span class="vital-badge stamina">STAM <b>${player.stamina}/${player.maxStamina}</b></span>
-            <span class="vital-badge potion">🧪 Potions <b>${player.potions}</b></span>
-          </div>
-        </div>
+    {
+      key: "armor",
+      label: "Armor",
+      render: armorTab.render,
+      onAction: armorTab.onAction,
+    },
 
-        <div class="card summary-card wide-card">
-          <div class="summary-label">Equipment Loadout</div>
-          ${renderPaperdoll()}
-        </div>
-      </div>
-    </div>
+    {
+      key: "materials",
+      label: "Materials",
+      render: materialTab.render,
+      onAction: materialTab.render,
+    },
 
-    <div class="panel">
-      ${renderTabBar()}
-      ${renderTabContent()}
-    </div>
-  `;
-}
-
-/* ---------- UI HANDLERS (need window bindings in main.js) ---------- */
-export function selectInventoryTab(tab) {
-  activeInvTab = tab;
-  renderVillage();
-}
-
-export function selectInventoryItem(tab, key) {
-  selectedKeys[tab] = key;
-  renderVillage();
+    {
+      key: "trophies",
+      label: "Trophies",
+      render: trophyTab.render,
+      onAction: trophyTab.onAction,
+    },
+  ];
 }
 
 export function equipOwnedItem(key, isWeapon) {

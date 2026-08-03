@@ -50,8 +50,26 @@
 
       <!-- Main Game Canvas / Viewport Area -->
       <div class="game-viewport">
-        <section id="village-screen"></section>
-        <section id="hunt-screen" class="hidden"></section>
+        <div id="world">
+          <section id="village-screen"></section>
+          <section id="hunt-screen" class="hidden"></section>
+        </div>
+
+        <div id="overlay-layer">
+          <div class="panel-shell">
+            <div class="panel-header">
+              <h2></h2>
+
+              <button class="panel-close">✕</button>
+            </div>
+
+            <div class="panel-tabbar"></div>
+
+            <div class="panel-body"></div>
+          </div>
+        </div>
+
+        <div id="wipe"></div>
       </div>
 
       <footer class="hud-footer">

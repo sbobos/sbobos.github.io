@@ -115,7 +115,6 @@ export function endHunt(result) {
 
     for (let i = 0; i < 3; i++) {
       const pick = rollLoot(carveTable);
-
       loot[pick] = (loot[pick] || 0) + 1;
     }
     const goldcoinGain = randInt(
@@ -126,8 +125,8 @@ export function endHunt(result) {
     player.goldcoin += goldcoinGain;
 
     rewardsHtml = `
-      <h3>Hunt successful</h3>
-      <p style="font-size:13px;color:var(--text-dim);">The ${hunt.monster.name} has been felled. You carve what you can before it's claimed by the terrain.</p>
+      <h2 class="overlay-title victory">HUNT SUCCESSFUL</h2>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">The ${hunt.monster.name} has been felled. You carve what you can before it's claimed by the terrain.</p>
       <div class="loot-grid">
         ${Object.entries(loot)
           .map(
@@ -140,32 +139,19 @@ export function endHunt(result) {
     `;
   } else if (result === "defeat") {
     rewardsHtml = `
-      <h3>You were carried back to camp</h3>
-      <p style="font-size:13px;color:var(--text-dim);">The ${hunt.monster.name} proved too much this time. No materials recovered — rest up and try again.</p>
+      <h2 class="overlay-title defeat">HUNT FAILED</h2>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">The ${hunt.monster.name} proved too much this time. No materials recovered — rest up and try again.</p>
     `;
   } else {
     rewardsHtml = `
-      <h3>You withdrew from the hunt</h3>
-      <p style="font-size:13px;color:var(--text-dim);">Sometimes the wiser hunter lives to track another day.</p>
+      <h2 class="overlay-title">HUNT WITHDRAWN</h2>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:12px;">Sometimes the wiser hunter lives to track another day.</p>
     `;
   }
 
-  const h = document.getElementById("hunt-screen");
+  // Save html onto state so renderHunt can render it cleanly as a modal
+  hunt.rewardsHtml = rewardsHtml;
 
-  // Softlock fix: the reward overlay used to just be appended on top of a
-  // still-live combat screen, so a mis-timed click could land on a move
-  // button underneath instead of the overlay's Continue button. Disabling
-  // every button in the combat panel before injecting the overlay makes
-  // the overlay's Continue the only thing that responds to clicks.
-  const panel = h.querySelector(".panel");
-  if (panel) {
-    panel.querySelectorAll("button").forEach((btn) => (btn.disabled = true));
-  }
-
-  h.insertAdjacentHTML(
-    "beforeend",
-    `<div class="overlay">${rewardsHtml}<button class="primary" style="margin-top:10px;" onclick="continueExpedition()">Continue</button></div>`,
-  );
-
-  h.scrollIntoView({ behavior: "smooth", block: "start" });
+  // Re-render UI immediately so buttons lock and popup appears instantly!
+  renderHunt();
 }

@@ -521,20 +521,37 @@
 
 .detail-layout {
   display: flex;
-  gap: 14px;
-  align-items: flex-start;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 16px;
+  gap: 16px;
+  overflow: hidden;
 }
 
-.detail-strip {
-  flex: 1 1 auto;
+.detail-strip,
+.inv-icon-strip,
+.icon-strip {
+  flex: 1; /* Takes up ALL remaining space left over by the 280px sidebar */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-content: flex-start;
+  overflow-y: auto; /* Scroll items vertically if they overflow */
+  padding-right: 8px;
 }
 
 .detail-sidebar {
-  flex: 0 0 280px;
-  background: var(--panel-alt);
+  width: 280px;
+  flex: 0 0 280px; /* Locked width: never shrink, never grow */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 0, 0, 0.3);
   border: 1px solid var(--border);
-  border-radius: 4px;
   padding: 16px;
+  box-sizing: border-box;
+  overflow-y: auto;
 }
 
 @media (max-width: 700px) {
@@ -597,8 +614,8 @@
 
 .inv-icon-item {
   position: relative;
-  width: 84px;
-  min-height: 68px;
+  flex: 0 0 56px;
+  height: 56px;
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 3px;
@@ -645,18 +662,12 @@
   background: var(--moss);
 }
 
+/* Ensure icon span doesn't add extra inline margins */
 .inv-icon {
-  font-size: 20px;
-  line-height: 1;
-}
-
-.inv-icon-label {
-  font-size: 10px;
-  color: var(--text-dim);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;          /* Removes line-height spacing issues */
 }
 
 .inv-icon-item.selected .inv-icon-label {
