@@ -55,9 +55,18 @@ export function getQuestBoardEntries() {
   const sidePool = MISSIONS.filter(
     (m) => m.category === "side" && m.unlockChapter <= story.chapter,
   );
-  const shuffled = [...sidePool].sort(() => Math.random() - 0.5);
 
-  for (const mission of shuffled.slice(0, 2)) {
+  // Fisher-Yates Shuffle for a true random shuffle
+  const shuffled = [...sidePool];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  // Calculate half the pool size
+  const count = Math.floor(shuffled.length / 2);
+
+  for (const mission of shuffled.slice(0, count)) {
     registerMission(mission);
 
     entries.push({

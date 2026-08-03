@@ -3,16 +3,14 @@ import { isPartBroken } from "./parts.js";
 import { logMsg } from "./log.js";
 import { getArmorStats } from "../utils.js";
 
-/* ---------- RESOLVING THE MONSTER'S TELEGRAPHED MOVE ---------- */
-
-export function resolvePendingMove(actionType, payload) {
+export function resolvePendingMove(actionType, payload = {}) {
   const move = hunt.pendingMove;
   const m = hunt.monster;
 
   if (isPartBroken(m, "head") && Math.random() < 0.15) {
     logMsg(
       "Dazed from its wound, the attack fizzles before it lands!",
-      "l-good",
+      "l-good"
     );
     hunt.pendingMove = null;
     hunt.sandstormActive = false;
@@ -21,12 +19,21 @@ export function resolvePendingMove(actionType, payload) {
 
   let outcome;
   if (actionType === "dodge") {
-    outcome =
-      payload.dir === move.dodgeType
-        ? hunt.sandstormActive
-          ? "partial"
-          : "perfect"
-        : "partial";
+    const correctDir = payload.dir === move.dodgeType;
+    const timing = payload.timingQuality || "PERFECT"; // Passed from timing check
+
+    if (correctDir && timing === "PERFECT") {
+      outcome = hunt.sandstormActive ? "partial" : "perfect";
+    } else if (correctDir && timing === "EARLY") {
+      outcome = "partial";
+      logMsg("You dodged early! The blow glances off you.", "l-sys");
+    } else if (!correctDir) {
+      outcome = "full";
+      logMsg(`Wrong direction! (Expected ${move.dodgeType.toUpperCase()})`, "l-dmg");
+    } else {
+      outcome = "full";
+      logMsg("Mistimed dodge!", "l-dmg");
+    }
   } else if (actionType === "guard") {
     switch (move.guardResult) {
       case "block":
@@ -36,21 +43,14 @@ export function resolvePendingMove(actionType, payload) {
       case "stagger":
         player.staggered = true;
         if (move.staminaBreak) player.stamina = 0;
-
         logMsg("Your guard is shattered by the impact!", "l-dmg");
-
         outcome = "guardFail";
         break;
 
       case "pierce":
-        if (move.staminaBreak) player.stamina = 0;
-        logMsg("The attack pierces straight through your guard!", "l-dmg");
-
-        outcome = "full";
-        break;
-
       case "ignore":
         if (move.staminaBreak) player.stamina = 0;
+        logMsg("The attack pierces straight through your guard!", "l-dmg");
         outcome = "full";
         break;
 
@@ -79,30 +79,33 @@ export function resolvePendingMove(actionType, payload) {
   } else {
     let dmg = Math.round(
       move.baseDamage *
-        (m.enraged ? 1.25 : 1) *
-        (isPartBroken(m, "tail") ? 0.9 : 1) *
-        (m.damageMult ?? 1) *
-        dmgMult,
+      (m.enraged ? 1.25 : 1) *
+      (isPartBroken(m, "tail") ? 0.9 : 1) *
+      (m.damageMult ?? 1) *
+      dmgMult
     );
+
     if (move.element !== "none") {
       const armorStats = getArmorStats();
       const resist = armorStats.resist[move.element] || 0;
       dmg = Math.round(dmg * (1 - resist / 100));
     }
+
     if (dmg > 0) {
       const armorStats = getArmorStats();
       dmg = Math.max(1, dmg - Math.round(armorStats.def * 0.5));
       player.hp = Math.max(0, player.hp - dmg);
     }
+
     if (outcome === "perfect")
       logMsg(
         `${move.resolveText} You read it perfectly and dodge clean.`,
-        "l-good",
+        "l-good"
       );
     else if (outcome === "guardFail")
       logMsg(
         `${move.resolveText} Your guard does nothing against this — you take ${dmg} damage.`,
-        "l-dmg",
+        "l-dmg"
       );
     else if (dmg > 0)
       logMsg(`${move.resolveText} You take ${dmg} damage.`, "l-dmg");

@@ -38,13 +38,45 @@ function getArenaTheme(arenaKey, arenaName = "") {
     };
   }
 
-  // Default fallback (uses theme object from arena data if available, or border dim)
   return {
     accent: "var(--gold)",
     from: "var(--gold-glow)",
     to: "var(--panel-alt)",
     border: "var(--border)",
   };
+}
+
+/* ---------- HELPER: TELEGRAPH BANNER WITH TIMING BAR ---------- */
+function renderTelegraphBanner(move) {
+  let guardTag = "";
+  if (move.guardResult === "pierce" || move.guardResult === "ignore") {
+    guardTag = `<span class="badge danger" style="color:var(--blood); border:1px solid var(--blood); padding:1px 4px; font-size:9px; border-radius:3px;">UNBLOCKABLE</span>`;
+  } else if (move.guardResult === "stagger") {
+    guardTag = `<span class="badge warning" style="color:var(--gold); border:1px solid var(--gold); padding:1px 4px; font-size:9px; border-radius:3px;">GUARD BREAKER</span>`;
+  } else {
+    guardTag = `<span class="badge info" style="color:var(--moss); border:1px solid var(--moss); padding:1px 4px; font-size:9px; border-radius:3px;">BLOCKABLE</span>`;
+  }
+
+  return `
+    <div class="telegraph-banner">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+        <span class="tt-label">${move.name}</span>
+        ${guardTag}
+      </div>
+      <div>${move.telegraph}</div>
+
+      <!-- ACTIVE TIMING BAR -->
+      <div class="timing-bar-container" style="margin: 8px 0 4px 0; background: rgba(0,0,0,0.6); height: 10px; border-radius: 5px; position: relative; overflow: hidden; border: 1px solid var(--border);">
+        <div id="timing-target-zone" style="position: absolute; left: 55%; width: 30%; height: 100%; background: rgba(122, 154, 110, 0.5); border-left: 2px solid var(--moss); border-right: 2px solid var(--moss);"></div>
+        <div id="timing-progress-bar" style="width: 0%; height: 100%; background: var(--gold);"></div>
+      </div>
+
+      <div style="margin-top:2px; display:flex; justify-content:space-between; align-items:center;">
+        
+        <span style="font-size:9px; color:var(--text-dim);">TIMING IS KEY!</span>
+      </div>
+    </div>
+  `;
 }
 
 /* ---------- HUNT SCREEN RENDER ---------- */
@@ -59,11 +91,9 @@ export function renderHunt() {
   const rank = hunt.rank;
   const weapon = currentWeapon();
   const arena = ARENAS[m.arenaKey];
-  const hazard = HAZARDS[arena.hazard];
+  const hazard = arena?.hazard ? HAZARDS[arena.hazard] : null;
 
-  // Pull theme directly from your ARENAS object (fallback to dark neutral if undefined)
-  const theme = arena?.theme ?? { from: "#20201c", to: "var(--panel-alt)" };
-
+  const theme = arena?.theme ?? getArenaTheme(m.arenaKey, arena?.name);
   const moveset = movesetFor(weapon);
 
   if (
@@ -111,18 +141,12 @@ export function renderHunt() {
     `;
 
   const telegraphHtml = hunt.pendingMove
-    ? `
-    <div class="telegraph-banner">
-      <span class="tt-label">Incoming — ${hunt.pendingMove.blockable ? "blockable" : "must dodge"}</span>
-      ${hunt.pendingMove.telegraph}
-      <div style="margin-top:4px; color:var(--frost); font-size:10px;">React: ${hunt.pendingMove.blockable ? "guard or dodge" : "dodge only"}.</div>
-    </div>
-  `
+    ? renderTelegraphBanner(hunt.pendingMove)
     : hunt.recoveryWindow
       ? `
     <div class="telegraph-banner" style="border-color:var(--moss-dim); color:var(--moss);">
-      <span class="tt-label">Tempo opening</span>
-      The monster is recovering. Press an attack!
+      <span class="tt-label">Tempo Opening</span>
+      The monster is exhausted and recovering. Take your time to plan an attack!
     </div>
   `
       : `
@@ -137,7 +161,7 @@ export function renderHunt() {
     const { every, warnText } = hazard;
     if (hunt.sandstormActive) {
       hazardHint = `<span class="hazard-note" style="color:var(--blood);">Sandstorm Active</span>`;
-    } else if (hunt.turnCount > 0 && hunt.turnCount % every === every - 1) {
+    } else if (every && warnText && hunt.turnCount > 0 && hunt.turnCount % every === every - 1) {
       hazardHint = `<span class="hazard-note" style="color:var(--gold);">${warnText}</span>`;
     }
   }
@@ -162,7 +186,6 @@ export function renderHunt() {
       
       <!-- LEFT COLUMN -->
       <div class="hunt-col-left">
-        <!-- ARENA SCENE PANEL WITH INJECTED GRADIENT VARIABLES -->
         <div class="arena-scene arena-card hunt-panel" style="--scene-from:${theme.from}; --scene-to:${theme.to};">
           <div class="arena-tag">${rank.toUpperCase()} • ${arena.name}</div>
           <div class="monster-head">
@@ -174,6 +197,11 @@ export function renderHunt() {
           </div>
           <div class="barlabel"><span>Monster Vitality</span><span>${m.hp} / ${m.maxHp}</span></div>
           <div class="barwrap"><div class="barfill hp" style="width:${pct(m.hp, m.maxHp)}%"></div></div>
+          
+          <!-- MONSTER STAMINA BAR -->
+          <div class="barlabel" style="margin-top:4px;"><span>Monster Stamina</span><span>${m.stamina ?? 100} / ${m.maxStamina ?? 100}</span></div>
+          <div class="barwrap mini"><div class="barfill stam" style="width:${pct(m.stamina ?? 100, m.maxStamina ?? 100)}%"></div></div>
+
           ${telegraphHtml}
         </div>
 
@@ -199,7 +227,7 @@ export function renderHunt() {
           <div class="action-group-label">Tactical Actions</div>
           <div class="actions util-grid">
             <button ${actionsDisabled} onclick="playerAction('guard')">Guard</button>
-            <button ${actionsDisabled} onclick="playerAction('item')" ${player.potions <= 0 || hunt.pendingMove || hunt.over ? "disabled" : ""}>Potion (${player.potions})</button>
+            <button ${actionsDisabled} onclick="playerAction('item')" ${player.potions <= 0 || hunt.over ? "disabled" : ""}>Potion (${player.potions})</button>
             <button ${actionsDisabled} onclick="playerAction('flee')">Flee</button>
           </div>
         </div>

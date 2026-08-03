@@ -522,11 +522,11 @@
 .detail-layout {
   display: flex;
   width: 100%;
-  height: 100%;
+  height: 400px;
   box-sizing: border-box;
   padding: 16px;
   gap: 16px;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .detail-strip,

@@ -1,5 +1,4 @@
 import { hunt, player } from "../state.js";
-
 import { doPlayerAttack } from "./combat/attack.js";
 import {
   currentWeapon,
@@ -8,16 +7,27 @@ import {
   triggerDamageFlash,
   delay,
 } from "../utils.js";
-
 import { logMsg } from "./log.js";
 import { resolvePendingMove } from "./resolve.js";
-import { monsterTelegraphPhase } from "./telegraph.js";
+import {
+  monsterTelegraphPhase,
+  startDodgeTiming,
+  stopDodgeTiming,
+  getAndStopTiming,
+  setTimingTimeoutCallback,
+} from "./telegraph.js";
 import { endHunt } from "./setup.js";
-
 import { renderHunt } from "../ui/hunt.js";
 
-// Input lock to prevent rapid spamming while turn sequence plays out
 let isBusy = false;
+
+// Register auto-miss when the timing bar runs out
+setTimingTimeoutCallback(() => {
+  if (hunt.pendingMove && !isBusy) {
+    logMsg("You failed to react in time!", "l-dmg");
+    playerAction("timeout_miss");
+  }
+});
 
 export async function playerAction(actionType, payload = {}) {
   if (hunt.over || isBusy) {
@@ -28,6 +38,7 @@ export async function playerAction(actionType, payload = {}) {
 
   try {
     if (player.staggered) {
+      stopDodgeTiming();
       await handleStagger();
       return;
     }
@@ -35,6 +46,7 @@ export async function playerAction(actionType, payload = {}) {
     hunt.playerGuardedThisRound = actionType === "guard";
 
     if (actionType === "flee") {
+      stopDodgeTiming();
       await handleFlee();
       return;
     }
@@ -42,17 +54,22 @@ export async function playerAction(actionType, payload = {}) {
     if (hunt.pendingMove) {
       const handled = await handleReaction(actionType, payload);
       if (handled) {
+        if (combatFinished()) return;
+
+        recoverStamina(10);
+        await nextMonsterTurn();
         return;
       }
     }
 
+    // Direct action during recovery window / player turn
     await performAction(actionType, payload);
 
-    // Stop execution completely if player action ended the hunt (e.g. killed monster)
     if (combatFinished()) {
       return;
     }
 
+    recoverStamina(10);
     await nextMonsterTurn();
   } finally {
     isBusy = false;
@@ -77,22 +94,32 @@ async function handleStagger() {
 }
 
 async function handleReaction(actionType, payload) {
+  // If player timed out
+  if (actionType === "timeout_miss") {
+    payload.timingQuality = "MISSED";
+    payload.dir = "none";
+    resolvePendingMove("dodge", payload);
+
+    playSound("player_hurt");
+    triggerShake();
+    triggerDamageFlash();
+
+    renderHunt();
+    return true;
+  }
+
   if (actionType === "attack") {
+    stopDodgeTiming();
     logMsg(
       "You commit to the attack, trading blows as the monster's strike lands!",
-      "l-sys",
+      "l-sys"
     );
 
     doPlayerAttack(payload.partKey, payload.moveKey);
 
-    // If attack killed the monster, render log/end and exit
-    if (combatFinished()) {
-      return true;
-    }
+    if (combatFinished()) return true;
 
     renderHunt();
-
-    // Pacing pause before monster strike connects
     await delay(500);
 
     const hpBefore = player.hp;
@@ -104,24 +131,34 @@ async function handleReaction(actionType, payload) {
       triggerDamageFlash();
     }
 
-    if (combatFinished()) {
-      return true;
-    }
+    if (combatFinished()) return true;
 
     hunt.recoveryWindow = true;
     renderHunt();
-
     return true;
   }
 
-  if (actionType !== "guard" && actionType !== "dodge") {
-    logMsg(
-      "The monster is already committing to its attack — react now!",
-      "l-sys",
-    );
-
+  if (actionType !== "guard" && actionType !== "dodge" && actionType !== "item") {
+    logMsg("The monster is already committing to its attack — react now!", "l-sys");
     renderHunt();
     return true;
+  }
+
+  // --- CAPTURE TIMING AT THE MOMENT OF CLICK ---
+  if (actionType === "dodge") {
+    const timingQuality = getAndStopTiming();
+    payload.timingQuality = timingQuality;
+  } else {
+    stopDodgeTiming();
+  }
+
+  if (actionType === "item") {
+    usePotion();
+  }
+
+  if (actionType === "guard") {
+    const weapon = currentWeapon();
+    recoverStamina(Math.round(15 * (weapon.guardStaminaMult ?? 1)));
   }
 
   const hpBefore = player.hp;
@@ -133,9 +170,7 @@ async function handleReaction(actionType, payload) {
     triggerDamageFlash();
   }
 
-  if (combatFinished()) {
-    return true;
-  }
+  if (combatFinished()) return true;
 
   renderHunt();
   return true;
@@ -146,15 +181,12 @@ async function performAction(actionType, payload) {
     case "attack":
       attack(payload.partKey, payload.moveKey);
       break;
-
     case "guard":
       guard();
       break;
-
     case "dodge":
       dodge();
       break;
-
     case "item":
       usePotion();
       break;
@@ -164,22 +196,13 @@ async function performAction(actionType, payload) {
 function attack(partKey, moveKey) {
   doPlayerAttack(partKey, moveKey);
 
-  if (combatFinished()) {
-    return;
-  }
+  if (combatFinished()) return;
 
   if (!hunt.recoveryWindow) {
     hunt.recoveryWindow = true;
-
-    logMsg(
-      "The monster recoils from the hit, giving you a brief opening.",
-      "l-good",
-    );
+    logMsg("The monster recoils, giving you a brief opening.", "l-good");
   } else {
-    logMsg(
-      "You keep the pressure on while the monster is still off-balance.",
-      "l-good",
-    );
+    logMsg("You keep the pressure on while the monster is off-balance.", "l-good");
   }
 
   renderHunt();
@@ -187,9 +210,7 @@ function attack(partKey, moveKey) {
 
 function guard() {
   const weapon = currentWeapon();
-
   recoverStamina(Math.round(20 * (weapon.guardStaminaMult ?? 1)));
-
   if (!hunt.pendingMove) {
     logMsg("You settle into a ready stance, catching your breath.", "l-sys");
   }
@@ -197,12 +218,8 @@ function guard() {
 }
 
 function dodge() {
-  if (hunt.pendingMoveWasJustResolved) {
-    return;
-  }
-
+  if (hunt.pendingMoveWasJustResolved) return;
   recoverStamina(10);
-
   logMsg("You reposition, staying light on your feet.", "l-sys");
   renderHunt();
 }
@@ -213,10 +230,8 @@ function usePotion() {
     renderHunt();
     return;
   }
-
   player.potions--;
   player.hp = Math.min(player.maxHp, player.hp + 40);
-
   logMsg("You down a potion, recovering 40 HP.", "l-sys");
   renderHunt();
 }
@@ -226,9 +241,9 @@ function recoverStamina(amount) {
 }
 
 async function handleFlee() {
+  stopDodgeTiming();
   if (Math.random() < 0.75) {
     logMsg("You break away and retreat from the hunting grounds.", "l-sys");
-
     hunt.pendingMove = null;
     endHunt("flee");
     return;
@@ -239,7 +254,6 @@ async function handleFlee() {
 
   if (hunt.pendingMove) {
     await delay(500);
-
     const hpBefore = player.hp;
     resolvePendingMove("flee_fail", {});
 
@@ -249,10 +263,7 @@ async function handleFlee() {
       triggerDamageFlash();
     }
 
-    if (combatFinished()) {
-      return;
-    }
-
+    if (combatFinished()) return;
     renderHunt();
   }
 
@@ -262,35 +273,38 @@ async function handleFlee() {
 async function nextMonsterTurn() {
   if (combatFinished()) return;
 
-  // Pacing pause (500ms) before monster telegraphs its next move
-  await delay(500);
-
+  await delay(400);
   if (combatFinished()) return;
 
   hunt.pendingMoveWasJustResolved = false;
-  hunt.recoveryWindow = false;
-
   monsterTelegraphPhase();
 
   renderHunt();
-
   hunt.playerGuardedThisRound = false;
+
+  // 👇 START TIMING BAR INSTANTLY IF MONSTER IS ATTACKING 👇
+  if (hunt.pendingMove) {
+    await delay(50); // Small DOM paint delay
+    const speed = hunt.pendingMove.speedMs || 1500;
+    startDodgeTiming(speed);
+  }
 }
 
 function combatFinished() {
   if (hunt.over) {
+    stopDodgeTiming();
     return true;
   }
 
-  // 1. Monster Defeated (Victory)
   if (hunt.monster.hp <= 0) {
+    stopDodgeTiming();
     logMsg(`THE ${hunt.monster.name.toUpperCase()} COLLAPSES. THE HUNT IS OVER.`, "l-break");
     endHunt("victory");
     return true;
   }
 
-  // 2. Player Defeated (Defeat)
   if (player.hp <= 0) {
+    stopDodgeTiming();
     playSound("player_hurt");
     triggerShake();
     triggerDamageFlash();
