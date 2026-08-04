@@ -13,14 +13,13 @@ export function resolvePendingMove(actionType, payload = {}) {
       "l-good"
     );
     hunt.pendingMove = null;
-    hunt.sandstormActive = false;
     return;
   }
 
   let outcome;
   if (actionType === "dodge") {
     const correctDir = payload.dir === move.dodgeType;
-    const timing = payload.timingQuality || "PERFECT"; // Passed from timing check
+    const timing = payload.timingQuality || "PERFECT";
 
     if (correctDir && timing === "PERFECT") {
       outcome = hunt.sandstormActive ? "partial" : "perfect";
@@ -29,7 +28,7 @@ export function resolvePendingMove(actionType, payload = {}) {
       logMsg("You dodged early! The blow glances off you.", "l-sys");
     } else if (!correctDir) {
       outcome = "full";
-      logMsg(`Wrong direction! (Expected ${move.dodgeType.toUpperCase()})`, "l-dmg");
+      logMsg("You dodged the wrong way!", "l-dmg");
     } else {
       outcome = "full";
       logMsg("Mistimed dodge!", "l-dmg");
@@ -57,6 +56,9 @@ export function resolvePendingMove(actionType, payload = {}) {
       default:
         outcome = "blocked";
     }
+  } else if (actionType === "attack") {
+    // 💥 OFFSET MECHANIC: Perfect timing gives 65% damage reduction!
+    outcome = payload.timingQuality === "PERFECT" ? "offset" : "full";
   } else {
     outcome = "full";
   }
@@ -65,6 +67,7 @@ export function resolvePendingMove(actionType, payload = {}) {
     perfect: 0,
     partial: 0.5,
     blocked: 0.35,
+    offset: 0.35, // Reduced damage taken when successfully offsetting the monster!
     guardFail: 1,
     full: 1,
   }[outcome];
@@ -100,6 +103,11 @@ export function resolvePendingMove(actionType, payload = {}) {
     if (outcome === "perfect")
       logMsg(
         `${move.resolveText} You read it perfectly and dodge clean.`,
+        "l-good"
+      );
+    else if (outcome === "offset")
+      logMsg(
+        `Your counter-strike partially deflects the incoming blow! You take ${dmg} damage.`,
         "l-good"
       );
     else if (outcome === "guardFail")

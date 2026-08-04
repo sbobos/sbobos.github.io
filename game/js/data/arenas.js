@@ -7,14 +7,14 @@ export const ARENAS = {
     desc: "Wind-carved dunes stretch to the horizon.",
 
     theme: {
-      from: "#3a2c14", // deep sand-shadow
-      to: "#7a5a2a", // warm dune gold
+      accent: "#7a5a2a",
+      from: "#3a2c14",
+      to: "#7a5a2a",
+      border: "rgba(122, 90, 42, 0.5)",
     },
 
     hazard: {
       key: "sandstorm",
-
-      every: 3,
 
       warnText: "The wind begins picking up.",
 
@@ -45,14 +45,14 @@ export const ARENAS = {
     desc: "A frozen ravine covered in ancient ice.",
 
     theme: {
-      from: "#0f2a30", // deep ice-shadow
-      to: "#3a6a78", // pale frost blue
+      accent: "#3a6a78",
+      from: "#0f2a30",
+      to: "#3a6a78",
+      border: "rgba(111, 155, 176, 0.5)",
     },
 
     hazard: {
       key: "icefall",
-
-      every: 4,
 
       warnText: "The ice ceiling begins to crack.",
 
@@ -73,3 +73,24 @@ export const ARENAS = {
     },
   },
 };
+
+export function getArenaTheme(arenaKey, arenaName = "") {
+  const search = (arenaKey || arenaName).toLowerCase();
+
+  // Find arena by matching key or checking if name includes search string
+  const arena = ARENAS[search] || Object.values(ARENAS).find(
+    (a) => a.key.toLowerCase() === search || a.name.toLowerCase().includes(search)
+  );
+
+  if (arena?.theme) {
+    return arena.theme;
+  }
+
+  // Default fallback
+  return {
+    accent: "var(--gold)",
+    from: "var(--gold-glow)",
+    to: "var(--panel-alt)",
+    border: "var(--border)",
+  };
+}

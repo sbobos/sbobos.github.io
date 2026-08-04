@@ -1,48 +1,19 @@
 import { hunt, player } from "../state.js";
 import { currentWeapon, getArmorStats, pct } from "../utils.js";
-import { ARENAS } from "../data/arenas.js";
+import { ARENAS, getArenaTheme } from "../data/arenas.js";
 import { hitzoneHints } from "../hunt/parts.js";
 import { renderLog } from "../hunt/log.js";
 import { renderTopbar } from "./topbar.js";
 import { HAZARDS } from "../hunt/combat/hazards.js";
 import { movesetFor } from "../data/playermoves.js";
 
-/* ---------- HELPER: DYNAMIC ARENA THEMING ---------- */
-function getArenaTheme(arenaKey, arenaName = "") {
-  const key = (arenaKey || arenaName).toLowerCase();
-
-  if (key.includes("tundra") || key.includes("frost") || key.includes("snow")) {
-    return {
-      accent: "var(--frost)",
-      from: "rgba(111, 155, 176, 0.25)",
-      to: "var(--panel-alt)",
-      border: "rgba(111, 155, 176, 0.5)",
-    };
-  }
-
-  if (key.includes("dune") || key.includes("desert") || key.includes("sand")) {
-    return {
-      accent: "var(--gold-dim)",
-      from: "rgba(153, 117, 43, 0.25)",
-      to: "var(--panel-alt)",
-      border: "var(--gold-dim)",
-    };
-  }
-
-  if (key.includes("forest") || key.includes("woods") || key.includes("swamp")) {
-    return {
-      accent: "var(--moss)",
-      from: "rgba(122, 154, 110, 0.25)",
-      to: "var(--panel-alt)",
-      border: "var(--moss-dim)",
-    };
-  }
-
+// Helper to structure the theme consistently
+function buildThemeObject(themeData) {
   return {
-    accent: "var(--gold)",
-    from: "var(--gold-glow)",
-    to: "var(--panel-alt)",
-    border: "var(--border)",
+    accent: themeData.to,          // Uses theme's highlight color
+    from: themeData.from,          // Direct color from ARENAS
+    to: themeData.to || "var(--panel-alt)",
+    border: themeData.from,        // Or generate border dynamically
   };
 }
 

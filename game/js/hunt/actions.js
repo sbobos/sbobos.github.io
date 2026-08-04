@@ -94,7 +94,6 @@ async function handleStagger() {
 }
 
 async function handleReaction(actionType, payload) {
-  // If player timed out
   if (actionType === "timeout_miss") {
     payload.timingQuality = "MISSED";
     payload.dir = "none";
@@ -108,19 +107,36 @@ async function handleReaction(actionType, payload) {
     return true;
   }
 
+  // --- ATTACK / COUNTER OFFSET LOGIC ---
   if (actionType === "attack") {
-    stopDodgeTiming();
-    logMsg(
-      "You commit to the attack, trading blows as the monster's strike lands!",
-      "l-sys"
-    );
+    // Capture the timing quality specifically for the Attack offset window
+    const timingQuality = getAndStopTiming("attack");
+    payload.timingQuality = timingQuality;
+
+    if (timingQuality === "PERFECT") {
+      logMsg(
+        "CRITICAL OFFSET ATTACK! You completely break the monster's assault and drain its stamina!",
+        "l-good"
+      );
+      playSound("part_break");
+
+      // Wipe ALL Monster Stamina at once!
+      if (hunt.monster) {
+        hunt.monster.stamina = 0;
+      }
+    } else {
+      logMsg(
+        "You commit to the attack, trading blows as the monster's strike lands!",
+        "l-sys"
+      );
+    }
 
     doPlayerAttack(payload.partKey, payload.moveKey);
 
     if (combatFinished()) return true;
 
     renderHunt();
-    await delay(500);
+    await delay(400);
 
     const hpBefore = player.hp;
     resolvePendingMove("attack", payload);
@@ -138,13 +154,7 @@ async function handleReaction(actionType, payload) {
     return true;
   }
 
-  if (actionType !== "guard" && actionType !== "dodge" && actionType !== "item") {
-    logMsg("The monster is already committing to its attack — react now!", "l-sys");
-    renderHunt();
-    return true;
-  }
-
-  // --- CAPTURE TIMING AT THE MOMENT OF CLICK ---
+  // --- DODGE LOGIC ---
   if (actionType === "dodge") {
     const timingQuality = getAndStopTiming();
     payload.timingQuality = timingQuality;
