@@ -150,7 +150,7 @@ export function renderTimingBarZones() {
 
 let delayTimeout = null;
 
-export function startDodgeTiming(durationMs = 1000, delayMs = 1000) {
+export function startDodgeTiming(durationMs = 1000, delayMs = 2000) {
   stopDodgeTiming();
 
   const barEl = document.getElementById("timing-progress-bar");
