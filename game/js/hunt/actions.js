@@ -18,6 +18,7 @@ import {
 } from "./telegraph.js";
 import { endHunt } from "./setup.js";
 import { renderHunt } from "../ui/hunt.js";
+import { movesetFor } from "../data/playermoves.js";
 
 let isBusy = false;
 
@@ -109,8 +110,13 @@ async function handleReaction(actionType, payload) {
 
   // --- ATTACK / COUNTER OFFSET LOGIC ---
   if (actionType === "attack") {
-    // Capture the timing quality specifically for the Attack offset window
-    const timingQuality = getAndStopTiming("attack");
+    // 1. Get current moveset and resolve the chosen move object
+    const weapon = currentWeapon();
+    const moveset = movesetFor(weapon);
+    const chosenMove = moveset.moves.find((m) => m.key === payload.moveKey);
+
+    // 2. Pass chosenMove into getAndStopTiming
+    const timingQuality = getAndStopTiming("attack", chosenMove);
     payload.timingQuality = timingQuality;
 
     if (timingQuality === "PERFECT") {
@@ -120,7 +126,6 @@ async function handleReaction(actionType, payload) {
       );
       playSound("part_break");
 
-      // Wipe ALL Monster Stamina at once!
       if (hunt.monster) {
         hunt.monster.stamina = 0;
       }

@@ -245,16 +245,21 @@ function renderPartDetailPanel(part, moveset, weapon, actionsDisabled) {
   const moveListHtml = moveset.moves
     .map((mv) => {
       const cost = Math.round(mv.staminaCost * (weapon.staminaMult ?? 1));
-      const disabled =
-        player.stamina < cost || actionsDisabled !== "" ? "disabled" : "";
+      const disabled = player.stamina < cost || actionsDisabled !== "" ? "disabled" : "";
+
+      // Add an OFFSET badge if the move allows it
+      const offsetBadge = mv.canOffset
+        ? `<span style="font-size:9px; color:var(--gold); border:1px solid var(--gold); padding:0 3px; border-radius:2px; margin-left:4px;">OFFSET</span>`
+        : "";
+
       return `
-      <button class="move-pick" ${disabled}
-              onclick="playerAction('attack',{partKey:'${part.key}',moveKey:'${mv.key}'})">
-        <div class="move-name">${mv.name}</div>
-        <div class="move-desc">${mv.desc}</div>
-        <div class="move-cost">${cost} stamina</div>
-      </button>
-    `;
+    <button class="move-pick" ${disabled}
+            onclick="playerAction('attack',{partKey:'${part.key}',moveKey:'${mv.key}'})">
+      <div class="move-name">${mv.name} ${offsetBadge}</div>
+      <div class="move-desc">${mv.desc}</div>
+      <div class="move-cost">${cost} stamina</div>
+    </button>
+  `;
     })
     .join("");
 

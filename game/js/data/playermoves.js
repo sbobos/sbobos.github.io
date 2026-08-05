@@ -17,6 +17,7 @@ export const MOVESETS = {
         staminaCost: 32,
         damageMult: 1.6,
         critRateMod: 0.05,
+        canOffset: true,
       },
     ],
   },
@@ -42,6 +43,7 @@ export const MOVESETS = {
         staminaCost: 30,
         damageMult: 1.55,
         critRateMod: 0.05,
+        canOffset: true,
       },
     ],
   },
@@ -66,6 +68,7 @@ export const MOVESETS = {
         damageMult: 1.4,
         critRateMod: 0,
         bonusVsBrokenPart: 12, // flat bonus damage if targeted part is already broken
+        canOffset: true,
       },
     ],
   },
@@ -91,6 +94,7 @@ export const MOVESETS = {
         critRateMod: 0.1,
         bonusOnCrit: 8, // flat bonus damage if this hit crits
         bonusVsElementWeak: { element: "fire", threshold: 20, amount: 10 }, // flat bonus if part's fire hitzone >= 20
+        canOffset: true,
       },
     ],
   },
@@ -116,6 +120,7 @@ export const MOVESETS = {
         staminaCost: 24,
         damageMult: 1.2,
         critRateMod: 0.1,
+        canOffset: true,
       },
     ],
   },
@@ -141,6 +146,7 @@ export const MOVESETS = {
         critRateMod: 0,
         procChance: 0.25,
         procBonus: 18, // flat bonus damage on proc
+        canOffset: true,
       },
     ],
   },

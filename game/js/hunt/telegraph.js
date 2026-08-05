@@ -9,6 +9,7 @@ let activeAnimationFrame = null;
 let timingProgressPct = 0;
 let timingActive = false;
 let onTimeoutCallback = null;
+let activePlayerMove = null; // 👈 1. Add state to store current move[cite: 1]
 
 export function setTimingTimeoutCallback(fn) {
   onTimeoutCallback = fn;
@@ -78,7 +79,7 @@ export function monsterTelegraphPhase() {
 
   const offsetOffset = Math.floor(Math.random() * 15) - 5;
   const offsetStart = Math.max(10, Math.min(80, dodgeStart + offsetOffset));
-  const offsetWidth = 5;
+  const offsetWidth = 4;
 
   hunt.pendingMove = {
     ...chosen,
@@ -149,7 +150,7 @@ export function renderTimingBarZones() {
 
 let delayTimeout = null;
 
-export function startDodgeTiming(durationMs = 1000, delayMs = 500) {
+export function startDodgeTiming(durationMs = 1000, delayMs = 1000) {
   stopDodgeTiming();
 
   const barEl = document.getElementById("timing-progress-bar");
@@ -214,8 +215,7 @@ export function stopDodgeTiming() {
   }
 }
 
-export function getAndStopTiming(actionType = "dodge") {
-  // If player acts during the 500ms delay phase before the bar starts moving
+export function getAndStopTiming(actionType = "dodge", playerMove = null) {
   if (delayTimeout && !timingActive) {
     stopDodgeTiming();
     return "EARLY";
@@ -227,6 +227,11 @@ export function getAndStopTiming(actionType = "dodge") {
   stopDodgeTiming();
 
   if (actionType === "attack") {
+    // 👈 If the chosen attack move lacks `canOffset: true`, treat it as missed/standard attack
+    if (!playerMove?.canOffset) {
+      return "MISSED";
+    }
+
     const offsetStart = hunt.pendingMove.offsetZoneStart ?? 50;
     const offsetEnd = hunt.pendingMove.offsetZoneEnd ?? 60;
 
@@ -234,7 +239,7 @@ export function getAndStopTiming(actionType = "dodge") {
     return "MISSED";
   }
 
-  // Default: Dodge window checking
+  // Dodge window checking
   const start = hunt.pendingMove.targetZoneStart ?? 55;
   const end = hunt.pendingMove.targetZoneEnd ?? 85;
 
