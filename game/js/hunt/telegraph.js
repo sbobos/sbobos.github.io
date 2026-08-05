@@ -146,39 +146,57 @@ export function renderTimingBarZones() {
 
 /* ---------- 60FPS REAL-TIME DODGE TIMING MINIGAME ---------- */
 
-export function startDodgeTiming(durationMs = 1500) {
+let delayTimeout = null;
+
+export function startDodgeTiming(durationMs = 1500, delayMs = 1000) {
   stopDodgeTiming();
-  timingActive = true;
-  timingProgressPct = 0;
 
-  const startTime = performance.now();
+  const barEl = document.getElementById("timing-progress-bar");
+  const containerEl = document.querySelector(".timing-bar-container");
 
-  function animate(currentTime) {
-    if (!timingActive) return;
+  if (barEl) barEl.style.width = "0%";
 
-    const elapsed = currentTime - startTime;
-    timingProgressPct = Math.min(100, (elapsed / durationMs) * 100);
+  // Apply warning style to the container during the telegraph phase
+  if (containerEl) containerEl.classList.add("telegraphing");
 
-    const barEl = document.getElementById("timing-progress-bar");
-    if (barEl) {
-      barEl.style.width = `${timingProgressPct}%`;
-    }
+  delayTimeout = setTimeout(() => {
+    // Remove warning style when countdown starts
+    if (containerEl) containerEl.classList.remove("telegraphing");
 
-    if (timingProgressPct < 100) {
-      activeAnimationFrame = requestAnimationFrame(animate);
-    } else {
-      timingActive = false;
-      stopDodgeTiming();
-      if (typeof onTimeoutCallback === "function") {
-        onTimeoutCallback();
+    timingActive = true;
+    timingProgressPct = 0;
+    const startTime = performance.now();
+
+    function animate(currentTime) {
+      if (!timingActive) return;
+
+      const elapsed = currentTime - startTime;
+      timingProgressPct = Math.min(100, (elapsed / durationMs) * 100);
+
+      if (barEl) barEl.style.width = `${timingProgressPct}%`;
+
+      if (timingProgressPct < 100) {
+        activeAnimationFrame = requestAnimationFrame(animate);
+      } else {
+        timingActive = false;
+        stopDodgeTiming();
+        if (typeof onTimeoutCallback === "function") {
+          onTimeoutCallback();
+        }
       }
     }
-  }
 
-  activeAnimationFrame = requestAnimationFrame(animate);
+    activeAnimationFrame = requestAnimationFrame(animate);
+  }, delayMs);
 }
 
 export function getAndStopTiming(actionType = "dodge") {
+  // If player acts during the 500ms delay phase before the bar starts moving
+  if (delayTimeout && !timingActive) {
+    stopDodgeTiming();
+    return "EARLY";
+  }
+
   if (!timingActive || !hunt.pendingMove) return "MISSED";
 
   const pct = timingProgressPct;
@@ -203,6 +221,15 @@ export function getAndStopTiming(actionType = "dodge") {
 
 export function stopDodgeTiming() {
   timingActive = false;
+
+  // Ensure the class is removed if the sequence is stopped early
+  const containerEl = document.querySelector(".timing-bar-container");
+  if (containerEl) containerEl.classList.remove("telegraphing");
+
+  if (delayTimeout) {
+    clearTimeout(delayTimeout);
+    delayTimeout = null;
+  }
   if (activeAnimationFrame) {
     cancelAnimationFrame(activeAnimationFrame);
     activeAnimationFrame = null;

@@ -857,3 +857,12 @@ button[disabled],
   filter: grayscale(80%);
 }
 
+@keyframes telegraphGlow {
+  0% { border-color: var(--border); box-shadow: 0 0 0px transparent; }
+  50% { border-color: var(--gold); box-shadow: 0 0 8px var(--gold); }
+  100% { border-color: var(--border); box-shadow: 0 0 0px transparent; }
+}
+
+.timing-bar-container.telegraphing {
+  animation: telegraphGlow 0.5s ease-in-out infinite;
+}
