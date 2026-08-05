@@ -152,7 +152,7 @@
 .forge-layout {
   display: grid;
   grid-template-columns: 1fr 280px;
-  gap: 16px;
+  gap: 8px;
   align-items: start;
 }
 

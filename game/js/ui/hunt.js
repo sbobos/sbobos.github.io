@@ -249,7 +249,7 @@ function renderPartDetailPanel(part, moveset, weapon, actionsDisabled) {
 
       // Add an OFFSET badge if the move allows it
       const offsetBadge = mv.canOffset
-        ? `<span style="font-size:9px; color:var(--gold); border:1px solid var(--gold); padding:0 3px; border-radius:2px; margin-left:4px;">OFFSET</span>`
+        ? `<span style="font-size:9px; color:var(--offset); border:1px solid var(--offset); padding:0 3px; border-radius:2px; margin-left:4px;">OFFSET</span>`
         : "";
 
       return `

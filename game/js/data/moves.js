@@ -66,7 +66,7 @@ export const MOVES = {
     status: null,
 
     telegraph:
-      "The boar lowers its tusked snout, scraping its hooves against the dirt as it locks its eyes onto you. It's preparing a full-speed charge!",
+      "The boar lowers its tusked snout and angles sharply to your right, locking eyes with you — dodge LEFT to evade!",
 
     resolveText:
       "The Boar surges forward like a battering ram! Its tusks spear through your guard and knock you back.",
@@ -90,7 +90,7 @@ export const MOVES = {
     status: null,
 
     telegraph:
-      "The Boar pulls its heavy, armored skull back, snorting aggressively at close range.",
+      "The Boar pulls its heavy, armored skull back at point-blank range — leap BACKWARDS to clear its reach!",
 
     resolveText:
       "The head whips its heavy head upward! The massive impact leaves your head ringing!",
@@ -114,7 +114,7 @@ export const MOVES = {
     status: null,
 
     telegraph:
-      "The Boar suddenly pivots away, bucking its hindquarters toward you while glancing back over its shoulder.",
+      "The Boar pivots, sweeping its hindquarters toward your left — step RIGHT immediately!",
 
     resolveText:
       "The Boar kicks out savagely with its sharp hind hooves, tearing through you!",
@@ -139,7 +139,7 @@ export const MOVES = {
     status: null,
 
     telegraph:
-      "Its already-scarred hide ripples as raw fury takes hold — this charge will not be gentle.",
+      "Raw fury takes hold as it winds up a deadly charge down your right flank — roll LEFT to get out of the way!",
 
     resolveText:
       "It launches into a frenzied charge, faster and heavier than before, snapping clean through your guard!",
@@ -164,7 +164,7 @@ export const MOVES = {
     status: null,
 
     telegraph:
-      "Bloodshot eyes lock onto you as it kicks up a wall of dust — nothing short of distance will save you from what's coming.",
+      "Bloodshot eyes lock onto you as it kicks up a wide wall of dust — create distance and jump BACK!",
 
     resolveText:
       "It goes into a full rampage, plowing through everything in its path — guard or not, you take the hit.",
@@ -190,7 +190,7 @@ export const MOVES = {
     status: null,
 
     telegraph:
-      "The wyrm lowers its head and lunges its jaw forward — better to fall back than meet it head-on.",
+      "The wyrm coils its neck forward, snapping violently — jump BACK to stay clear of the jaws!",
 
     resolveText: "It snaps forward with a vicious bite!",
   },
@@ -213,7 +213,7 @@ export const MOVES = {
     status: null,
 
     telegraph:
-      "Its tail curls out wide to the side, building for a sweeping strike.",
+      "Its tail winds up high to your right, preparing a sweeping strike — dive LEFT!",
 
     resolveText: "The tail whips through where you were standing!",
   },
@@ -236,7 +236,7 @@ export const MOVES = {
     status: null,
 
     telegraph:
-      "It rears up, its spiked back arched high. No shield will withstand the impact—move!",
+      "It rears back, leaning spiked weight heavily toward your left — leap RIGHT before it crashes down!",
 
     resolveText:
       "It slams its spiked back into the ground like a falling boulder!",
@@ -260,7 +260,7 @@ export const MOVES = {
     status: null,
 
     telegraph:
-      "It digs its claws into the sand, coiling its body before bursting forward.",
+      "It digs in its claws and shifts weight to burst toward your left flank — slide RIGHT!",
 
     resolveText: "It charges through the sand at full speed!",
   },
@@ -283,7 +283,7 @@ export const MOVES = {
     status: "burn",
 
     telegraph:
-      "Its cracked belly glows from within as pressure rapidly builds beneath the scales.",
+      "Superheated sand ignites around its body — jump BACKWARDS to escape the blast radius!",
 
     resolveText: "The wyrm erupts in a violent explosion of superheated sand!",
   },
@@ -307,7 +307,7 @@ export const MOVES = {
     status: null,
 
     telegraph:
-      "It slips beneath the sand entirely, vanishing without a trace — the only warning is a faint ripple closing in beneath your feet.",
+      "Ripples close in beneath your feet as it prepares to burst directly upward — hop BACK right now!",
 
     resolveText:
       "It erupts from directly underfoot in a spray of sand and fangs!",
@@ -332,7 +332,7 @@ export const MOVES = {
     status: "burn",
 
     telegraph:
-      "Sand begins to churn violently in a wide ring around it, glowing faintly orange from beneath — there is no safe angle to guard this.",
+      "A glowing vortex expands beneath you — disengage and retreat BACKWARDS immediately!",
 
     resolveText:
       "The dunes erupt into a screaming maelstrom of superheated sand, engulfing everything nearby!",
@@ -357,7 +357,8 @@ export const MOVES = {
     element: "none",
     status: null,
 
-    telegraph: "It raises a massive paw, claws catching the light.",
+    telegraph:
+      "It cocks back a massive right paw, preparing a heavy horizontal swipe — roll LEFT!",
 
     resolveText: "A heavy paw swipe crashes toward you!",
   },
@@ -380,7 +381,7 @@ export const MOVES = {
     status: null,
 
     telegraph:
-      "It plants its forelegs firmly and lowers its head before charging.",
+      "It lowers its head and aims straight along your left side — evade RIGHT!",
 
     resolveText: "It barrels straight toward you!",
   },
@@ -403,7 +404,7 @@ export const MOVES = {
     status: null,
 
     telegraph:
-      "Both forelegs rise high into the air. Standing your ground would be a mistake.",
+      "Both massive forelegs rise high above your head — spring BACK before the ground ruptures!",
 
     resolveText: "Both forelegs slam into the earth with tremendous force!",
   },
@@ -425,7 +426,8 @@ export const MOVES = {
     element: "none",
     status: "fear",
 
-    telegraph: "It rises onto its hind legs, drawing in a massive breath.",
+    telegraph:
+      "It rears up on hind legs, inhaling to blast a shockwave forward — step BACK out of range!",
 
     resolveText:
       "A thunderous roar echoes across the arena, rattling your nerves!",
@@ -449,7 +451,7 @@ export const MOVES = {
     status: "bleed",
 
     telegraph:
-      "Driven into a frenzy, it lunges wildly with bloodshot eyes and exposed fangs.",
+      "Frenzied eyes focus on your right shoulder as exposed fangs lunge forward — dodge LEFT!",
 
     resolveText: "It lunges forward in a desperate, savage bite!",
   },
@@ -473,7 +475,7 @@ export const MOVES = {
     status: null,
 
     telegraph:
-      "It plants both paws and rears back, claws glinting — this isn't a single swing, it's two.",
+      "It rears back, coiling for a vicious two-claw combo targeting your right side — slip LEFT!",
 
     resolveText:
       "It lashes out with both claws in a brutal one-two mauling strike!",
@@ -498,7 +500,7 @@ export const MOVES = {
     status: null,
 
     telegraph:
-      "It rises to its full towering height, muscles coiling like a landslide about to break loose — there will be no blocking this.",
+      "It towers over you like a falling mountain — leap BACKWARDS immediately to clear the crush zone!",
 
     resolveText:
       "It comes down like an avalanche, an unstoppable wall of muscle and claw!",
@@ -517,7 +519,7 @@ export const MOVES = {
     baseDamage: 8,
     element: "none",
     status: null,
-    telegraph: "The small boarling paws at the dirt and squeals angrily!",
+    telegraph: "The boarling squeals and charges down your right side — hop LEFT!",
     resolveText: "The boarling lunges forward, crashing into your legs!",
   },
 
@@ -533,7 +535,7 @@ export const MOVES = {
     baseDamage: 12,
     element: "none",
     status: null,
-    telegraph: "The jackal circles low, snapping its jaws at your heels.",
+    telegraph: "The jackal snaps low at your feet — jump BACK!",
     resolveText: "The jackal leaps forward and nips at your ankles!",
   },
 
@@ -549,7 +551,7 @@ export const MOVES = {
     baseDamage: 14,
     element: "ice",
     status: null,
-    telegraph: "The ice wolf growls silently as snow kicks up under its paws.",
+    telegraph: "The wolf leaps in from your left with frosty claws — dodge RIGHT!",
     resolveText: "The wolf pounces with frost-coated claws!",
   },
 };

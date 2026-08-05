@@ -407,60 +407,143 @@ function resolveEncounter(encounter, action) {
 
 function getButtons(encounter) {
   switch (encounter.type) {
-    case "mining":
-      return [
-        { label: "Careful Dig", action: "mine" },
-        { label: "Dig Deeper", action: "mine_deep" },
-        { label: "Leave", action: "leave" },
-      ];
+    case "mining": {
+      const staminaCost = encounter.staminaCost ?? 8;
+      const deepStaminaCost = encounter.deepStaminaCost ?? staminaCost * 2;
+      const deepInjuryChance = encounter.deepInjury
+        ? injuryChance(encounter.deepInjury.chance)
+        : 0;
+      const deepInjuryDmg = encounter.deepInjury?.damage ?? 0;
 
-    case "foraging":
       return [
-        { label: "Quick Gather", action: "gather" },
-        { label: "Forage Thoroughly", action: "gather_deep" },
-        { label: "Leave", action: "leave" },
+        {
+          label: "Careful Dig",
+          action: "mine",
+          tooltip: `⚡ -${staminaCost} Stamina | ⛏️ 2 Loot Rolls`,
+        },
+        {
+          label: "Dig Deeper",
+          action: "mine_deep",
+          tooltip: `⚡ -${deepStaminaCost} Stamina | ⛏️ 4 Loot Rolls | ⚠️ ${deepInjuryChance}% Risk (-${deepInjuryDmg} HP)`,
+        },
+        { label: "Leave", action: "leave", tooltip: "Pass without mining." },
       ];
+    }
+
+    case "foraging": {
+      const staminaCost = encounter.staminaCost ?? 2;
+      const deepStaminaCost = encounter.deepStaminaCost ?? staminaCost * 2;
+      const normalInjury = encounter.injury;
+      const normalRisk = normalInjury ? injuryChance(normalInjury.chance) : 0;
+      const deepInjury = encounter.deepInjury;
+      const deepRisk = deepInjury ? injuryChance(deepInjury.chance) : 0;
+
+      return [
+        {
+          label: "Quick Gather",
+          action: "gather",
+          tooltip: `⚡ -${staminaCost} Stamina | 🌿 2 Loot Rolls${
+            normalRisk ? ` | ⚠️ ${normalRisk}% Risk (-${normalInjury.damage} HP)` : ""
+          }`,
+        },
+        {
+          label: "Forage Thoroughly",
+          action: "gather_deep",
+          tooltip: `⚡ -${deepStaminaCost} Stamina | 🌿 4 Loot Rolls${
+            deepRisk ? ` | ⚠️ ${deepRisk}% Risk (-${deepInjury.damage} HP)` : ""
+          }`,
+        },
+        { label: "Leave", action: "leave", tooltip: "Leave herbs behind." },
+      ];
+    }
 
     case "battle":
       return [
-        { label: "Fight", action: "fight" },
-        { label: "Retreat", action: "leave" },
+        {
+          label: "Fight",
+          action: "fight",
+          tooltip: "⚔️ Engage hostiles in combat.",
+        },
+        {
+          label: "Retreat",
+          action: "leave",
+          tooltip: "Safely slip past without fighting.",
+        },
       ];
 
     case "event":
       if (encounter.event === "merchant") {
+        const potionPrice = encounter.potionPrice ?? 15;
+        const rationsPrice = encounter.rationsPrice ?? 10;
+        const staminaGain = encounter.rationsStamina ?? 20;
+
         return [
           {
-            label: `Buy Potion (${encounter.potionPrice ?? 15}g)`,
+            label: `Buy Potion (${potionPrice}g)`,
             action: "buy_potion",
+            tooltip: `💰 -${potionPrice} Gold | 🧪 +1 Potion`,
           },
           {
-            label: `Buy Rations (${encounter.rationsPrice ?? 10}g)`,
+            label: `Buy Rations (${rationsPrice}g)`,
             action: "buy_rations",
+            tooltip: `💰 -${rationsPrice} Gold | ⚡ +${staminaGain} Stamina`,
           },
-          { label: "Move On", action: "leave" },
+          { label: "Move On", action: "leave", tooltip: "Leave shop." },
         ];
       }
 
       if (encounter.event === "lost_hunter") {
+        const escortStamina = encounter.escortStaminaCost ?? 10;
+        const rewardChance = encounter.escortRewardChance ?? 50;
+        const rewardGold = encounter.escortRewardGold ?? 20;
+        const ambushChance = encounter.ambushChance ?? 0;
+        const aloneGold = encounter.aloneReward ?? 10;
+
         return [
-          { label: "Escort Them", action: "escort" },
-          { label: "Point the Way", action: "direct" },
-          { label: "Ignore", action: "leave" },
+          {
+            label: "Escort Them",
+            action: "escort",
+            tooltip: `⚡ -${escortStamina} Stamina | 💰 ${rewardChance}% Chance (+${rewardGold}g)${
+              ambushChance ? ` | ⚔️ ${ambushChance}% Ambush` : ""
+            }`,
+          },
+          {
+            label: "Point the Way",
+            action: "direct",
+            tooltip: `💰 +${aloneGold} Gold | No risks`,
+          },
+          { label: "Ignore", action: "leave", tooltip: "Leave hunter behind." },
         ];
       }
 
-      return [{ label: "Continue", action: "continue" }];
+      return [{ label: "Continue", action: "continue", tooltip: "Proceed along trail." }];
 
-    case "rest":
+    case "rest": {
+      const heal = encounter.heal ?? 20;
+      const stamina = encounter.stamina ?? 25;
+      const fullHeal = encounter.fullHeal ?? heal * 2;
+      const fullStamina = encounter.fullStamina ?? stamina * 2;
+      const ambushChance = encounter.ambushChance ?? 0;
+
       return [
-        { label: "Short Rest", action: "rest" },
-        { label: "Full Rest", action: "rest_full" },
-        { label: "Continue", action: "leave" },
+        {
+          label: "Short Rest",
+          action: "rest",
+          tooltip: `❤️ +${heal} HP | ⚡ +${stamina} Stamina`,
+        },
+        {
+          label: "Full Rest",
+          action: "rest_full",
+          tooltip: `❤️ +${fullHeal} HP | ⚡ +${fullStamina} Stamina${
+            ambushChance ? ` | ⚔️ ${ambushChance}% Ambush` : ""
+          }`,
+        },
+        { label: "Continue", action: "leave", tooltip: "Skip resting." },
       ];
+    }
 
     default:
-      return [{ label: "Continue", action: "continue" }];
+      return [{ label: "Continue", action: "continue", tooltip: "Proceed along trail." }];
   }
 }
 
