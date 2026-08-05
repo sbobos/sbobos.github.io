@@ -53,6 +53,7 @@ export const MOVES = {
     name: "Boar Ram",
 
     type: "damage",
+    staminaCost: 25,
 
     dodgeType: "left",
     guardResult: "block",
@@ -76,6 +77,7 @@ export const MOVES = {
     name: "Headbutt",
 
     type: "damage",
+    staminaCost: 25,
 
     dodgeType: "back",
     guardResult: "block",
@@ -99,6 +101,7 @@ export const MOVES = {
     name: "Hind Kick",
 
     type: "damage",
+    staminaCost: 25,
 
     dodgeType: "right",
     guardResult: "stagger",
@@ -123,6 +126,7 @@ export const MOVES = {
     name: "Frenzied Charge",
 
     type: "damage",
+    staminaCost: 25,
 
     dodgeType: "left",
     guardResult: "stagger",
@@ -147,6 +151,7 @@ export const MOVES = {
     name: "Rampage",
 
     type: "damage",
+    staminaCost: 25,
 
     dodgeType: "back",
     guardResult: "pierce",
@@ -172,6 +177,7 @@ export const MOVES = {
     name: "Savage Bite",
 
     type: "damage",
+    staminaCost: 25,
 
     dodgeType: "back",
     guardResult: "block",
@@ -194,6 +200,7 @@ export const MOVES = {
     name: "Tail Whip",
 
     type: "damage",
+    staminaCost: 25,
 
     dodgeType: "left",
     guardResult: "block",
@@ -216,6 +223,7 @@ export const MOVES = {
     name: "Spike Slam",
 
     type: "damage",
+    staminaCost: 25,
 
     dodgeType: "right",
     guardResult: "stagger",
@@ -239,6 +247,7 @@ export const MOVES = {
     name: "Sand Charge",
 
     type: "damage",
+    staminaCost: 25,
 
     dodgeType: "right",
     guardResult: "block",
@@ -261,6 +270,7 @@ export const MOVES = {
     name: "Sand Burst",
 
     type: "damage",
+    staminaCost: 25,
 
     dodgeType: "back",
     guardResult: "stagger",
@@ -284,6 +294,7 @@ export const MOVES = {
     name: "Burrow Strike",
 
     type: "damage",
+    staminaCost: 25,
 
     dodgeType: "back",
     guardResult: "stagger",
@@ -308,6 +319,7 @@ export const MOVES = {
     name: "Sand Maelstrom",
 
     type: "damage",
+    staminaCost: 25,
 
     dodgeType: "back",
     guardResult: "pierce",
@@ -333,6 +345,7 @@ export const MOVES = {
     name: "Heavy Paw",
 
     type: "damage",
+    staminaCost: 25,
 
     dodgeType: "left",
     guardResult: "block",
@@ -354,6 +367,7 @@ export const MOVES = {
     name: "Bear Charge",
 
     type: "damage",
+    staminaCost: 25,
 
     dodgeType: "right",
     guardResult: "block",
@@ -376,6 +390,7 @@ export const MOVES = {
     name: "Earth Slam",
 
     type: "damage",
+    staminaCost: 25,
 
     dodgeType: "back",
     guardResult: "stagger",
@@ -398,6 +413,7 @@ export const MOVES = {
     name: "War Roar",
 
     type: "debuff",
+    staminaCost: 25,
 
     dodgeType: "back",
     guardResult: "block",
@@ -420,6 +436,7 @@ export const MOVES = {
     name: "Fury Bite",
 
     type: "damage",
+    staminaCost: 25,
 
     dodgeType: "left",
     guardResult: "stagger",
@@ -443,6 +460,7 @@ export const MOVES = {
     name: "Mauling Strike",
 
     type: "damage",
+    staminaCost: 25,
 
     dodgeType: "left",
     guardResult: "stagger",
@@ -467,6 +485,7 @@ export const MOVES = {
     name: "Avalanche",
 
     type: "damage",
+    staminaCost: 25,
 
     dodgeType: "back",
     guardResult: "pierce",
@@ -483,5 +502,54 @@ export const MOVES = {
 
     resolveText:
       "It comes down like an avalanche, an unstoppable wall of muscle and claw!",
+  },
+
+  /* ---- Small Monster ---- */
+  boarling_tackle: {
+    key: "boarling_tackle",
+    name: "Tackle",
+    type: "damage",
+    staminaCost: 25,
+    dodgeType: "left",
+    guardResult: "block",
+    staminaBreak: false,
+    knockback: "small",
+    baseDamage: 8,
+    element: "none",
+    status: null,
+    telegraph: "The small boarling paws at the dirt and squeals angrily!",
+    resolveText: "The boarling lunges forward, crashing into your legs!",
+  },
+
+  sandjackal_nip: {
+    key: "sandjackal_nip",
+    name: "Quick Nip",
+    type: "damage",
+    staminaCost: 25,
+    dodgeType: "back",
+    guardResult: "block",
+    staminaBreak: false,
+    knockback: "small",
+    baseDamage: 12,
+    element: "none",
+    status: null,
+    telegraph: "The jackal circles low, snapping its jaws at your heels.",
+    resolveText: "The jackal leaps forward and nips at your ankles!",
+  },
+
+  icewolf: {
+    key: "icewolf_pounce",
+    name: "Frost Pounce",
+    type: "damage",
+    staminaCost: 25,
+    dodgeType: "right",
+    guardResult: "block",
+    staminaBreak: false,
+    knockback: "small",
+    baseDamage: 14,
+    element: "ice",
+    status: null,
+    telegraph: "The ice wolf growls silently as snow kicks up under its paws.",
+    resolveText: "The wolf pounces with frost-coated claws!",
   },
 };

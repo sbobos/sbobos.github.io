@@ -612,7 +612,7 @@
   align-content: flex-start;
 }
 
-.inv-icon-item {
+.icon-item {
   position: relative;
   flex: 0 0 56px;
   height: 56px;
@@ -630,17 +630,17 @@
   transition: all 0.15s ease;
 }
 
-.inv-icon-item:hover {
+.icon-item:hover {
   border-color: var(--gold-dim);
 }
 
-.inv-icon-item.selected {
+.icon-item.selected {
   border-color: var(--gold);
   box-shadow: 0 0 8px rgba(199, 154, 60, 0.25);
   background: rgba(199, 154, 60, 0.08);
 }
 
-.inv-icon-item.equipped::after {
+.icon-item.equipped::after {
   content: "";
   position: absolute;
   top: 4px;
@@ -651,7 +651,7 @@
   background: var(--gold);
 }
 
-.inv-icon-item.ready::after {
+.icon-item.ready::after {
   content: "";
   position: absolute;
   top: 4px;
@@ -660,6 +660,7 @@
   height: 6px;
   border-radius: 50%;
   background: var(--moss);
+  box-shadow: 0 0 4px var(--moss); /* Adds a nice subtle glow */
 }
 
 /* Ensure icon span doesn't add extra inline margins */
@@ -670,7 +671,7 @@
   line-height: 1;          /* Removes line-height spacing issues */
 }
 
-.inv-icon-item.selected .inv-icon-label {
+.icon-item.selected .inv-icon-label {
   color: var(--text);
 }
 

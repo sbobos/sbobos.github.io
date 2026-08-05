@@ -92,7 +92,7 @@ function getIcon(type) {
       return "🌿";
 
     case "battle":
-      return "🐗";
+      return "⚔️";
 
     case "event":
       return "❔";

@@ -367,13 +367,36 @@ body {
   height: 26px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 13px;
   opacity: 0.75;
+  position: relative;
+  padding: 0;
 }
+
+/* Draw the 'X' lines */
+.panel-close::before,
+.panel-close::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 1.5px;
+  background-color: currentColor;
+}
+
+.panel-close::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.panel-close::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
 .panel-close:hover {
   opacity: 1;
   border-color: var(--gold);
 }
+/* Panel tabbar container */
 .panel-tabbar {
   display: flex;
   gap: 4px;

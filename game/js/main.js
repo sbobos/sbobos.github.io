@@ -67,6 +67,7 @@ window.turnInBounty = turnInBounty;
 window.doTrade = doTrade;
 window.equipOwnedItem = equipOwnedItem;
 window.renderVillage = renderVillage;
+window.doGenerateSave = doGenerateSave;
 window.doLoadSave = doLoadSave;
 window.doNewGame = doNewGame;
 

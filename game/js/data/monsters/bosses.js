@@ -41,6 +41,7 @@ export const BOSSES = {
     timeOfDay: "Daytime",
     population: "Plenty",
     maxHp: 160,
+    maxStamina: 100,
     defaultMoveKeys: ["boar_ram", "boar_headbut", "boar_kick"],
     ranks: {
       elite: { hpMult: 2.4, damageMult: 1.3, addMoveKeys: ["boar_frenzy"] },
@@ -92,6 +93,7 @@ export const BOSSES = {
     timeOfDay: "Dusk",
     population: "Rare",
     maxHp: 320,
+    maxStamina: 150,
     defaultMoveKeys: [
       "wyrm_bite",
       "wyrm_tailwhip",
@@ -184,6 +186,7 @@ export const BOSSES = {
     timeOfDay: "Daytime",
     population: "Scarce",
     maxHp: 300,
+    maxStamina: 150,
     defaultMoveKeys: ["bear_paw", "bear_charge", "bear_slam", "bear_roar"],
     ranks: {
       elite: { hpMult: 2.4, damageMult: 1.3, addMoveKeys: ["bear_mauling"] },

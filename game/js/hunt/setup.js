@@ -30,6 +30,9 @@ export function startHunt(
   const scale = getRankScaling(template, rank);
   monster.maxHp = Math.round(monster.maxHp * scale.hpMult);
   monster.hp = monster.maxHp;
+  monster.maxStamina = monster.maxStamina ?? 100;
+  monster.stamina = monster.maxStamina;
+  monster.isExhausted = false;
   monster.damageMult = scale.damageMult;
   monster.enraged = false;
   monster.parts.forEach((p) => {

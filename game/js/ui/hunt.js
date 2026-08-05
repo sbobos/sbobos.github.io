@@ -6,6 +6,7 @@ import { renderLog } from "../hunt/log.js";
 import { renderTopbar } from "./topbar.js";
 import { HAZARDS } from "../hunt/combat/hazards.js";
 import { movesetFor } from "../data/playermoves.js";
+import { renderTimingBarZones } from "../hunt/telegraph.js";
 
 // Helper to structure the theme consistently
 function buildThemeObject(themeData) {
@@ -39,6 +40,7 @@ function renderTelegraphBanner(move) {
       <!-- ACTIVE TIMING BAR -->
       <div class="timing-bar-container" style="margin: 8px 0 4px 0; background: rgba(0,0,0,0.6); height: 10px; border-radius: 5px; position: relative; overflow: hidden; border: 1px solid var(--border);">
         <div id="timing-target-zone" style="position: absolute; left: 55%; width: 30%; height: 100%; background: rgba(122, 154, 110, 0.5); border-left: 2px solid var(--moss); border-right: 2px solid var(--moss);"></div>
+        <div id="offset-zone" style="position: absolute; height: 100%; background: rgba(200, 80, 50, 0.6); border-left: 2px solid var(--blood); border-right: 2px solid var(--blood);"></div>
         <div id="timing-progress-bar" style="width: 0%; height: 100%; background: var(--gold);"></div>
       </div>
 
@@ -170,8 +172,13 @@ export function renderHunt() {
           <div class="barwrap"><div class="barfill hp" style="width:${pct(m.hp, m.maxHp)}%"></div></div>
           
           <!-- MONSTER STAMINA BAR -->
-          <div class="barlabel" style="margin-top:4px;"><span>Monster Stamina</span><span>${m.stamina ?? 100} / ${m.maxStamina ?? 100}</span></div>
-          <div class="barwrap mini"><div class="barfill stam" style="width:${pct(m.stamina ?? 100, m.maxStamina ?? 100)}%"></div></div>
+          <div class="barlabel" style="margin-top:4px;">
+            <span>Monster Stamina</span>
+            <span>${m.stamina ?? m.maxStamina ?? 100} / ${m.maxStamina ?? 100}</span>
+          </div>
+          <div class="barwrap mini">
+            <div class="barfill stam" style="width:${pct(m.stamina ?? m.maxStamina ?? 100, m.maxStamina ?? 100)}%"></div>
+          </div>
 
           ${telegraphHtml}
         </div>
@@ -227,6 +234,7 @@ export function renderHunt() {
 
   renderLog();
   renderTopbar();
+  renderTimingBarZones();
 }
 
 function renderPartDetailPanel(part, moveset, weapon, actionsDisabled) {

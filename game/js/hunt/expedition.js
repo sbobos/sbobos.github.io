@@ -10,10 +10,32 @@ import { smallMonsterToHuntShape } from "./monsteradapter.js";
 import { getRegisteredMission, unregisterMission } from "../questregistry.js";
 import { expandExpedition } from "./expeditionbuilder.js";
 import { advanceDay } from "./day.js";
+import { BOSSES } from "../data/monsters/bosses.js";
+import { SMALL_MONSTERS } from "../data/monsters/smallmonsters.js";
 
 let currentMission = null;
 let step = 0;
 let currentEncounter = null;
+
+// Helper: Get current arena key (defaults to 'dunes')
+function getArenaKey() {
+  if (currentMission?.arena) return currentMission.arena;
+
+  // Fallback: derive arena from target boss monster
+  if (currentMission?.monsterId && BOSSES[currentMission.monsterId]) {
+    return BOSSES[currentMission.monsterId].arenaKey;
+  }
+
+  return "dunes";
+}
+
+// Helper: Pick an arena-appropriate small monster
+function getSmallMonsterForArena(arenaKey) {
+  const match = Object.values(SMALL_MONSTERS).find(
+    (m) => m.arena === arenaKey
+  );
+  return match ? match.id : "boarling";
+}
 
 /**
  * Flat progress snapshot for the trail strip UI. No fog of war — every
@@ -125,6 +147,8 @@ function injuryChance(baseChance) {
 }
 
 function resolveEncounter(encounter, action) {
+  const arenaKey = getArenaKey();
+
   switch (encounter.type) {
     case "foraging": {
       if (action === "leave") {
@@ -144,18 +168,18 @@ function resolveEncounter(encounter, action) {
 
       player.stamina = clamp(player.stamina - cost, 0, player.maxStamina);
 
-      const rewards = gatherFromTable(LOOT_TABLES.foraging.dunes, rolls);
+      // DYNAMIC: Pull from LOOT_TABLES.foraging[arenaKey]
+      const lootTable = LOOT_TABLES.foraging[arenaKey] ?? LOOT_TABLES.foraging.dunes;
+      const rewards = gatherFromTable(lootTable, rolls);
 
       let text = `Spent ${cost} stamina.\n\n` + rewardText(rewards);
 
       if (injury && Math.random() * 100 < injuryChance(injury.chance)) {
         player.hp = clamp(player.hp - injury.damage, 0, player.maxHp);
-
-        text += `\n\nYou were scratched while gathering (-${injury.damage} HP).`;
+        text += `\n\nYou were injured while gathering (-${injury.damage} HP).`;
       }
 
       finishEncounterWithText(encounter.title, text);
-
       return;
     }
 
@@ -176,7 +200,9 @@ function resolveEncounter(encounter, action) {
 
       player.stamina = clamp(player.stamina - cost, 0, player.maxStamina);
 
-      const rewards = gatherFromTable(LOOT_TABLES.mining.dunes, rolls);
+      // DYNAMIC: Pull from LOOT_TABLES.mining[arenaKey]
+      const lootTable = LOOT_TABLES.mining[arenaKey] ?? LOOT_TABLES.mining.dunes;
+      const rewards = gatherFromTable(lootTable, rolls);
 
       let text = `Spent ${cost} stamina.\n\n${rewardText(rewards)}`;
 
@@ -190,12 +216,10 @@ function resolveEncounter(encounter, action) {
           0,
           player.maxHp,
         );
-
-        text += `\n\nA support beam gives way (-${encounter.deepInjury.damage} HP).`;
+        text += `\n\nA rockfall strikes you (-${encounter.deepInjury.damage} HP).`;
       }
 
       finishEncounterWithText(encounter.title, text);
-
       return;
     }
 
@@ -205,8 +229,9 @@ function resolveEncounter(encounter, action) {
         return;
       }
 
-      startSmallMonsterFight(encounter.monster, finishEncounter);
-
+      // DYNAMIC: Small monster selected by arena
+      const monsterKey = encounter.monster || getSmallMonsterForArena(arenaKey);
+      startSmallMonsterFight(monsterKey, finishEncounter);
       return;
     }
 
@@ -267,17 +292,13 @@ function resolveEncounter(encounter, action) {
       if (encounter.event === "lost_hunter") {
         if (action === "escort") {
           const cost = encounter.escortStaminaCost ?? 10;
-
           player.stamina = clamp(player.stamina - cost, 0, player.maxStamina);
 
           const ambushChance = encounter.ambushChance ?? 0;
-
           if (ambushChance && Math.random() * 100 < ambushChance) {
-            startSmallMonsterFight(
-              encounter.ambushMonster ?? "boarling",
-              finishEncounter,
-            );
-
+            // DYNAMIC: Ambush monster selected by arena
+            const ambushMonster = getSmallMonsterForArena(arenaKey);
+            startSmallMonsterFight(ambushMonster, finishEncounter);
             return;
           }
 
@@ -348,19 +369,15 @@ function resolveEncounter(encounter, action) {
 
       if (action === "rest_full") {
         const ambushChance = encounter.ambushChance ?? 0;
-
         if (ambushChance && Math.random() * 100 < ambushChance) {
           const partialHeal = Math.round(
             (encounter.fullHeal ?? encounter.heal * 2) / 2,
           );
-
           player.hp = clamp(player.hp + partialHeal, 0, player.maxHp);
 
-          startSmallMonsterFight(
-            encounter.ambushMonster ?? "boarling",
-            finishEncounter,
-          );
-
+          // DYNAMIC: Rest ambush monster selected by arena
+          const ambushMonster = getSmallMonsterForArena(arenaKey);
+          startSmallMonsterFight(ambushMonster, finishEncounter);
           return;
         }
 

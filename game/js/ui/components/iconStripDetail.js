@@ -23,24 +23,22 @@ export function iconStripDetail({ items: getItems, onSuccess }) {
     }
 
     return `
-      <div class="detail-layout">
-        <div class="icon-strip">
-          ${items
-            .map(
-              (it) => `
-            <div class="icon-item ${it.key === selectedKey ? 'selected' : ''} ${it.ready ? 'ready' : ''}"
-                 data-action="select-item" data-key="${it.key}">
-              <span class="icon">${it.icon}</span>
-              <span class="ready-dot"></span>
-            </div>
-          `,
-            )
-            .join('')}
+  <div class="detail-layout">
+    <div class="icon-strip">
+      ${items
+        .map(
+          (it) => `
+        <div class="icon-item ${it.key === selectedKey ? 'selected' : ''} ${it.ready ? 'ready' : ''} ${it.equipped ? 'equipped' : ''}"
+             data-action="select-item" data-key="${it.key}">
+          <span class="icon inv-icon">${it.icon}</span>
         </div>
-        <div class="detail-sidebar" id="detail-sidebar">
-          ${
-            selected
-              ? `
+      `,
+        )
+        .join('')}
+    </div>
+    <div class="detail-sidebar" id="detail-sidebar">
+          ${selected
+        ? `
             <div class="detail-title">${selected.label}</div>
             <div class="detail-tag">${selected.tag}</div>
             <div class="detail-desc">${selected.desc ? selected.desc.replace(/\n/g, '<br>') : ''}</div>
@@ -51,9 +49,8 @@ export function iconStripDetail({ items: getItems, onSuccess }) {
             <div class="detail-actions">
               <span>${selected.cost || ""}</span>
 
-              ${
-                selected.actionLabel
-                  ? `
+              ${selected.actionLabel
+          ? `
                   <button
                     data-action="confirm-item"
                     data-key="${selected.key}"
@@ -62,12 +59,12 @@ export function iconStripDetail({ items: getItems, onSuccess }) {
                     ${selected.actionLabel}
                   </button>
                 `
-                  : ""
-              }
+          : ""
+        }
             </div>
           `
-              : `<div class="detail-empty">Nothing selected.</div>`
-          }
+        : `<div class="detail-empty">Nothing selected.</div>`
+      }
         </div>
       </div>
     `;

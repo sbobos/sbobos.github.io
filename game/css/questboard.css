@@ -15,6 +15,7 @@
   grid-template-columns: repeat(auto-fill, 96px);
   grid-auto-rows: 112px;
   gap: 8px;
+  padding-top: 1px; /* Prevents cards from touching the top edge */
 }
 
 .quest-card {

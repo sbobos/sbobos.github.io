@@ -18,7 +18,7 @@ export const MISSIONS = [
     expedition: [
       "merchant",
       "herb_patch",
-      "small_boar",
+      "small_beast",
       "iron_mine",
       { node: "boss_encounter", monsters: ["boar"] },
     ],

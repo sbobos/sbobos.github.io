@@ -1,5 +1,6 @@
 import { SMALL_MONSTERS } from "../data/monsters/smallmonsters.js";
 
+// Updated smallMonsterToHuntShape function
 export function smallMonsterToHuntShape(key) {
   const m = SMALL_MONSTERS[key];
 
@@ -9,7 +10,9 @@ export function smallMonsterToHuntShape(key) {
     icon: m.icon,
     arenaKey: m.arena,
     maxHp: m.hp,
-    defaultMoveKeys: m.moveKeys ?? ["basic_attack"], // see note below
+    maxStamina: m.maxStamina,
+    // Pull moveKeys directly from m, falling back only if undefined
+    defaultMoveKeys: m.moveKeys ?? ["basic_attack"],
     parts: [
       {
         key: "body",

@@ -24,10 +24,13 @@ export function monsterTelegraphPhase() {
   checkArenaHazard();
 
   // 2. Initialize stamina & exhaustion state
+  m.maxStamina = m.maxStamina ?? 100;
+
   if (m.stamina === undefined) {
-    m.maxStamina = m.maxStamina || 100;
     m.stamina = m.maxStamina;
     m.isExhausted = false;
+  } else {
+    m.stamina = Math.min(m.stamina, m.maxStamina);
   }
 
   // 3. Trigger exhaustion as soon as stamina hits 0
@@ -61,14 +64,18 @@ export function monsterTelegraphPhase() {
 
   // 5. ATTACK PHASE
   const chosen = chooseMonsterMove(m, hunt.rank);
-  const staminaCost = chosen.staminaCost ?? 35;
+
+  // Dynamic Stamina Drain: Priority sequence checks:
+  // 1. Specific stamina cost defined on the move object
+  // 2. Monster-level flat stamina cost (if defined on m.perTurnStamina)
+  // 3. Fallback default of 35
+  const staminaCost = chosen.staminaCost ?? m.perTurnStamina ?? 35;
   m.stamina = Math.max(0, m.stamina - staminaCost);
 
   // --- RANDOMIZE DODGE & OFFSET TIMING ZONES ---
-  const dodgeStart = Math.floor(Math.random() * 40) + 30; // Dodge window (30%-70%)
+  const dodgeStart = Math.floor(Math.random() * 40) + 30;
   const dodgeWidth = 20;
 
-  // Offset gap (10% wide target) near or overlapping dodge timing
   const offsetOffset = Math.floor(Math.random() * 15) - 5;
   const offsetStart = Math.max(10, Math.min(80, dodgeStart + offsetOffset));
   const offsetWidth = 10;
@@ -124,14 +131,12 @@ export function renderTimingBarZones() {
   const move = hunt.pendingMove;
   if (!move) return;
 
-  // 1. Target Dodge Zone Element
-  const dodgeZoneEl = document.getElementById("dodge-zone");
+  const dodgeZoneEl = document.getElementById("timing-target-zone");
   if (dodgeZoneEl) {
     dodgeZoneEl.style.left = `${move.targetZoneStart}%`;
     dodgeZoneEl.style.width = `${move.targetZoneEnd - move.targetZoneStart}%`;
   }
 
-  // 2. Target Offset Zone Element (NEW)
   const offsetZoneEl = document.getElementById("offset-zone");
   if (offsetZoneEl) {
     offsetZoneEl.style.left = `${move.offsetZoneStart}%`;

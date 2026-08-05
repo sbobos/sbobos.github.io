@@ -94,3 +94,8 @@ export function getArenaTheme(arenaKey, arenaName = "") {
     border: "var(--border)",
   };
 }
+
+export const ARENA_FILLER_NODES = {
+  dunes: ["herb_patch", "iron_mine", "small_beast", "merchant", "oasis"],
+  tundra: ["herb_patch", "iron_mine", "small_beast", "merchant", "oasis"],
+};
