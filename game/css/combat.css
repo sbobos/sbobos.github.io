@@ -866,3 +866,19 @@ button[disabled],
 .timing-bar-container.telegraphing {
   animation: telegraphGlow 0.5s ease-in-out infinite;
 }
+
+.timing-bar-container.delay-phase #offset-zone {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease;
+}
+
+/* Hidden by default */
+#offset-zone {
+  display: none;
+}
+
+/* Revealed only when timing starts */
+.timing-bar-container.running #offset-zone {
+  display: block;
+}

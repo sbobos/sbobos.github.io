@@ -78,7 +78,7 @@ export function monsterTelegraphPhase() {
 
   const offsetOffset = Math.floor(Math.random() * 15) - 5;
   const offsetStart = Math.max(10, Math.min(80, dodgeStart + offsetOffset));
-  const offsetWidth = 10;
+  const offsetWidth = 5;
 
   hunt.pendingMove = {
     ...chosen,
@@ -141,6 +141,7 @@ export function renderTimingBarZones() {
   if (offsetZoneEl) {
     offsetZoneEl.style.left = `${move.offsetZoneStart}%`;
     offsetZoneEl.style.width = `${move.offsetZoneEnd - move.offsetZoneStart}%`;
+    offsetZoneEl.style.display = "none"; // 👈 Keep hidden when positioned
   }
 }
 
@@ -148,20 +149,24 @@ export function renderTimingBarZones() {
 
 let delayTimeout = null;
 
-export function startDodgeTiming(durationMs = 1500, delayMs = 1000) {
+export function startDodgeTiming(durationMs = 1000, delayMs = 500) {
   stopDodgeTiming();
 
   const barEl = document.getElementById("timing-progress-bar");
   const containerEl = document.querySelector(".timing-bar-container");
+  const offsetZoneEl = document.getElementById("offset-zone");
 
   if (barEl) barEl.style.width = "0%";
-
-  // Apply warning style to the container during the telegraph phase
   if (containerEl) containerEl.classList.add("telegraphing");
 
+  // Force hide immediately upon starting delay
+  if (offsetZoneEl) offsetZoneEl.style.display = "none";
+
   delayTimeout = setTimeout(() => {
-    // Remove warning style when countdown starts
     if (containerEl) containerEl.classList.remove("telegraphing");
+
+    // Show offset zone ONLY when progress bar starts moving
+    if (offsetZoneEl) offsetZoneEl.style.display = "block";
 
     timingActive = true;
     timingProgressPct = 0;
@@ -188,6 +193,25 @@ export function startDodgeTiming(durationMs = 1500, delayMs = 1000) {
 
     activeAnimationFrame = requestAnimationFrame(animate);
   }, delayMs);
+}
+
+export function stopDodgeTiming() {
+  timingActive = false;
+
+  const containerEl = document.querySelector(".timing-bar-container");
+  if (containerEl) containerEl.classList.remove("telegraphing");
+
+  const offsetZoneEl = document.getElementById("offset-zone");
+  if (offsetZoneEl) offsetZoneEl.style.display = "none"; // 👈 Hide on reset
+
+  if (delayTimeout) {
+    clearTimeout(delayTimeout);
+    delayTimeout = null;
+  }
+  if (activeAnimationFrame) {
+    cancelAnimationFrame(activeAnimationFrame);
+    activeAnimationFrame = null;
+  }
 }
 
 export function getAndStopTiming(actionType = "dodge") {
@@ -217,21 +241,4 @@ export function getAndStopTiming(actionType = "dodge") {
   if (pct >= start && pct <= end) return "PERFECT";
   if (pct >= start - 20 && pct < start) return "EARLY";
   return "MISSED";
-}
-
-export function stopDodgeTiming() {
-  timingActive = false;
-
-  // Ensure the class is removed if the sequence is stopped early
-  const containerEl = document.querySelector(".timing-bar-container");
-  if (containerEl) containerEl.classList.remove("telegraphing");
-
-  if (delayTimeout) {
-    clearTimeout(delayTimeout);
-    delayTimeout = null;
-  }
-  if (activeAnimationFrame) {
-    cancelAnimationFrame(activeAnimationFrame);
-    activeAnimationFrame = null;
-  }
 }
